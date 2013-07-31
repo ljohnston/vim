@@ -1,0 +1,10 @@
+/*
+
+!.gitignore
+!/README.md
+!/bin
+!/bin/*
+!/config
+!/config/*
+
+*.swp
