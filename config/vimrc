@@ -1,60 +1,8 @@
 
-" Setup {
 "
-"   - Install pathogen:
-"     $ mkdir ~/.vim/{autoload,bundle}
-"     $ curl 'www.vim.org/scripts/download_script.php?src_id=19375' \
-"       > ~/.vim/autoload/pathogen.vim
-"
-"   - Plugin: bufexplorer (check http://www.vim.org/scripts/script.php?script_id=42
-"                          for latest download src_id for wget cmd)
-"     $ cd ~/.vim/bundle
-"     $ wget "http://www.vim.org/scripts/download_script.php?src_id=19481" -O bufexplorer.zip
-"     $ unzip bufexplorer.zip; rm bufexplorer.zip
-"
-"   - Plugin: buffergator (check http://www.vim.org/scripts/script.php?script_id=3619
-"                          for latest download src_id for wget cmd)
-"
-"     NOTE: Not using on linux as it is VERY slow to open buffer window.
-"
-"     $ cd ~/.vim/bundle
-"     $ mkdir buffergator; cd buffergator
-"     $ wget "http://www.vim.org/scripts/download_script.php?src_id=16816" -O buffergator.tgz
-"     $ tar -zxvf buffergator.tgz; rm buffergator.tgz
-"
-"   - Plugin: buftabs (check http://www.vim.org/scripts/script.php?script_id=1664
-"                      for latest download src_id for wget cmd)
-"     $ mkdir ~/.vim/plugin
-"     $ wget "http://www.vim.org/scripts/download_script.php?src_id=15439" \
-"         -O ~/.vim/plugin/buftabs.vim
-"
-"   - Plugin: solarized
-"     $ cd ~/.vim/bundle
-"     $ git clone git://github.com/altercation/vim-colors-solarized.git
-"
-"   - Plugin: surround
-"     $ cd ~/.vim/bundle
-"     $ git clone git://github.com/tpope/vim-surround.git
-"
-"   - Plugin: puppet
-"     $ git clone git://github.com/rodjek/vim-puppet.git ~/.vim/bundle/puppet
-"
-"   - Plugin: tabular (probably useful, but installed it for puppet)
-"     $ git clone git://github.com/godlygeek/tabular.git ~/.vim/bundle/tabular
-"
-"   - Plugin: snipmate (probably useful, but installed it for puppet)
-"     $ git clone git://github.com/msanders/snipmate.vim.git ~/.vim/bundle/snipmate
-"
-"   - Plugin: syntastic (probably useful, but installed it for puppet)
-"     $ git clone git://github.com/scrooloose/syntastic.git ~/.vim/bundle/syntastic
-"
-"   - Plugin: powershell
-"     $ git clone https://github.com/PProvost/vim-ps1.git ~/.vim/bundle/powershell
-" }
-
-
-
 " TODO {
+"
+"   - Refactor/Reformat.
 "
 "   - I use C-L and C-H to go back and forth between buffers.
 "   When I hit a netrw buffer, however, these keys are remapped to
@@ -73,13 +21,18 @@
 "   this.
 "
 " }
+"
 
+"
+" DEBUGGING/TROUBLESHOOTING - Can use 'echom "<msg>" for messages that
+" may show up in the cmd window (if it exceeds cmdheight) and/or can be 
+" displayed with :messages.
+"
 
 
 " Basics {
     call pathogen#infect()
 " }
-
 
 
 
@@ -266,33 +219,46 @@
 " }
 
 
+if has("gui_macvim")
+    echom ".vimrc:has:gui_macvim"
+endif
 
 " GUI {
     if has("gui_running")
 
         set background=dark
-        colorscheme candy "solarized
+
+        " candy colorscheme has crappy cursor line colors.
+        colorscheme candy 
         highlight CursorLine guibg=Gray20
         highlight CursorColumn guibg=Gray20
+        highlight ColorColumn guibg=DarkSlateGray
 
         " 
         " For a good resource regarding how to pic and set a font, see:
         "
         "   http://www.scholarslab.org/grad-student-research/vim-gui-font-magic/
         "
+        
+        "
+        " TODO: This needs some work. 'gui_macvim' and 'unix' are not
+        " exclusive (i.e. has('gui_macvim') also has('unix')).
+        "
 
-        if has('unix') 
+        "if has('unix') 
+        "    set guifont=Courier\ New:h13
+        "    set columns=100
+        "    set lines=64
+        "elseif has('gui_macvim') 
+        if has('gui_macvim') 
+            set transparency=14
             set guifont=Courier\ New:h13
             set columns=100
             set lines=64
-        elseif has('mac') 
-            set guifont=Courier\ New:h13
-            set columns=100
-            set lines=64
-        else
-            set guifont=Courier\ New:h13
-            set columns=100
-            set lines=64
+        "else
+        "    set guifont=Courier\ New:h13
+        "    set columns=100
+        "    set lines=64
         endif
 
         " This is primarily to keep buffergator (assuming it comes up
