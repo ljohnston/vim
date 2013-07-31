@@ -9,3 +9,8 @@ $ git clone git@github.com:ljohnston/vim.git ~/.vim
 $ ~/.vim/bin/config.sh
 
 Done.
+
+TODO
+====
+
+- gradlew clean|build to tear down / reconfig?

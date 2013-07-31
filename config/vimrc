@@ -219,9 +219,6 @@
 " }
 
 
-if has("gui_macvim")
-    echom ".vimrc:has:gui_macvim"
-endif
 
 " GUI {
     if has("gui_running")
