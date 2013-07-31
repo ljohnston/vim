@@ -1,0 +1,376 @@
+
+" Setup {
+"
+"   - Install pathogen:
+"     $ mkdir ~/.vim/{autoload,bundle}
+"     $ curl 'www.vim.org/scripts/download_script.php?src_id=19375' \
+"       > ~/.vim/autoload/pathogen.vim
+"
+"   - Plugin: bufexplorer (check http://www.vim.org/scripts/script.php?script_id=42
+"                          for latest download src_id for wget cmd)
+"     $ cd ~/.vim/bundle
+"     $ wget "http://www.vim.org/scripts/download_script.php?src_id=19481" -O bufexplorer.zip
+"     $ unzip bufexplorer.zip; rm bufexplorer.zip
+"
+"   - Plugin: buffergator (check http://www.vim.org/scripts/script.php?script_id=3619
+"                          for latest download src_id for wget cmd)
+"
+"     NOTE: Not using on linux as it is VERY slow to open buffer window.
+"
+"     $ cd ~/.vim/bundle
+"     $ mkdir buffergator; cd buffergator
+"     $ wget "http://www.vim.org/scripts/download_script.php?src_id=16816" -O buffergator.tgz
+"     $ tar -zxvf buffergator.tgz; rm buffergator.tgz
+"
+"   - Plugin: buftabs (check http://www.vim.org/scripts/script.php?script_id=1664
+"                      for latest download src_id for wget cmd)
+"     $ mkdir ~/.vim/plugin
+"     $ wget "http://www.vim.org/scripts/download_script.php?src_id=15439" \
+"         -O ~/.vim/plugin/buftabs.vim
+"
+"   - Plugin: solarized
+"     $ cd ~/.vim/bundle
+"     $ git clone git://github.com/altercation/vim-colors-solarized.git
+"
+"   - Plugin: surround
+"     $ cd ~/.vim/bundle
+"     $ git clone git://github.com/tpope/vim-surround.git
+"
+"   - Plugin: puppet
+"     $ git clone git://github.com/rodjek/vim-puppet.git ~/.vim/bundle/puppet
+"
+"   - Plugin: tabular (probably useful, but installed it for puppet)
+"     $ git clone git://github.com/godlygeek/tabular.git ~/.vim/bundle/tabular
+"
+"   - Plugin: snipmate (probably useful, but installed it for puppet)
+"     $ git clone git://github.com/msanders/snipmate.vim.git ~/.vim/bundle/snipmate
+"
+"   - Plugin: syntastic (probably useful, but installed it for puppet)
+"     $ git clone git://github.com/scrooloose/syntastic.git ~/.vim/bundle/syntastic
+"
+"   - Plugin: powershell
+"     $ git clone https://github.com/PProvost/vim-ps1.git ~/.vim/bundle/powershell
+" }
+
+
+
+" TODO {
+"
+"   - I use C-L and C-H to go back and forth between buffers.
+"   When I hit a netrw buffer, however, these keys are remapped to
+"   something else. Ideally, I'd like the netrw buffer to just go
+"   away when I select a file.
+"
+"   - How can I "close" a netrw buffer (:bd doesn't even work!).
+"
+"   - Figure out how to get :bnext, :bprev ignore directory buffers.
+"   If I do this, would also want to figure out how to get buftabs to
+"   not include directory tabs in its list.
+"
+"   - I currently have buftabs configured to put buffers on status
+"   line. This causes me to lose useful stuff that should show up
+"   there (e.g. line/column), though not always. Need to look into
+"   this.
+"
+" }
+
+
+
+" Basics {
+    call pathogen#infect()
+" }
+
+
+
+
+" General {
+    syntax on
+
+    filetype plugin indent on
+
+    set backspace=indent,eol,start "a better backspace
+    set fileformats=unix 
+    set hidden "change buffers without saving
+
+    " Detect external file changes
+    set autoread
+
+    " Silence the damn bell
+    "set noerrorbells 
+    "set visualbell
+    "set t_vb=
+    set noerrorbells visualbell t_vb=
+    autocmd GUIEnter * set visualbell t_vb=
+
+    " This will help keep netrw from displaying the annoying
+    " 'Press ENTER or type command to continue' prompt all the time.
+    " This solution, however, is generally annoying.
+    set cmdheight=3
+
+    " This seems to cause problems in console vim.
+    if exists('+autochdir')
+      set autochdir "always switch to current buffer directory 
+    endif
+
+    "System clipboard integration.
+    if has('unix') && exists('+xterm_clipboard')
+        set clipboard+=unnamedplus
+    else
+        set clipboard+=unnamed
+    endif
+
+    if has('unix')
+        " Removing this from the list first will ensure it gets
+        " pre-pended to the list in the ^= line (if it's already
+        " anywhere in the list that line is a no-op).
+        set directory-=~/tmp
+        set directory^=~/tmp
+
+        set backupdir-=~/tmp
+        set backupdir^=~/tmp
+    endif
+" }
+
+
+
+" UI {
+    set hlsearch
+    set ruler "show cursor position
+    set scrolloff=3 "context lines when scrolling
+    set sidescrolloff=5 "context columns when scrolling
+    set guioptions-=T "turn off the toolbar
+    
+    " cursor movement
+    set nostartofline
+    set virtualedit=all
+" }
+
+
+
+" Formatting {
+    set expandtab
+    set shiftwidth=4
+    set softtabstop=4
+" }
+
+
+
+" Autocommands {
+    " Ruby {
+        " ruby standard 2 spaces, always
+        au BufRead,BufNewFile *.rb,*.rhtml setlocal shiftwidth=2 
+        au BufRead,BufNewFile *.rb,*.rhtml setlocal softtabstop=2 
+    " }
+
+    " gradle {
+        au BufNewFile,BufRead *.gradle setf groovy
+    " }
+    
+    " shell scripts {
+    "    autocmd FileType sh setlocal shiftwidth=2
+    "    autocmd FileType sh setlocal softtabstop=2
+    " }
+
+    " reread .vimrc on save
+    au! BufWritePost .vimrc source % 
+
+    "
+    " wrap lines in .txt files.
+    " When writing text-based documentation, automatically wrap text.
+    " Ideally _don't_ wrap text for entering strings to be entered on
+    " the command-line. We should be able to achieve this by setting
+    " # and $ as comment characters and not including 'c' in the
+    " formatoptions. Looks like I may be understanding this incorrectly
+    " and it may not be possible. Rather it appears that 't' is _all_
+    " text (including comments), and 'c' is comments only.
+    "
+
+    au BufRead,BufNewFile *.txt setlocal textwidth=72
+    au BufRead,BufNewFile *.txt setlocal formatoptions=tq
+
+    "
+    " Turn off handling of '-' as a bullet (sort of).
+    " Without this, we get (for wrapped lines):
+    " - some text ...
+    "   another line ...
+    " yet another line.
+    "
+    " Note that we can get _all_ of the above lines to indent within
+    " the paragraph by setting 'autoindent'.
+    "
+
+    au BufRead,BufNewFile *.txt setlocal comments-=fb:-
+"}
+
+
+
+" Buffergator {
+
+    " Don't allow buffergator to extend window.
+    let g:buffergator_autoexpand_on_split = 0
+
+    " Sort buffer list by most recently used.
+    "let g:buffergator_sort_regime = "basename"
+    "let g:buffergator_sort_regime = "filepath"
+    let g:buffergator_sort_regime = "mru"
+
+    " Though I'd prefer the viewport on the left, it's not
+    " wide enough (nor is it practical to _make_ it wide enough)
+    " to show full file details.
+    let g:buffergator_viewport_split_policy = "T"
+    let g:buffergator_split_size = 18
+" }
+
+" Buftabs {
+    set laststatus=2
+    let g:buftabs_in_statusline=1
+    let g:buftabs_only_basename=1
+" }
+
+
+" Netrw {
+    let g:netrw_liststyle = 3 " 0=thin 1=long 2=wide 3=tree        
+    let g:netrw_keepdir = 0
+" }
+
+
+" Syntastic {
+"    let g:syntastic_enable_signs=1
+" }
+
+" Keys {
+    let mapleader = ","
+    let g:mapleader = ","
+
+    nmap <leader>w :w!<cr>
+    nmap <leader>W :wa!<cr>
+    nmap <leader>c :set cursorcolumn!<CR>
+
+    " Disable highlight when <leader><cr> is pressed
+    map <silent> <leader>/ :noh<cr>
+
+    nmap <leader>e :Explore<CR>
+    
+    " After installing syntatic, :E causes an error because synastic
+    " defines the ':Errors' command. Thought this would get us back
+    " on track, but it doesn't work. Gotta use :Ex, or the <leader>e
+    " I mapped above.
+    "cmap E<CR> Ex<CR>
+    
+    " toggle line numbers
+    nmap <leader>n :set invnumber<CR>
+
+    " buffer switching
+    map <C-h> :bp<cr>
+    map <C-l> :bn<cr>
+" }
+
+
+
+" GUI {
+    if has("gui_running")
+
+        set background=dark
+        colorscheme candy "solarized
+        highlight CursorLine guibg=Gray20
+        highlight CursorColumn guibg=Gray20
+
+        " 
+        " For a good resource regarding how to pic and set a font, see:
+        "
+        "   http://www.scholarslab.org/grad-student-research/vim-gui-font-magic/
+        "
+
+        if has('unix') 
+            set guifont=Courier\ New:h13
+            set columns=100
+            set lines=64
+        elseif has('mac') 
+            set guifont=Courier\ New:h13
+            set columns=100
+            set lines=64
+        else
+            set guifont=Courier\ New:h13
+            set columns=100
+            set lines=64
+        endif
+
+        " This is primarily to keep buffergator (assuming it comes up
+        " on the left side of the screen... which it does) from adding
+        " a scrollbar to its window.
+        set guioptions-=L
+    
+        " hightlight current line
+        set cursorline
+
+        set colorcolumn=81
+    endif
+" }
+
+
+
+"------------------------------------------------------------
+" [Functions]
+"------------------------------------------------------------
+
+
+
+function! FormatCss()
+
+    " TODO: Make sure we're in css buffer?
+
+    "
+    " Decontstruct the file to a consistent format from which
+    " we can reliably reconstruct it.
+    "
+
+    silent %s///g                       " Just in case, delete any control-M's.
+    silent %s/\s*$//g                     " Remove trailing whitespace on all lines.
+    silent %s/\s\+/ /g                    " Replace multiple whitespace with single space.
+    silent g/^\s*$/d                      " Delete all blank lines.
+    silent %s/\n//g                       " Remove all carriage returns.
+
+    "
+    " Reformat the deconstructed file.
+    "
+    
+    silent %s/\*\//*\/\r\r/g              " Two newlines after comment lines.
+    silent %s/}/}\r\r/g                   " Two newlines after }.
+    silent %s/{/{\r/g                     " Newline after {.
+    silent %s/;/;\r/g                     " Newline after ;.
+    silent %s/^\(\s*\S\+.*\)}$/\1\r}/g    " Newline before ).
+
+    " TODO: These's a potential issue with sorting attributes in
+    " that the original css could have multiple attributes, with
+    " the last one not being terminated with a ';'. In this case,
+    " sorting could move that attribute to the middle of the list,
+    " which, without the ';', would be invalid html. Therefore,
+    " we'll simply return here until we account for this.
+
+    return
+
+    "
+    " Sort attributes.
+    "
+
+    " Start at top of file.
+    normal gg
+
+    while search("{$", "W")
+        +1
+        let first = line(".")
+
+        /}
+        -1
+        let last = line(".")
+
+        execute first . "," . last . "sort"
+    endwhile
+
+    " Indent file.
+    normal gg=G
+
+endfunction
+
+nmap <silent>  ;c  :call FormatCss()<CR>
+
