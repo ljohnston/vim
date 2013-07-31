@@ -54,13 +54,21 @@ wget "http://www.vim.org/scripts/download_script.php?src_id=20082" -O buffergato
 tar -zxvf buffergator.tgz; rm buffergator.tgz
 
 cd $VIM_DIR
-git clone git://github.com/tpope/vim-surround.git bundle/vim-surround
-git clone git://github.com/rodjek/vim-puppet.git bundle/vim-puppet
-git clone git://github.com/godlygeek/tabular.git bundle/tabular
-git clone git://github.com/msanders/snipmate.vim.git bundle/snipmate.vim
-git clone git://github.com/scrooloose/syntastic.git bundle/syntastic
-git clone git://github.com/PProvost/vim-ps1.git bundle/vim-ps1
-git clone git://github.com/jelera/vim-gummybears-colorscheme bundle/vim-gummybears-colorscheme
+git clone git://github.com/msanders/snipmate.vim.git  bundle/snipmate.vim
+git clone git://github.com/scrooloose/syntastic.git   bundle/syntastic
+git clone git://github.com/godlygeek/tabular.git      bundle/tabular
+git clone git://github.com/flazz/vim-colorschemes.git bundle/vim-colorschemes
+git clone git://github.com/PProvost/vim-ps1.git       bundle/vim-ps1
+git clone git://github.com/rodjek/vim-puppet.git      bundle/vim-puppet
+git clone git://github.com/tpope/vim-surround.git     bundle/vim-surround
 
-rm ~/.vimrc
+#
+# Link up ~/.vimrc to config/vimrc in the project.
+# If it already exists as a link, we'll delete it and recreate it.
+# If it already exists and is not a link, we'll leave it, causing the 
+# subsequent link creation to fail (with an error message we'll want
+# to see).
+#
+
+[ -L ~/.vimrc ] && rm ~/.vimrc
 ln -s $VIM_DIR/config/vimrc ~/.vimrc
