@@ -8,21 +8,6 @@ VIM_DIR="$( cd $SCRIPT_DIR/.. && pwd )"
 mkdir -p $VIM_DIR/{autoload,bundle,plugin}
 
 #
-# TODO: Undo this... too much of a pain in the ass. Just do simple
-# 'git clone ...'s instead.
-#
-# We'll use submodules for plugins that live in git. Currently...
-#
-# git submodule add git://github.com/tpope/vim-surround.git bundle/vim-surround
-# git submodule add git://github.com/rodjek/vim-puppet.git bundle/vim-puppet
-# git submodule add git://github.com/godlygeek/tabular.git bundle/tabular
-# git submodule add git://github.com/msanders/snipmate.vim.git bundle/snipmate.vim
-# git submodule add git://github.com/scrooloose/syntastic.git bundle/syntastic
-# git submodule add git://github.com/PProvost/vim-ps1.git bundle/vim-ps1
-# git submodule add git://github.com/jelera/vim-gummybears-colorscheme bundle/vim-gummybears-colorscheme
-#
-
-#
 # To ensure the latest available release of plugins from vim.org:
 #
 # - Go to: 'http://www.vim.org/scripts/script.php?script_id=<id>
@@ -68,6 +53,7 @@ rm buffergator.tgz
 wget "http://www.vim.org/scripts/download_script.php?src_id=20082" -O buffergator.tgz
 tar -zxvf buffergator.tgz; rm buffergator.tgz
 
+cd $VIM_DIR
 git clone git://github.com/tpope/vim-surround.git bundle/vim-surround
 git clone git://github.com/rodjek/vim-puppet.git bundle/vim-puppet
 git clone git://github.com/godlygeek/tabular.git bundle/tabular
