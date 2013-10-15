@@ -11,6 +11,7 @@ type wget >/dev/null 2>&1 || { echo >&2 "'wget' not installed.  Aborting."; exit
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 VIM_DIR="$( cd $SCRIPT_DIR/.. && pwd )"
 
+rm -rf $VIM_DIR/{autoload,bundle,plugin} 2>/dev/null
 mkdir -p $VIM_DIR/{autoload,bundle,plugin}
 
 #

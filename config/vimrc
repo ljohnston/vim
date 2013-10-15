@@ -243,24 +243,19 @@
         "
         
         "
-        " TODO: This needs some work. 'gui_macvim' and 'unix' are not
-        " exclusive (i.e. has('gui_macvim') also has('unix')).
+        " NOTE: 'gui_macvim' and 'unix' are not exclusive (i.e. 
+        " has('gui_macvim') also has('unix')).
         "
 
-        "if has('unix') 
-        "    set guifont=Courier\ New:h13
-        "    set columns=100
-        "    set lines=64
-        "elseif has('gui_macvim') 
         if has('gui_macvim') 
             set transparency=14
             set guifont=Courier\ New:h13
             set columns=100
             set lines=64
-        "else
-        "    set guifont=Courier\ New:h13
-        "    set columns=100
-        "    set lines=64
+        elseif has('unix') 
+            set guifont="Courier 10 Pitch":h9
+            set columns=100
+            set lines=64
         endif
 
         " This is primarily to keep buffergator (assuming it comes up
