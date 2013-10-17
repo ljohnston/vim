@@ -4,9 +4,9 @@
 # Need curl, wget, git installed.
 #
 
-type git >/dev/null 2>&1 || { echo >&2 "'git' not installed.  Aborting."; exit 1; }
-type curl >/dev/null 2>&1 || { echo >&2 "'curl' not installed.  Aborting."; exit 1; }
-type wget >/dev/null 2>&1 || { echo >&2 "'wget' not installed.  Aborting."; exit 1; }
+type git >/dev/null 2>&1 || { echo >&2 "'git' not installed. Aborting..."; exit 1; }
+type curl >/dev/null 2>&1 || { echo >&2 "'curl' not installed. Aborting..."; exit 1; }
+type wget >/dev/null 2>&1 || { echo >&2 "'wget' not installed. Aborting..."; exit 1; }
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 VIM_DIR="$( cd $SCRIPT_DIR/.. && pwd )"
