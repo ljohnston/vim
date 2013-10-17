@@ -1,10 +1,12 @@
-/*
 
-!.gitignore
-!/README.md
-!/bin
-!/bin/*
-!/config
-!/config/*
+# project ignores
+autoload/
+bundle/
+plugin
 
+# gradle ignores
+.gradle/
+
+# vim ignores
+.netrwhist
 *.swp
