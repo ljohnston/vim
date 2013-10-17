@@ -32,6 +32,7 @@
 
 " Basics {
     call pathogen#infect()
+    call pathogen#helptags()
 " }
 
 
@@ -216,6 +217,10 @@
     " buffer switching
     map <C-h> :bp<cr>
     map <C-l> :bn<cr>
+
+    " TODO: Get this working. Update: apparently can't remap , and .
+    "map <C-,> #
+    "map <C-.> *
 " }
 
 
