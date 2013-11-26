@@ -20,6 +20,10 @@
 "   there (e.g. line/column), though not always. Need to look into
 "   this.
 "
+"   - Groovy (gradle) syntax highlighting, indenting. Currently this pretty
+"   much sucks. Added the groovy.vim for indenting, but doesn't seem to do
+"   _anything_. I'll leave it here, but this needs to be dealt with.
+"
 " }
 "
 

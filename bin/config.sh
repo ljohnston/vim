@@ -40,13 +40,22 @@ BUFFERGATOR_SRC_ID=20082
 # - http://www.vim.org/scripts/script.php?script_id=1664
 BUFTABS_SRC_ID=15439
 
+# groovy indent
+# - http://www.vim.org/scripts/script.php?script_id=2961
+GROOVYINDENT_SRC_ID=12312
+
 # pathogen
 rm $VIM_DIR/autoload/pathogen.vim >/dev/null 2>&1
 curl "www.vim.org/scripts/download_script.php?src_id=$PATHOGEN_SRC_ID" > $VIM_DIR/autoload/pathogen.vim
 
 # buftabs 
 rm $VIM_DIR/plugin/buftabs.vim
-wget "http://www.vim.org/scripts/download_script.php?src_id=15439" -O $VIM_DIR/plugin/buftabs.vim
+wget "http://www.vim.org/scripts/download_script.php?src_id=$BUFTABS_SRC_ID" -O $VIM_DIR/plugin/buftabs.vim
+
+# groovy indent 
+rm $VIM_DIR/plugin/groovy.vim
+wget "http://www.vim.org/scripts/download_script.php?src_id=$GROOVYINDENT_SRC_ID" \
+    -O - | sed -e "s///" > $VIM_DIR/plugin/groovy.vim
 
 # bufexplorer
 cd $VIM_DIR/bundle
