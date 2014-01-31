@@ -46,6 +46,10 @@
 
     filetype plugin indent on
 
+    " (Mostly) bash-like autocompletion.
+    set wildmenu
+    set wildmode=longest,list,full
+
     set backspace=indent,eol,start "a better backspace
     set fileformats=unix 
     set hidden "change buffers without saving
