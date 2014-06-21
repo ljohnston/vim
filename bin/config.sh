@@ -21,3 +21,5 @@ git clone https://github.com/Shougo/neobundle.vim $VIM_DIR/bundle/neobundle.vim
 
 [ -L ~/.vimrc ] && rm ~/.vimrc
 ln -s $VIM_DIR/vimfiles/vimrc ~/.vimrc
+
+$VIM_DIR/bundle/neobundle.vim/bin/neoinstall 2>&1 |grep -v vimproc\.vim
