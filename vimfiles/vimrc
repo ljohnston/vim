@@ -1,7 +1,6 @@
-
 "
 " TODO {
-"
+
 "   - Refactor/Reformat.
 "
 "   - I use C-L and C-H to go back and forth between buffers.
@@ -11,7 +10,7 @@
 "
 "   - How can I "close" a netrw buffer (:bd doesn't even work!).
 "
-"   - Figure out how to get :bnext, :bprev ignore directory buffers.
+"   - Figure out how to get :bnext, :bprev to ignore directory buffers.
 "   If I do this, would also want to figure out how to get buftabs to
 "   not include directory tabs in its list.
 "
@@ -20,6 +19,62 @@
 "   there (e.g. line/column), though not always. Need to look into
 "   this.
 "
+"   - Groovy (gradle) syntax highlighting, indenting. Currently this pretty
+"   much sucks. Added the groovy.vim for indenting, but doesn't seem to do
+"   _anything_. I'll leave it here, but this needs to be dealt with.
+"
+"   - New plugins I want to look at:
+"     - vim-airline
+"     - snipmate/ultisnips/neosnippet or something
+"     - notes
+"     - unite
+"     - nerd-commenter
+"
+"   - scratch buffer
+"
+"   - Really need to get netrw whipped into shape, which seems to be
+"     a much bigger pain in the ass than it should be. From this link...
+"
+"     http://vim.1045645.n5.nabble.com/Getting-out-of-netrw-td1156403.html
+"
+"     ... some things that might be useful:
+"
+"     function MyExplore()
+"       tabnew
+"       Explore
+"       nmap <buffer> <leader>q :q<cr>
+"     endfunction 
+"
+"     Run this ':topleft vsplit .'
+"
+"     And from...
+"
+"       http://stackoverflow.com/questions/21996768/how-do-you-change-the-root-of-the-netrw-tree-in-vim
+"
+"     ... when in tree mode, you can use :Ntree to reset the head of the
+"     tree.
+"
+"   - Some interesting things I see in Nate Neff's vim github
+"     project:
+"
+"     <Space>    Show recent buffers at bottom of screen.
+"                Use 'f' and 'b' to move back & forth between them.
+"                Thanks to bufmru plugin author!
+"
+"     # NERD Commenter
+"     
+"      <leader>ci      Comment / Uncomment line(s)
+"      <leader>cu      UN-comment line(s)
+"      <leader>cl      Comment lines
+"     
+"     # Source Control
+"     
+"     (From VCSCommand.vim)
+"     
+"      <leader>nvc     Commit current file
+"      <leader>nvd     Diff current file w/repository version
+"      <leader>nvv     VimDiff current file w/repository version
+"     
 " }
 "
 
@@ -29,13 +84,40 @@
 " displayed with :messages.
 "
 
+if has('vim_starting')
+   set nocompatible               " Be iMproved
 
-" Basics {
-    call pathogen#infect()
-    call pathogen#helptags()
-" }
+   " Required:
+   set runtimepath+=~/.vim/bundle/neobundle.vim/
+ endif
 
+ " Required:
+ call neobundle#begin(expand('~/.vim/bundle/'))
 
+ " Let NeoBundle manage NeoBundle
+ " Required:
+ NeoBundleFetch 'Shougo/neobundle.vim'
+
+ " Bundles here:
+ "NeoBundle 'Shougo/neosnippet.vim'
+ "NeoBundle 'Shougo/neosnippet-snippets'
+ NeoBundle 'jeetsukumaran/vim-buffergator', { 'rev' : 'v2.4.0' }
+ NeoBundle 'scrooloose/syntastic', { 'rev' : 'v0.5.7' }
+ NeoBundle 'tpope/vim-surround.git', { 'rev' : 'v2.0' }
+
+ " These plugins don't have tags. :-(
+ NeoBundle 'rodjek/vim-puppet.git'
+ NeoBundle 'godlygeek/tabular.git'
+ NeoBundle 'flazz/vim-colorschemes.git'
+
+ call neobundle#end()
+
+ " Required:
+ filetype plugin indent on
+
+ " If there are uninstalled bundles found on startup,
+ " this will conveniently prompt you to install them.
+ NeoBundleCheck
 
 " General {
     syntax on
@@ -62,9 +144,10 @@
     set cmdheight=3
 
     " This seems to cause problems in console vim.
-    if exists('+autochdir')
-      set autochdir "always switch to current buffer directory 
-    endif
+    "if exists('+autochdir')
+    "  set autochdir "always switch to current buffer directory 
+    "endif
+    autocmd BufEnter * silent! lcd %:p:h
 
     "System clipboard integration.
     if has('unix') && exists('+xterm_clipboard')
@@ -176,14 +259,15 @@
 " }
 
 " Buftabs {
-    set laststatus=2
-    let g:buftabs_in_statusline=1
-    let g:buftabs_only_basename=1
+"    set laststatus=2
+"    let g:buftabs_in_statusline=1
+"    let g:buftabs_only_basename=1
 " }
 
 
 " Netrw {
-    let g:netrw_liststyle = 3 " 0=thin 1=long 2=wide 3=tree        
+    " Defect. See: https://groups.google.com/forum/#!topic/vim_use/XNOcLYsgk8Y
+    "let g:netrw_liststyle = 3 " 0=thin 1=long 2=wide 3=tree        
     let g:netrw_keepdir = 0
 " }
 
@@ -230,11 +314,18 @@
 
         set background=dark
 
-        " candy colorscheme has crappy cursor line colors.
-        colorscheme candy 
+        colorscheme molokai "candy
+
+        " TODO: Make these cusomizations scheme-specific.
+
+        " Some colorscheme's need some tweaking.
+        " candy colorscheme (most?) has crappy cursor line colors.
         highlight CursorLine guibg=Gray20
         highlight CursorColumn guibg=Gray20
         highlight ColorColumn guibg=DarkSlateGray
+
+        " molokai's comments are too dark.
+        highlight Comment guifg=SkyBlue3
 
         " 
         " For a good resource regarding how to pic and set a font, see:
@@ -250,11 +341,11 @@
         if has('gui_macvim') 
             set transparency=14
             set guifont=Courier\ New:h13
-            set columns=100
+            set columns=120
             set lines=64
         elseif has('unix') 
             set guifont="Courier 10 Pitch":h9
-            set columns=100
+            set columns=120
             set lines=64
         endif
 

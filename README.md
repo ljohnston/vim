@@ -13,4 +13,6 @@ Done.
 TODO
 ====
 
-- gradlew clean|build to tear down / reconfig?
+- gradlew clean|build|updateBundles
+
+  How do build and updateBundles differ?
