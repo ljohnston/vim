@@ -23,6 +23,15 @@
 "   much sucks. Added the groovy.vim for indenting, but doesn't seem to do
 "   _anything_. I'll leave it here, but this needs to be dealt with.
 "
+"   - Add keystroke/functionality to quickly search for my code section
+"   "headers"...
+"
+"   //----------------------------------------------------------------------
+"   // [some text]
+"   //----------------------------------------------------------------------
+"
+"   - ... and something to insert a snippet for the above.
+"
 "   - New plugins I want to look at:
 "     - vim-airline
 "     - snipmate/ultisnips/neosnippet or something
