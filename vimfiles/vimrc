@@ -85,7 +85,7 @@
 "
 
 if has('vim_starting')
-   set nocompatible               " Be iMproved
+   set nocompatible
 
    " Required:
    set runtimepath+=~/.vim/bundle/neobundle.vim/
@@ -118,6 +118,43 @@ if has('vim_starting')
  " If there are uninstalled bundles found on startup,
  " this will conveniently prompt you to install them.
  NeoBundleCheck
+
+
+"
+" TODO: Refactor this. Needs to be up here so it's available when
+" we need it.
+"
+" LOJ: Got the following colorscheme stuff from:
+"
+" https://github.com/megaannum/colorschemer/blob/master/autoload/colorschemer/viewer.vim
+"
+
+" used to capture the Color Scheme name in GetColorSchemeName
+let s:colorsname = ""
+
+"---------------------------------------------------------------------------
+" s:GetColorSchemeName: {{{3
+" Returns the current Color Scheme name.
+" If g:colors_name exists, then return it otherwise return
+" the result of the the command line: colorscheme.
+" parameters: None
+"---------------------------------------------------------------------------
+function! s:GetColorSchemeName()
+  if exists("g:colors_name")
+    return g:colors_name
+  else
+    if exists("s:colorsname")
+      unlet s:colorsname
+    endif
+
+" capture result of executing ":highlight"
+    execute "redir => s:colorsname"
+    silent execute "colorscheme"
+    execute "redir END"
+    let s:colorsname = s:colorsname[1:]
+    return s:colorsname
+  endif
+endfunction
 
 " General {
     syntax on
@@ -318,18 +355,25 @@ if has('vim_starting')
 
         set background=dark
 
-        colorscheme molokai "candy
+        "colorscheme candy 
+        colorscheme molokai 
 
-        " TODO: Make these cusomizations scheme-specific.
+        let cname = s:GetColorSchemeName()
 
-        " Some colorscheme's need some tweaking.
-        " candy colorscheme (most?) has crappy cursor line colors.
-        highlight CursorLine guibg=Gray20
-        highlight CursorColumn guibg=Gray20
-        highlight ColorColumn guibg=DarkSlateGray
+        if cname == 'molokai'
+    
+            " Seems most colorschemes use crappy cursor line colors.
+            highlight CursorLine guibg=Gray30
+            highlight CursorColumn guibg=Gray30
+            highlight ColorColumn guibg=DarkSlateGray
+    
+            " molokai's comments are too dark.
+            highlight Comment guifg=SkyBlue3
+    
+            " molokai's visual selection needs more contrast.
+            highlight Visual guifg=Gray30 guibg=NavajoWhite
 
-        " molokai's comments are too dark.
-        highlight Comment guifg=SkyBlue3
+        endif
 
         " 
         " For a good resource regarding how to pic and set a font, see:
@@ -343,7 +387,7 @@ if has('vim_starting')
         "
 
         if has('gui_macvim') 
-            set transparency=14
+            set transparency=10
             set guifont=Courier\ New:h13
             set columns=120
             set lines=64
@@ -370,7 +414,6 @@ if has('vim_starting')
 "------------------------------------------------------------
 " [Functions]
 "------------------------------------------------------------
-
 
 
 function! FormatCss()
