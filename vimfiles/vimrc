@@ -23,6 +23,12 @@
 "   much sucks. Added the groovy.vim for indenting, but doesn't seem to do
 "   _anything_. I'll leave it here, but this needs to be dealt with.
 "
+"   - Copy character from line above.
+"
+"   - Need a keystroke for go to matching paren (or...). Default is %.
+"
+"   - Fix issue with ';' after a 'f' waiting for the leader delay.
+"
 "   - Add keystroke/functionality to quickly search for my code section
 "   "headers"...
 "
@@ -38,6 +44,7 @@
 "     - notes
 "     - unite
 "     - nerd-commenter
+"     - supertab
 "
 "   - scratch buffer
 "
@@ -98,35 +105,39 @@ if has('vim_starting')
 
    " Required:
    set runtimepath+=~/.vim/bundle/neobundle.vim/
- endif
+endif
 
- " Required:
- call neobundle#begin(expand('~/.vim/bundle/'))
+" Required:
+call neobundle#begin(expand('~/.vim/bundle/'))
 
- " Let NeoBundle manage NeoBundle
- " Required:
- NeoBundleFetch 'Shougo/neobundle.vim'
+" Let NeoBundle manage NeoBundle
+" Required:
+NeoBundleFetch 'Shougo/neobundle.vim'
 
- " Bundles here:
- "NeoBundle 'Shougo/neosnippet.vim'
- "NeoBundle 'Shougo/neosnippet-snippets'
- NeoBundle 'jeetsukumaran/vim-buffergator', { 'rev' : 'v2.4.0' }
- NeoBundle 'scrooloose/syntastic', { 'rev' : 'v0.5.7' }
- NeoBundle 'tpope/vim-surround.git', { 'rev' : 'v2.0' }
+" Bundles here:
+"NeoBundle 'Shougo/neosnippet.vim'
+"NeoBundle 'Shougo/neosnippet-snippets'
+NeoBundle 'jeetsukumaran/vim-buffergator', { 'rev' : 'v2.4.0' }
+NeoBundle 'scrooloose/syntastic', { 'rev' : 'v0.5.7' }
+NeoBundle 'tpope/vim-surround.git', { 'rev' : 'v2.0' }
+NeoBundle 'xolox/vim-notes.git', { 'rev' : '0.26' }
+NeoBundle 'xolox/vim-misc.git', { 'rev' : '1.15' }
 
- " These plugins don't have tags. :-(
- NeoBundle 'rodjek/vim-puppet.git'
- NeoBundle 'godlygeek/tabular.git'
- NeoBundle 'flazz/vim-colorschemes.git'
 
- call neobundle#end()
+" These plugins don't have tags. :-(
+NeoBundle 'rodjek/vim-puppet.git'
+NeoBundle 'godlygeek/tabular.git'
+NeoBundle 'flazz/vim-colorschemes.git'
+NeoBundle 'mtth/scratch.vim.git'
 
- " Required:
- filetype plugin indent on
+call neobundle#end()
 
- " If there are uninstalled bundles found on startup,
- " this will conveniently prompt you to install them.
- NeoBundleCheck
+" Required:
+filetype plugin indent on
+
+" If there are uninstalled bundles found on startup,
+" this will conveniently prompt you to install them.
+NeoBundleCheck
 
 
 "
