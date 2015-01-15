@@ -23,8 +23,34 @@
 "   much sucks. Added the groovy.vim for indenting, but doesn't seem to do
 "   _anything_. I'll leave it here, but this needs to be dealt with.
 "
+"   - Copy character from line above.
+"
+"   - Need a keystroke to go to matching paren (or...). Default is %.
+"
+"   - Fix issue with ';' after a 'f' waiting for the leader delay.
+"
 "   - Add keystroke/functionality to quickly search for my code section
 "   "headers"...
+"
+"   - Need to setup some keystrokes and/or function for using diff while
+"   in vim. Vim can do this no problem, but the user experience is kind
+"   of a pain in the ass. Here's (one way) how it works:
+"     - open two buffers in vertical or horizontal split
+"     - go to one buffer and do ':diffthis'
+"     - go to other buffer and do ':diffthis'
+"     - do your merges/edits (]c, [c to jump diffs, :diffget, :diffput
+"     to merge across buffers
+"     - go to one buffer and do ':diffoff'
+"     - go to other buffer and do ':diffoff'
+"   Wow, really? That kinda sucks. Here's my wishlist:
+"     - if in a split, keystroke will start diff for the two buffers in
+"     the split
+"     - if NOT in a split, keystroke will ~horizontally~ extend the
+"     window and open the prior buffer in a vertical split
+"     - while in the diff, a keystroke will turn off diff in both buffers,
+"     closing the split (~ideally~ only if it opened the split to begin)
+"     - while in diff mode, some handy dandy keystroke mappings would be
+"     nice
 "
 "   //----------------------------------------------------------------------
 "   // [some text]
@@ -38,6 +64,7 @@
 "     - notes
 "     - unite
 "     - nerd-commenter
+"     - supertab
 "
 "   - scratch buffer
 "
@@ -98,36 +125,44 @@ if has('vim_starting')
 
    " Required:
    set runtimepath+=~/.vim/bundle/neobundle.vim/
- endif
+endif
 
- " Required:
- call neobundle#begin(expand('~/.vim/bundle/'))
+" Required:
+call neobundle#begin(expand('~/.vim/bundle/'))
 
- " Let NeoBundle manage NeoBundle
- " Required:
- NeoBundleFetch 'Shougo/neobundle.vim'
+" Let NeoBundle manage NeoBundle
+" Required:
+NeoBundleFetch 'Shougo/neobundle.vim'
 
- " Bundles here:
- "NeoBundle 'Shougo/neosnippet.vim'
- "NeoBundle 'Shougo/neosnippet-snippets'
- NeoBundle 'jeetsukumaran/vim-buffergator', { 'rev' : 'v2.4.0' }
- NeoBundle 'scrooloose/syntastic', { 'rev' : 'v0.5.7' }
- NeoBundle 'tpope/vim-surround.git', { 'rev' : 'v2.0' }
+" Bundles here:
+"NeoBundle 'Shougo/neosnippet.vim'
+"NeoBundle 'Shougo/neosnippet-snippets'
+NeoBundle 'jeetsukumaran/vim-buffergator', { 'rev' : 'v2.4.0' }
+NeoBundle 'scrooloose/syntastic', { 'rev' : 'v0.5.7' }
+NeoBundle 'tpope/vim-surround.git', { 'rev' : 'v2.0' }
+NeoBundle 'xolox/vim-notes.git', { 'rev' : '0.26' }
+NeoBundle 'xolox/vim-misc.git', { 'rev' : '1.15' }
 
- " These plugins don't have tags. :-(
- NeoBundle 'rodjek/vim-puppet.git'
- NeoBundle 'godlygeek/tabular.git'
- NeoBundle 'flazz/vim-colorschemes.git'
 
- call neobundle#end()
+" These plugins don't have tags. :-(
+NeoBundle 'rodjek/vim-puppet.git'
+NeoBundle 'godlygeek/tabular.git'
+NeoBundle 'flazz/vim-colorschemes.git'
+NeoBundle 'mtth/scratch.vim.git'
 
- " Required:
- filetype plugin indent on
+call neobundle#end()
 
- " If there are uninstalled bundles found on startup,
- " this will conveniently prompt you to install them.
- NeoBundleCheck
+" Required:
+filetype plugin indent on
 
+" If there are uninstalled bundles found on startup,
+" this will conveniently prompt you to install them.
+NeoBundleCheck
+
+"echom "unix:" . has('unix') 
+"echom "mac:" . has('mac') 
+"echom "gui_running:" . has('gui_running') 
+"echom "gui_macvim:" . has('gui_macvim') 
 
 "
 " TODO: Refactor this. Needs to be up here so it's available when
@@ -211,10 +246,10 @@ endfunction
         " pre-pended to the list in the ^= line (if it's already
         " anywhere in the list that line is a no-op).
         set directory-=~/tmp
-        set directory^=~/tmp
+        set directory^=~/tmp//
 
         set backupdir-=~/tmp
-        set backupdir^=~/tmp
+        set backupdir^=~/tmp//
     endif
 " }
 
