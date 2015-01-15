@@ -25,12 +25,32 @@
 "
 "   - Copy character from line above.
 "
-"   - Need a keystroke for go to matching paren (or...). Default is %.
+"   - Need a keystroke to go to matching paren (or...). Default is %.
 "
 "   - Fix issue with ';' after a 'f' waiting for the leader delay.
 "
 "   - Add keystroke/functionality to quickly search for my code section
 "   "headers"...
+"
+"   - Need to setup some keystrokes and/or function for using diff while
+"   in vim. Vim can do this no problem, but the user experience is kind
+"   of a pain in the ass. Here's (one way) how it works:
+"     - open two buffers in vertical or horizontal split
+"     - go to one buffer and do ':diffthis'
+"     - go to other buffer and do ':diffthis'
+"     - do your merges/edits (]c, [c to jump diffs, :diffget, :diffput
+"     to merge across buffers
+"     - go to one buffer and do ':diffoff'
+"     - go to other buffer and do ':diffoff'
+"   Wow, really? That kinda sucks. Here's my wishlist:
+"     - if in a split, keystroke will start diff for the two buffers in
+"     the split
+"     - if NOT in a split, keystroke will ~horizontally~ extend the
+"     window and open the prior buffer in a vertical split
+"     - while in the diff, a keystroke will turn off diff in both buffers,
+"     closing the split (~ideally~ only if it opened the split to begin)
+"     - while in diff mode, some handy dandy keystroke mappings would be
+"     nice
 "
 "   //----------------------------------------------------------------------
 "   // [some text]
@@ -139,6 +159,10 @@ filetype plugin indent on
 " this will conveniently prompt you to install them.
 NeoBundleCheck
 
+"echom "unix:" . has('unix') 
+"echom "mac:" . has('mac') 
+"echom "gui_running:" . has('gui_running') 
+"echom "gui_macvim:" . has('gui_macvim') 
 
 "
 " TODO: Refactor this. Needs to be up here so it's available when
@@ -222,10 +246,10 @@ endfunction
         " pre-pended to the list in the ^= line (if it's already
         " anywhere in the list that line is a no-op).
         set directory-=~/tmp
-        set directory^=~/tmp
+        set directory^=~/tmp//
 
         set backupdir-=~/tmp
-        set backupdir^=~/tmp
+        set backupdir^=~/tmp//
     endif
 " }
 
