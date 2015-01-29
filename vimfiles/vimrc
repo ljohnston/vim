@@ -148,7 +148,7 @@ NeoBundle 'xolox/vim-misc.git', { 'rev' : '1.15' }
 NeoBundle 'rodjek/vim-puppet.git'
 NeoBundle 'godlygeek/tabular.git'
 NeoBundle 'flazz/vim-colorschemes.git'
-NeoBundle 'mtth/scratch.vim.git'
+NeoBundle 'duff/vim-scratch.git'
 
 call neobundle#end()
 
