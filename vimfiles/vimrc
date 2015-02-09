@@ -260,7 +260,7 @@ endfunction
         set clipboard+=unnamed
     endif
 
-    if has('unix')
+    if has('unix') || has('gui_macvim') 
         " Removing this from the list first will ensure it gets
         " pre-pended to the list in the ^= line (if it's already
         " anywhere in the list that line is a no-op).
