@@ -137,11 +137,30 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 " Bundles here:
 "NeoBundle 'Shougo/neosnippet.vim'
 "NeoBundle 'Shougo/neosnippet-snippets'
-NeoBundle 'jeetsukumaran/vim-buffergator', { 'rev' : 'v2.4.0' }
+NeoBundle 'jeetsukumaran/vim-buffergator', { 'rev' : 'v2.4.1' }
 NeoBundle 'scrooloose/syntastic', { 'rev' : 'v0.5.7' }
 NeoBundle 'tpope/vim-surround.git', { 'rev' : 'v2.0' }
+
+" Installed vim-misc because it's required by vim-notes.
+" TODO: Not diggin' this plugin. Replace with a personal wiki plugin?
 NeoBundle 'xolox/vim-notes.git', { 'rev' : '0.26' }
 NeoBundle 'xolox/vim-misc.git', { 'rev' : '1.15' }
+
+" On OS X install ag (a.k.a the silver searcher) to enhance performance 
+" (unite detects it automatically). Can be installed via brew.
+NeoBundle 'Shougo/unite.vim', { 'rev' : 'ver.6.1' }
+
+" Installed this for unite.vim async features, but I think there
+" are other plugins that use this if installed.
+NeoBundle 'Shougo/vimproc.vim', {
+\ 'build' : {
+\     'windows' : 'tools\\update-dll-mingw',
+\     'cygwin'  : 'make -f make_cygwin.mak',
+\     'mac'     : 'make -f make_mac.mak',
+\     'linux'   : 'make',
+\     'unix'    : 'gmake',
+\    },
+\ }
 
 
 " These plugins don't have tags. :-(
@@ -432,9 +451,9 @@ endfunction
 
         if has('gui_macvim') 
             set transparency=10
-            set guifont=Courier\ New:h13
+            set guifont=Source\ Code\ Pro:h14
             set columns=120
-            set lines=64
+            set lines=52
         elseif has('unix') 
             set guifont="Courier 10 Pitch":h9
             set columns=120

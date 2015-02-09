@@ -16,3 +16,11 @@ TODO
 - gradlew clean|build|updateBundles
 
   How do build and updateBundles differ?
+
+- gradlew installFonts
+
+  ... and wire into bin/config.sh?
+
+  Installing fonts in os x:
+
+  cp <project_root>/fonts/source-code-pro-1.017R/TTF/*.ttf /Library/Fonts
