@@ -14,23 +14,23 @@
 "   If I do this, would also want to figure out how to get buftabs to
 "   not include directory tabs in its list.
 "
-"   - I currently have buftabs configured to put buffers on status
-"   line. This causes me to lose useful stuff that should show up
-"   there (e.g. line/column), though not always. Need to look into
-"   this.
+"   - buftabs might be cool (I tried it for a while), but I can't get it 
+"   to restore the status line after switching tabs (which it claims is
+"   the standard behavior). Also, I can't get it to sort the buffers
+"   (ideally, I'd like it to be mru).
 "
 "   - Groovy (gradle) syntax highlighting, indenting. Currently this pretty
 "   much sucks. Added the groovy.vim for indenting, but doesn't seem to do
 "   _anything_. I'll leave it here, but this needs to be dealt with.
 "
-"   - Copy character from line above.
+"   - Copy character from line above (below?).
 "
 "   - Need a keystroke to go to matching paren (or...). Default is %.
+"   FIXED: Mapped it to tab.
 "
 "   - Fix issue with ';' after a 'f' waiting for the leader delay.
-"
-"   - Add keystroke/functionality to quickly search for my code section
-"   "headers"...
+"   FIXED: Had key maps that started with ';' (FormatCss()). Changed
+"   the key mapping.
 "
 "   - Need to setup some keystrokes and/or function for using diff while
 "   in vim. Vim can do this no problem, but the user experience is kind
@@ -52,11 +52,14 @@
 "     - while in diff mode, some handy dandy keystroke mappings would be
 "     nice
 "
+"   - Add keystroke/functionality to insert a snippet for my code section
+"   "headers". For example:
+"
 "   //----------------------------------------------------------------------
 "   // [some text]
 "   //----------------------------------------------------------------------
 "
-"   - ... and something to insert a snippet for the above.
+"   Hmmm... how to get comment characters for the above?
 "
 "   - New plugins I want to look at:
 "     - vim-airline
@@ -65,6 +68,8 @@
 "     - unite
 "     - nerd-commenter
 "     - supertab
+"     - fugitive (git plugin)
+"     - yankring or yankstack (or will unite suffice?)
 "
 "   - scratch buffer
 "
@@ -133,11 +138,14 @@ call neobundle#begin(expand('~/.vim/bundle/'))
 " Let NeoBundle manage NeoBundle
 " Required:
 NeoBundleFetch 'Shougo/neobundle.vim'
-
+        
 " Bundles here:
 "NeoBundle 'Shougo/neosnippet.vim'
 "NeoBundle 'Shougo/neosnippet-snippets'
+NeoBundle 'bling/vim-airline', { 'rev' : 'v0.7' }
 NeoBundle 'jeetsukumaran/vim-buffergator', { 'rev' : 'v2.4.1' }
+NeoBundle 'luochen1990/rainbow.git', { 'rev' : 'v3.3.1' }
+NeoBundle 'ervandew/supertab.git', { 'rev' : '2.1' }
 NeoBundle 'scrooloose/syntastic', { 'rev' : 'v0.5.7' }
 NeoBundle 'tpope/vim-surround.git', { 'rev' : 'v2.0' }
 
@@ -168,6 +176,7 @@ NeoBundle 'rodjek/vim-puppet.git'
 NeoBundle 'godlygeek/tabular.git'
 NeoBundle 'flazz/vim-colorschemes.git'
 NeoBundle 'duff/vim-scratch.git'
+NeoBundle 'dbakker/vim-projectroot.git'
 
 call neobundle#end()
 
@@ -224,6 +233,8 @@ endfunction
 
     filetype plugin indent on
 
+    set ttyfast "fast terminal connection
+
     " (Mostly) bash-like autocompletion.
     set wildmenu
     set wildmode=longest,list,full
@@ -231,6 +242,13 @@ endfunction
     set backspace=indent,eol,start "a better backspace
     set fileformats=unix 
     set hidden "change buffers without saving
+
+    set history=100
+
+    set ignorecase
+    set smartcase
+    set incsearch
+    set showmatch
 
     " Detect external file changes
     set autoread
@@ -280,6 +298,10 @@ endfunction
     set scrolloff=3 "context lines when scrolling
     set sidescrolloff=5 "context columns when scrolling
     set guioptions-=T "turn off the toolbar
+
+    set laststatus=2 "always show status line
+    set showmode "display mode at bottom of screen
+    set showcmd "show useful stuff at bottom of screen
     
     " cursor movement
     set nostartofline
@@ -344,13 +366,16 @@ endfunction
 "}
 
 
+let g:airline_powerline_fonts = 1
+let g:airline_theme = 'bubblegum'
+
 
 " Buffergator {
 
     " Don't allow buffergator to extend window.
     let g:buffergator_autoexpand_on_split = 0
 
-    " Sort buffer list by most recently used.
+    " Sort buffer list.
     "let g:buffergator_sort_regime = "basename"
     "let g:buffergator_sort_regime = "filepath"
     let g:buffergator_sort_regime = "mru"
@@ -359,13 +384,9 @@ endfunction
     " wide enough (nor is it practical to _make_ it wide enough)
     " to show full file details.
     let g:buffergator_viewport_split_policy = "T"
-    let g:buffergator_split_size = 18
-" }
+    let g:buffergator_split_size = 15
 
-" Buftabs {
-"    set laststatus=2
-"    let g:buftabs_in_statusline=1
-"    let g:buftabs_only_basename=1
+    " TODO: Unmap buffergator's tab handling keys.
 " }
 
 
@@ -376,39 +397,65 @@ endfunction
 " }
 
 
+" SuperTab {
+    let g:SuperTabDefaultCompletionType = '<c-n>'
+" }
+
 " Syntastic {
 "    let g:syntastic_enable_signs=1
 " }
 
+
 " Keys {
+
+    "
+    " NOTE: Many keys in vim are not mapable. For example, Would like to 
+    " have keys for the following, but these particular keys (and several 
+    " others) can't be remapped. More here:
+    " http://vim.1045645.n5.nabble.com/How-to-map-Ctrl-td1192843.html
+    "
+    "map <C-,> #
+    "map <C-.> *
+    "nnoremap <C-/> :bdelete<cr>
+    
     let mapleader = ","
     let g:mapleader = ","
 
+    " Write buffers.
     nmap <leader>w :w!<cr>
     nmap <leader>W :wa!<cr>
-    nmap <leader>c :set cursorcolumn!<CR>
 
-    " Disable highlight when <leader><cr> is pressed
-    map <silent> <leader>/ :noh<cr>
-
-    nmap <leader>e :Explore<CR>
+    "
+    " <C-o> instead of escape to reduce side-effects. More here:
+    "
+    "   http://vim.wikia.com/wiki/Use_Ctrl-O_instead_of_Esc_in_insert_mode_mappings
+    "
+    " Really wanted this to be ctrl-i, but vim sees that the same as tab.
+    "
     
-    " After installing syntatic, :E causes an error because synastic
-    " defines the ':Errors' command. Thought this would get us back
-    " on track, but it doesn't work. Gotta use :Ex, or the <leader>e
-    " I mapped above.
-    "cmap E<CR> Ex<CR>
+    nmap <C-s> :set cursorcolumn!<cr>
+    imap <C-s> <C-o><C-s>
+
+    " <tab> to move to matching paren, bracket, etc., but
+    " ~only~ in normal and visual modes.
+    nmap <tab> %
+    vmap <tab> %
     
-    " toggle line numbers
-    nmap <leader>n :set invnumber<CR>
+    " Toggle line numbers.
+    nmap <C-n> :call CycleNumber()<cr>
+    imap <C-n> <C-o><C-n>
 
-    " buffer switching
-    map <C-h> :bp<cr>
-    map <C-l> :bn<cr>
+    " Buffer switching (Buffergator here as :bp and :bn don't honor mru).
+    nmap <C-l> :BuffergatorMruCycleNext<cr>
+    nmap <C-h> :BuffergatorMruCyclePrev<cr>
 
-    " TODO: Get this working. Update: apparently can't remap , and .
-    "map <C-,> #
-    "map <C-.> *
+    " Turn current highlight off.
+    nmap <silent> <leader>/ :noh<cr>
+
+    nmap <leader>e :Explore<cr>
+
+    " Search for my section headers.
+    nmap <leader>s /^.*-\{40,80}\n^.*\[.*\]\s*\_.\{-}-\{40,80}\s*$<cr>
 " }
 
 
@@ -416,7 +463,7 @@ endfunction
 " GUI {
     if has("gui_running")
 
-        set background=dark
+        set background=light
 
         "colorscheme candy 
         colorscheme molokai 
@@ -438,6 +485,8 @@ endfunction
 
         endif
 
+        let g:rainbow_active = 1 "if 0, can be enabled later via :RainbowToggle
+
         " 
         " For a good resource regarding how to pic and set a font, see:
         "
@@ -451,7 +500,7 @@ endfunction
 
         if has('gui_macvim') 
             set transparency=10
-            set guifont=Source\ Code\ Pro:h14
+            set guifont=Sauce\ Code\ Powerline:h13
             set columns=120
             set lines=52
         elseif has('unix') 
@@ -473,10 +522,129 @@ endfunction
 " }
 
 
+"
+" Wanted to have something I could use to go to the last visited
+" buffer (so I could map to a single key to bounce back and forth 
+" between the two most recent buffers). Way harder than I expected.
+" Abandoning this for now, but holding onto it just in case I want
+" to revisit.
+"
+"let g:toggle_buffer_next = 0
+"
+"function! ToggleMruBuffer()
+"    if g:toggle_buffer_next
+"        silent! BuffergatorMruCycleNext
+"        if &buftype == 'nofile'
+"            ToggleMruBuffer() 
+"        endif
+"        let g:toggle_buffer_next = 0
+"    else
+"        silent! BuffergatorMruCyclePrev
+"        if &buftype == 'nofile'
+"            ToggleMruBuffer() 
+"        endif
+"        let g:toggle_buffer_next = 1
+"    endif
+"endfunction
 
 "------------------------------------------------------------
-" [Functions]
+" [Unite]
 "------------------------------------------------------------
+"
+" I don't really understand how to use this plugin, some things
+" I've done:
+"
+" Grep cursor word from file's subdir:
+"   UniteWithCursorWord -silent -auto-preview -winheight=40 -no-quit grep
+" Grep cursor work from project root:
+"   UniteWithCursorWord -silent -auto-preview -winheight=40 -no-quit grep:!
+"
+
+"
+" I created this function so I could have more control over the project
+" root (the projectroot plugin is more customizable than unite's project
+" root handling). This was primarily to get around the svn 1.6 client
+" behavior of puppet a .svn directory at every level. After switching 
+" to the svn 1.8 client, however, this was no longer an issue. Will
+" keep this around in case I run into other limiations.
+"
+"function! Unite_projectRoot(args)
+"    execute ':Unite ' . a:args . ':' . projectroot#guess() 
+"endfunction
+"
+" Use the above as follows:
+"nnoremap <leader>f :call Unite_projectRoot("-buffer-name=files -start-insert buffer file_rec/async")<cr>
+"
+
+"
+" Most of this configuration, and more good stuff (I think) from:
+" http://www.codeography.com/2013/06/17/replacing-all-the-things-with-unite-vim.html
+
+let g:unite_source_history_yank_enable = 1
+
+nnoremap <leader>f :<C-u>Unite -buffer-name=files -start-insert file<cr>
+nnoremap <leader>F :<C-u>UniteWithProjectDir -buffer-name=files -start-insert file_rec/async<cr>
+nnoremap <leader>y :Unite history/yank<CR>
+
+call unite#custom#source(
+            \ 'file_rec,file_rec/async', 
+            \ 'ignore_pattern', 
+            \ '\(\.svn\|\.git\)')
+
+call unite#custom#source(
+            \ 'file', 'matchers',
+            \ ['matcher_default', 'matcher_hide_hidden_files',
+            \  'matcher_hide_current_file'])
+
+if executable('ag')
+    let g:unite_source_grep_command='ag'
+    let g:unite_source_grep_default_opts =
+                \ '-i --line-numbers --nocolor --nogroup --hidden --ignore ' .
+                \  '''.hg'' --ignore ''.svn'' --ignore ''.git'' --ignore ''.bzr'''
+    let g:unite_source_grep_recursive_opt=''
+    let g:unite_source_rec_async_command =
+                \ 'ag --follow --nocolor --nogroup --hidden -g ""'
+elseif executable('ack')
+    let g:unite_source_grep_command='ack'
+    let g:unite_source_grep_default_opts='--no-heading --no-color -a'
+    let g:unite_source_grep_recursive_opt=''
+    let g:unite_source_rec_async_command = 'ack -f --nofilter'
+endif
+
+" Custom mappings for unite buffers
+autocmd FileType unite call s:unite_settings()
+function! s:unite_settings()
+  " Play nice with supertab
+  let b:SuperTabDisabled=1
+
+  " Enable navigation with control-j and control-k in insert mode
+  imap <buffer> <C-j>   <Plug>(unite_select_next_line)
+  imap <buffer> <C-k>   <Plug>(unite_select_previous_line)
+  imap <buffer> <C-q>   <Plug>(unite_exit)
+endfunction
+
+"------------------------------------------------------------
+" [Utility functions]
+"------------------------------------------------------------
+
+"
+" Wanted to have <c-n> run invnumber and <c-r> run invrelativenumber
+" so I could toggle these independently, but <c-r> is redo and I didn't
+" want to mess with that. With this function I can just cycle through
+" using a single key.
+"
+
+function! CycleNumber() 
+    if ! &number && ! &relativenumber
+        set number
+    elseif &number && ! &relativenumber
+        set relativenumber
+    else
+        set nonumber
+        set norelativenumber
+    endif
+endfunction
+
 
 
 function! FormatCss()
@@ -504,7 +672,7 @@ function! FormatCss()
     silent %s/;/;\r/g                     " Newline after ;.
     silent %s/^\(\s*\S\+.*\)}$/\1\r}/g    " Newline before ).
 
-    " TODO: These's a potential issue with sorting attributes in
+    " TODO: There's a potential issue with sorting attributes in
     " that the original css could have multiple attributes, with
     " the last one not being terminated with a ';'. In this case,
     " sorting could move that attribute to the middle of the list,
@@ -536,5 +704,5 @@ function! FormatCss()
 
 endfunction
 
-nmap <silent>  ;c  :call FormatCss()<CR>
+nmap <silent> _c :call FormatCss()<CR>
 
