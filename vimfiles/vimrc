@@ -62,13 +62,10 @@
 "   Hmmm... how to get comment characters for the above?
 "
 "   - plugins to look at:
-"     - vim-airline
 "     - snipmate/ultisnips/neosnippet or something similar
 "     - personal wiki (mostly for note taking, searching, etc. - looked at
 "     xolox/notes.vim... no good)
-"     - unite
-"     - nerd-commenter
-"     - supertab
+"     - nerd-commenter (or something like it)
 "     - fugitive (git plugin)
 "     - yankring or yankstack (or will unite suffice?)
 "
@@ -408,9 +405,10 @@ let g:airline_theme = 'bubblegum'
 " Keys {
 
     "
-    " NOTE: Many keys in vim are not mapable. For example, Would like to 
+    " NOTE: Many keys in vim are not mapable. For example, would like to 
     " have keys for the following, but these particular keys (and several 
     " others) can't be remapped. More here:
+    "
     " http://vim.1045645.n5.nabble.com/How-to-map-Ctrl-td1192843.html
     "
     "map <C-,> #
@@ -499,7 +497,7 @@ let g:airline_theme = 'bubblegum'
 
         if has('gui_macvim') 
             set transparency=10
-            set guifont=Sauce\ Code\ Powerline:h13
+            set guifont=Sauce\ Code\ Powerline:h14
             set columns=120
             set lines=52
         elseif has('unix') 
@@ -646,14 +644,12 @@ endfunction
 
 
 function! OverwriteCharAbove()
-    k
-    y l
+    k y l
     j
     P
 endfunction
-nmap <silent>  ;t  :call OverwriteCharAbove()<CR>
+"nmap <silent>  ;t  :call OverwriteCharAbove()<CR>
 
-                       
 function! FormatCss()
 
     " TODO: Make sure we're in css buffer?
