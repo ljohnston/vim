@@ -58,15 +58,14 @@
 "
 "   - ... and something to insert a snippet for the above.
 "
-"   - New plugins I want to look at:
+"   - plugins to look at:
 "     - vim-airline
-"     - snipmate/ultisnips/neosnippet or something
-"     - notes
+"     - snipmate/ultisnips/neosnippet or something similar
+"     - personal wiki (mostly for note taking, searching, etc. - looked at
+"     xolox/notes.vim... no good)
 "     - unite
 "     - nerd-commenter
 "     - supertab
-"
-"   - scratch buffer
 "
 "   - Really need to get netrw whipped into shape, which seems to be
 "     a much bigger pain in the ass than it should be. From this link...
@@ -140,15 +139,13 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 NeoBundle 'jeetsukumaran/vim-buffergator', { 'rev' : 'v2.4.0' }
 NeoBundle 'scrooloose/syntastic', { 'rev' : 'v0.5.7' }
 NeoBundle 'tpope/vim-surround.git', { 'rev' : 'v2.0' }
-NeoBundle 'xolox/vim-notes.git', { 'rev' : '0.26' }
-NeoBundle 'xolox/vim-misc.git', { 'rev' : '1.15' }
 
 
 " These plugins don't have tags. :-(
 NeoBundle 'rodjek/vim-puppet.git'
 NeoBundle 'godlygeek/tabular.git'
 NeoBundle 'flazz/vim-colorschemes.git'
-NeoBundle 'mtth/scratch.vim.git'
+NeoBundle 'vim-scripts/scratch.vim.git'
 
 call neobundle#end()
 
@@ -459,7 +456,15 @@ endfunction
 " [Functions]
 "------------------------------------------------------------
 
+function! OverwriteCharAbove()
+    k
+    y l
+    j
+    P
+endfunction
+nmap <silent>  ;t  :call OverwriteCharAbove()<CR>
 
+                       
 function! FormatCss()
 
     " TODO: Make sure we're in css buffer?
