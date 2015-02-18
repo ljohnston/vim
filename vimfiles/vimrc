@@ -61,17 +61,13 @@
 "
 "   Hmmm... how to get comment characters for the above?
 "
-"   - New plugins I want to look at:
-"     - vim-airline
-"     - snipmate/ultisnips/neosnippet or something
-"     - notes
-"     - unite
-"     - nerd-commenter
-"     - supertab
+"   - plugins to look at:
+"     - snipmate/ultisnips/neosnippet or something similar
+"     - personal wiki (mostly for note taking, searching, etc. - looked at
+"     xolox/notes.vim... no good)
+"     - nerd-commenter (or something like it)
 "     - fugitive (git plugin)
 "     - yankring or yankstack (or will unite suffice?)
-"
-"   - scratch buffer
 "
 "   - Really need to get netrw whipped into shape, which seems to be
 "     a much bigger pain in the ass than it should be. From this link...
@@ -176,7 +172,7 @@ NeoBundle 'Shougo/vimproc.vim', {
 NeoBundle 'rodjek/vim-puppet.git'
 NeoBundle 'godlygeek/tabular.git'
 NeoBundle 'flazz/vim-colorschemes.git'
-NeoBundle 'duff/vim-scratch.git'
+NeoBundle 'vim-scripts/scratch.vim.git'
 NeoBundle 'dbakker/vim-projectroot.git'
 
 call neobundle#end()
@@ -411,9 +407,10 @@ let g:airline_theme = 'bubblegum'
 " Keys {
 
     "
-    " NOTE: Many keys in vim are not mapable. For example, Would like to 
+    " NOTE: Many keys in vim are not mapable. For example, would like to 
     " have keys for the following, but these particular keys (and several 
     " others) can't be remapped. More here:
+    "
     " http://vim.1045645.n5.nabble.com/How-to-map-Ctrl-td1192843.html
     "
     "map <C-,> #
@@ -502,7 +499,7 @@ let g:airline_theme = 'bubblegum'
 
         if has('gui_macvim') 
             set transparency=10
-            set guifont=Sauce\ Code\ Powerline:h13
+            set guifont=Sauce\ Code\ Powerline:h14
             set columns=120
             set lines=52
         elseif has('unix') 
@@ -648,6 +645,12 @@ function! CycleNumber()
 endfunction
 
 
+function! OverwriteCharAbove()
+    k y l
+    j
+    P
+endfunction
+"nmap <silent>  ;t  :call OverwriteCharAbove()<CR>
 
 function! FormatCss()
 
