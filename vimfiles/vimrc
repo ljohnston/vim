@@ -503,7 +503,11 @@ let g:airline_theme = 'bubblegum'
             set columns=120
             set lines=52
         elseif has('unix') 
-            set guifont="Courier 10 Pitch":h9
+            set guifont=Source\ Code\ Pro\ for\ Powerline\ Medium\ 10
+            set columns=120
+            set lines=52
+        else
+            set guifont="Courier 10 Pitch":h10
             set columns=120
             set lines=64
         endif
