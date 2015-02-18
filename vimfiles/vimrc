@@ -156,7 +156,8 @@ NeoBundle 'xolox/vim-misc.git', { 'rev' : '1.15' }
 
 " On OS X install ag (a.k.a the silver searcher) to enhance performance 
 " (unite detects it automatically). Can be installed via brew.
-NeoBundle 'Shougo/unite.vim', { 'rev' : 'ver.6.1' }
+"NeoBundle 'Shougo/unite.vim', { 'rev' : 'ver.6.1' }
+NeoBundle 'Shougo/unite.vim'
 
 " Installed this for unite.vim async features, but I think there
 " are other plugins that use this if installed.
@@ -391,14 +392,15 @@ let g:airline_theme = 'bubblegum'
 
 
 " Netrw {
-    " Defect. See: https://groups.google.com/forum/#!topic/vim_use/XNOcLYsgk8Y
-    "let g:netrw_liststyle = 3 " 0=thin 1=long 2=wide 3=tree        
     let g:netrw_keepdir = 0
+    let g:netrw_special_syntax = 1
 " }
 
 
 " SuperTab {
-    let g:SuperTabDefaultCompletionType = '<c-n>'
+    "let g:SuperTabDefaultCompletionType = '<c-n>'
+    let g:SuperTabDefaultCompletionType = "context"
+    let g:SuperTabContextDefaultCompletionType = "<c-n>"
 " }
 
 " Syntastic {
@@ -582,14 +584,14 @@ let g:airline_theme = 'bubblegum'
 
 let g:unite_source_history_yank_enable = 1
 
-nnoremap <leader>f :<C-u>Unite -buffer-name=files -start-insert file<cr>
+nnoremap <leader>f :<C-u>Unite -buffer-name=files -start-insert file_rec/async<cr>
 nnoremap <leader>F :<C-u>UniteWithProjectDir -buffer-name=files -start-insert file_rec/async<cr>
 nnoremap <leader>y :Unite history/yank<CR>
 
 call unite#custom#source(
             \ 'file_rec,file_rec/async', 
             \ 'ignore_pattern', 
-            \ '\(\.svn\|\.git\)')
+            \ '\(\.svn\|\.git\|\.gradle\)')
 
 call unite#custom#source(
             \ 'file', 'matchers',
@@ -600,7 +602,7 @@ if executable('ag')
     let g:unite_source_grep_command='ag'
     let g:unite_source_grep_default_opts =
                 \ '-i --line-numbers --nocolor --nogroup --hidden --ignore ' .
-                \  '''.hg'' --ignore ''.svn'' --ignore ''.git'' --ignore ''.bzr'''
+                \  '''.hg'' --ignore ''.svn'' --ignore ''.git'' --ignore ''.gradle'' --ignore ''.bzr'''
     let g:unite_source_grep_recursive_opt=''
     let g:unite_source_rec_async_command =
                 \ 'ag --follow --nocolor --nogroup --hidden -g ""'
