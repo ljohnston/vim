@@ -167,13 +167,15 @@ NeoBundle 'Shougo/vimproc.vim', {
 \    },
 \ }
 
-
 " These plugins don't have tags. :-(
 NeoBundle 'rodjek/vim-puppet.git'
 NeoBundle 'godlygeek/tabular.git'
 NeoBundle 'flazz/vim-colorschemes.git'
 NeoBundle 'vim-scripts/scratch.vim.git'
 NeoBundle 'dbakker/vim-projectroot.git'
+
+" Even worse, these plugins have tags, but they're ~way~ out of date. >:-(
+NeoBundle 'tpope/vim-abolish'
 
 call neobundle#end()
 
@@ -503,7 +505,11 @@ let g:airline_theme = 'bubblegum'
             set columns=120
             set lines=52
         elseif has('unix') 
-            set guifont="Courier 10 Pitch":h9
+            set guifont=Source\ Code\ Pro\ for\ Powerline\ Medium\ 10
+            set columns=120
+            set lines=52
+        else
+            set guifont="Courier 10 Pitch":h10
             set columns=120
             set lines=64
         endif

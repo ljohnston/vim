@@ -23,4 +23,13 @@ TODO
 
   Installing fonts in os x:
 
-  cp <project_root>/fonts/source-code-pro-1.017R/TTF/*.ttf /Library/Fonts
+  ```
+  # cp <project_root>/fonts/powerline-fonts-SourceCodePro/*.otf /Library/Fonts
+  ```
+
+  Installing fonts in ubuntu:
+
+  ```
+  # cp -r <project_root>/fonts/powerline-fonts-SourceCodePro/*.otf /usr/local/share/fonts/truetype
+  # fc-cache /usr/local/share/fonts/truetype/
+  ```
