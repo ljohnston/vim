@@ -155,6 +155,8 @@ NeoBundle 'xolox/vim-misc.git', { 'rev' : '1.15' }
 "NeoBundle 'Shougo/unite.vim', { 'rev' : 'ver.6.1' }
 NeoBundle 'Shougo/unite.vim'
 
+NeoBundle 'vimwiki/vimwiki.git'
+
 " Installed this for unite.vim async features, but I think there
 " are other plugins that use this if installed.
 NeoBundle 'Shougo/vimproc.vim', {
@@ -190,6 +192,26 @@ NeoBundleCheck
 "echom "mac:" . has('mac') 
 "echom "gui_running:" . has('gui_running') 
 "echom "gui_macvim:" . has('gui_macvim') 
+
+" TODO: Would like to solve the issue of line wrapping in various filetypes.
+" For some wordwrap configurations this is not a big deal. For example
+" '.txt' files I'd be happy to have just wrap (inserting a newline) at
+" 78 characters (textwidth=78). For other filetypes, however, (specifically
+" vimwiki), I don't want wrapping via inserting linebreaks. This can only
+" be achieved in vim by setting 'wrapmargin=', which unfotunately is
+" dependent on the current window width. Need to figure out how to use
+" something like the following to respond to the resizing accordingly.
+
+"function! ResizeEvent()
+"   let &lines = &lines - 1
+"   execute '!echo "resizing "'.&columns . ' >> ~/test.txt'
+"endfunction
+"
+"autocmd VimResized * call ResizeEvent()
+    
+" Set this right up front so we know it's available for all references.
+let mapleader = "\<Space>"
+let g:mapleader = "\<Space>"
 
 "
 " TODO: Refactor this. Needs to be up here so it's available when
@@ -231,6 +253,7 @@ endfunction
     syntax on
 
     filetype plugin indent on
+    set autoindent
 
     set ttyfast "fast terminal connection
 
@@ -409,6 +432,23 @@ let g:airline_theme = 'bubblegum'
 "    let g:syntastic_enable_signs=1
 " }
 
+" VimWiki {
+    silent! nunmap <leader>ww
+    silent! nunmap <leader>wi
+    silent! nunmap <leader>ws
+    silent! nunmap <leader>wt
+    silent! nunmap <leader>w<leader>t
+    silent! nunmap <leader>w<leader>w
+    silent! nunmap <leader>w<leader>i
+
+    nmap <leader>vw <Plug>VimwikiIndex
+    nmap <leader>vt <Plug>VimwikiTabIndex
+    nmap <leader>vs <Plug>VimwikiUISelect
+    nmap <leader>dw <Plug>VimwikiDiaryIndex
+    nmap <leader>dt <Plug>VimwikiTabMakeDiaryNote
+    nmap <leader>dn <Plug>VimwikiMakeDiaryNote
+    nmap <leader>dg <Plug>VimwikiDiaryGenerateLinks
+" }
 
 " Keys {
 
@@ -422,9 +462,6 @@ let g:airline_theme = 'bubblegum'
     "map <C-,> #
     "map <C-.> *
     "nnoremap <C-/> :bdelete<cr>
-    
-    let mapleader = "\<Space>"
-    let g:mapleader = "\<Space>"
 
     " Write buffers.
     nmap <leader>w :w!<cr>
