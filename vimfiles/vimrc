@@ -254,6 +254,7 @@ endfunction
 
     filetype plugin indent on
     set autoindent
+    set smartindent
 
     set ttyfast "fast terminal connection
 
@@ -389,7 +390,7 @@ endfunction
 
 
 let g:airline_powerline_fonts = 1
-let g:airline_theme = 'bubblegum'
+let g:airline_theme = 'ubaryd'
 
 
 " Buffergator {
@@ -475,8 +476,8 @@ let g:airline_theme = 'bubblegum'
     " Really wanted this to be ctrl-i, but vim sees that the same as tab.
     "
     
-    nmap <C-s> :set cursorcolumn!<cr>
-    imap <C-s> <C-o><C-s>
+    nmap <C-\> :set cursorcolumn!<cr>
+    imap <C-\> <C-o><C-\>
 
     " <tab> to move to matching paren, bracket, etc., but
     " ~only~ in normal and visual modes.
@@ -500,43 +501,47 @@ let g:airline_theme = 'bubblegum'
     nmap <leader>s /^.*-\{40,80}\n^.*\[.*\]\s*\_.\{-}-\{40,80}\s*$<cr>
 " }
 
-
-
 " GUI {
     if has("gui_running")
 
         set background=light
 
-        "colorscheme candy 
         colorscheme molokai 
+
+        "
+        " I'm not interested in creating my own versions of various color
+        " schemes. I do, however, want to be able to tweak the ones I use if
+        " necessary, so we'll do that here.
+        " 
 
         let cname = s:GetColorSchemeName()
 
         if cname == 'molokai'
-    
-            " Seems most colorschemes use crappy cursor line colors.
-            highlight CursorLine guibg=Gray30
-            highlight CursorColumn guibg=Gray30
+            " Better cursor line colors.
+            highlight CursorLine guibg=Gray25
+            highlight CursorColumn guibg=Gray25
+
+            " Default column color (i.e. column 80 indicator) sucks (it's red!).
             highlight ColorColumn guibg=DarkSlateGray
     
-            " molokai's comments are too dark.
-            highlight Comment guifg=SkyBlue3
+            " Default comment color too dark.
+            highlight Comment guifg=SkyBlue3  
     
-            " molokai's visual selection needs more contrast.
+            " Default visual selection needs more contrast.
             highlight Visual guifg=Gray30 guibg=NavajoWhite
-
         endif
 
-        let g:rainbow_active = 1 "if 0, can be enabled later via :RainbowToggle
+        " Enable rainbow (can toggle via :RainbowToggle).
+        let g:rainbow_active = 1
 
         " 
-        " For a good resource regarding how to pic and set a font, see:
+        " For a good resource regarding how to pick and set a font, see:
         "
         "   http://www.scholarslab.org/grad-student-research/vim-gui-font-magic/
         "
         
         "
-        " NOTE: 'gui_macvim' and 'unix' are not exclusive (i.e. 
+        " NOTE: 'gui_macvim' and 'unix' are not exclusive (i.e.
         " has('gui_macvim') also has('unix')).
         "
 
@@ -564,6 +569,7 @@ let g:airline_theme = 'bubblegum'
         set cursorline
 
         set colorcolumn=81
+
     endif
 " }
 
@@ -631,7 +637,8 @@ let g:unite_source_history_yank_enable = 1
 
 " NOTE: '!' means project dir.
 
-nnoremap <leader>F :<C-u>UniteWithProjectDir -buffer-name=files -start-insert file_rec/async<cr>
+"nnoremap <leader>F :<C-u>UniteWithProjectDir -buffer-name=files -start-insert file_rec/async<cr>
+nnoremap <leader>F :<C-u>Unite -buffer-name=files -start-insert file_rec/async:!<cr>
 nnoremap <leader>f :<C-u>Unite -buffer-name=files -start-insert file_rec/async<cr>
 nnoremap <leader>G :<C-u>Unite -buffer-name=grep -start-insert grep:!<cr>
 nnoremap <leader>g :<C-u>Unite -buffer-name=grep -start-insert grep:.<cr>
