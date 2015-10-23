@@ -471,6 +471,10 @@ endfunction
     nmap <leader>w :w!<cr>
     nmap <leader>W :wa!<cr>
 
+    " Build with gradle.
+    nmap ,gb :compiler gradlew<CR> :make build<CR>
+    nmap ,gt :compiler gradlew<CR> :make test<CR>
+
     "
     " <C-o> instead of escape to reduce side-effects. More here:
     "
