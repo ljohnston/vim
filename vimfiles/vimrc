@@ -121,39 +121,33 @@
 " displayed with :messages.
 "
 
+"
+" NeoBundle Setup
+"
+
 if has('vim_starting')
-   set nocompatible
-   set runtimepath+=~/.vim/bundle/neobundle.vim/
+    if &compatible
+        set nocompatible
+    endif
+
+    set runtimepath+=~/.vim/bundle/neobundle.vim/
 endif
 
-" Required:
+" Required
 call neobundle#begin(expand('~/.vim/bundle/'))
 
 " Let NeoBundle manage NeoBundle
-" Required:
 NeoBundleFetch 'Shougo/neobundle.vim'
-        
-" Bundles here:
-"NeoBundle 'Shougo/neosnippet.vim'
-"NeoBundle 'Shougo/neosnippet-snippets'
-NeoBundle 'bling/vim-airline', { 'rev' : 'v0.7' }
-NeoBundle 'jeetsukumaran/vim-buffergator', { 'rev' : 'v2.4.1' }
-NeoBundle 'luochen1990/rainbow', { 'rev' : 'v3.3.1' }
-NeoBundle 'ervandew/supertab', { 'rev' : '2.1' }
-NeoBundle 'tomtom/tcomment_vim', { 'rev' : '3.07' }
-NeoBundle 'tpope/vim-surround', { 'rev' : 'v2.0' }
 
-" Installed vim-misc because it's required by vim-notes.
-" TODO: Not diggin' this plugin. Replace with a personal wiki plugin?
-NeoBundle 'xolox/vim-notes', { 'rev' : '0.26' }
-NeoBundle 'xolox/vim-misc', { 'rev' : '1.15' }
+NeoBundle 'Shougo/neocomplete'
+NeoBundle 'Shougo/neosnippet'
+NeoBundle 'Shougo/neosnippet-snippets'
 
-" On OS X install ag (a.k.a the silver searcher) to enhance performance 
-" (unite detects it automatically). Can be installed via brew.
-"NeoBundle 'Shougo/unite.vim', { 'rev' : 'ver.6.1' }
-NeoBundle 'Shougo/unite.vim' " master has many fixes, waiting on release.
+"
+" Unite
+" 
 
-NeoBundle 'vimwiki/vimwiki'
+NeoBundle 'Shougo/unite.vim' 
 
 " Installed this for unite.vim async features, but I think there
 " are other plugins that use this if installed.
@@ -167,30 +161,31 @@ NeoBundle 'Shougo/vimproc.vim', {
 \    },
 \ }
 
-" These plugins have tags, but they're freakin' ancient. >:-o
-NeoBundle 'scrooloose/syntastic'
 NeoBundle 'tpope/vim-abolish'
+NeoBundle 'tpope/vim-surround'
 
-" These plugins don't have tags. :-(
+NeoBundle 'luochen1990/rainbow'
+NeoBundle 'ervandew/supertab'
+NeoBundle 'scrooloose/syntastic'
+NeoBundle 'tomtom/tcomment_vim'
+NeoBundle 'bling/vim-airline'
+NeoBundle 'jeetsukumaran/vim-buffergator'
+NeoBundle 'flazz/vim-colorschemes'
+NeoBundle 'tfnico/vim-gradle'
+
 NeoBundle 'rodjek/vim-puppet'
 NeoBundle 'godlygeek/tabular'
-NeoBundle 'flazz/vim-colorschemes'
-NeoBundle 'vim-scripts/scratch.vim'
-NeoBundle 'dbakker/vim-projectroot'
+
+NeoBundle 'vimwiki/vimwiki'
 
 call neobundle#end()
 
 " Required:
 filetype plugin indent on
 
-" If there are uninstalled bundles found on startup,
-" this will conveniently prompt you to install them.
+" If there are uninstalled bundles found on startup, this will prompt 
+" you to install them.
 NeoBundleCheck
-
-"echom "unix:" . has('unix') 
-"echom "mac:" . has('mac') 
-"echom "gui_running:" . has('gui_running') 
-"echom "gui_macvim:" . has('gui_macvim') 
 
 " TODO: Would like to solve the issue of line wrapping in various filetypes.
 " For some wordwrap configurations this is not a big deal. For example
@@ -251,7 +246,6 @@ endfunction
 " General {
     syntax on
 
-    filetype plugin indent on
     set autoindent
     set smartindent
 
@@ -343,12 +337,12 @@ endfunction
 " Autocommands {
     " Ruby {
         " ruby standard 2 spaces, always
-        au BufRead,BufNewFile *.rb,*.rhtml setlocal shiftwidth=2 
-        au BufRead,BufNewFile *.rb,*.rhtml setlocal softtabstop=2 
+        autocmd BufRead,BufNewFile *.rb,*.rhtml setlocal shiftwidth=2 
+        autocmd BufRead,BufNewFile *.rb,*.rhtml setlocal softtabstop=2 
     " }
 
     " gradle {
-        au BufNewFile,BufRead *.gradle setf groovy
+        autocmd BufNewFile,BufRead *.gradle setf groovy
     " }
     
     " shell scripts {
@@ -357,7 +351,7 @@ endfunction
     " }
 
     " reread .vimrc on save
-    au! BufWritePost .vimrc source % 
+    autocmd! BufWritePost .vimrc source % 
 
     "
     " wrap lines in .txt files.
@@ -370,8 +364,8 @@ endfunction
     " text (including comments), and 'c' is comments only.
     "
 
-    au BufRead,BufNewFile *.txt setlocal textwidth=72
-    au BufRead,BufNewFile *.txt setlocal formatoptions=tq
+    autocmd BufRead,BufNewFile *.txt setlocal textwidth=72
+    autocmd BufRead,BufNewFile *.txt setlocal formatoptions=tq
 
     "
     " Turn off handling of '-' as a bullet (sort of).
@@ -384,12 +378,22 @@ endfunction
     " the paragraph by setting 'autoindent'.
     "
 
-    au BufRead,BufNewFile *.txt setlocal comments-=fb:-
+    autocmd BufRead,BufNewFile *.txt setlocal comments-=fb:-
+
+    " python comment indents are all hosed up. This will fix it.
+    " See: http://stackoverflow.com/questions/2360249
+    autocmd BufRead,BufNewFile *.py inoremap # X<c-h>#<space>
 "}
 
 
-let g:airline_powerline_fonts = 1
-let g:airline_theme = 'ubaryd'
+" Airline {
+
+    let g:airline_powerline_fonts = 1
+
+    let g:airline_solarized_bg = 'light'
+    let g:airline_theme = 'solarized'
+
+" }
 
 
 " Buffergator {
@@ -429,7 +433,7 @@ let g:airline_theme = 'ubaryd'
 " }
 
 " Syntastic {
-"    let g:syntastic_enable_signs=1
+
 " }
 
 " VimWiki {
@@ -444,6 +448,7 @@ let g:airline_theme = 'ubaryd'
     nmap <leader>vw <Plug>VimwikiIndex
     nmap <leader>vt <Plug>VimwikiTabIndex
     nmap <leader>vs <Plug>VimwikiUISelect
+    nmap <leader>vr <Plug>VimwikiRenameLink
     nmap <leader>dw <Plug>VimwikiDiaryIndex
     nmap <leader>dt <Plug>VimwikiTabMakeDiaryNote
     nmap <leader>dn <Plug>VimwikiMakeDiaryNote
@@ -547,8 +552,8 @@ let g:airline_theme = 'ubaryd'
         if has('gui_macvim') 
             set transparency=10
             set guifont=Sauce\ Code\ Powerline:h14
-            set columns=120
-            set lines=52
+            set columns=220
+            set lines=50
         elseif has('unix') 
             set guifont=Source\ Code\ Pro\ for\ Powerline\ Medium\ 10
             set columns=120
@@ -598,78 +603,93 @@ let g:airline_theme = 'ubaryd'
 "    endif
 "endfunction
 
+
 "------------------------------------------------------------
 " [Unite]
 "------------------------------------------------------------
-"
-" I don't really understand how to use this plugin, some things
-" I've done:
-"
-" Grep cursor word from file's subdir:
-"   UniteWithCursorWord -silent -auto-preview -winheight=40 -no-quit grep
-" Grep cursor work from project root:
-"   UniteWithCursorWord -silent -auto-preview -winheight=40 -no-quit grep:!
-"
 
 "
-" I created this function so I could have more control over the project
-" root (the projectroot plugin is more customizable than unite's project
-" root handling). This was primarily to get around the svn 1.6 client
-" behavior of puppet a .svn directory at every level. After switching 
-" to the svn 1.8 client, however, this was no longer an issue. Will
-" keep this around in case I run into other limiations.
+" When we're bootstrapping our vim setup (via bin/config.sh in
+" our vim git project), we can run into a chicke/egg sort of thing
+" here that throws some warnings. Seems when installing via the
+" neobundle command line call, that .vimrc gets entirely read
+" before plugins get installed. We an eliminate this warnings
+" with the following if statement.
 "
-"function! Unite_projectRoot(args)
-"    execute ':Unite ' . a:args . ':' . projectroot#guess() 
-"endfunction
-"
-" Use the above as follows:
-"nnoremap <leader>f :call Unite_projectRoot("-buffer-name=files -start-insert buffer file_rec/async")<cr>
+" Turns out this test doesn't actually work. :-/
+" TODO: Solve this differently.
 "
 
+" if exists(":Unite")
+    "
+    " I don't really understand how to use this plugin, some things
+    " I've done:
+    "
+    " Grep cursor word from file's subdir:
+    "   UniteWithCursorWord -silent -auto-preview -winheight=40 -no-quit grep
+    " Grep cursor work from project root:
+    "   UniteWithCursorWord -silent -auto-preview -winheight=40 -no-quit grep:!
+    "
+    
+    "
+    " Most of this configuration, and more good stuff (I think) from:
+    " http://www.codeography.com/2013/06/17/replacing-all-the-things-with-unite-vim.html
+    "
+    
+    let g:unite_source_history_yank_enable = 1
+    
+    " NOTE: '!' means project dir.
+    
+    "nnoremap <leader>F :<C-u>UniteWithProjectDir -buffer-name=files -start-insert file_rec/async<cr>
+    nnoremap <leader>F :<C-u>Unite -buffer-name=files -start-insert file_rec/async:!<cr>
+    nnoremap <leader>f :<C-u>Unite -buffer-name=files -start-insert file_rec/async<cr>
+    nnoremap <leader>G :<C-u>Unite -buffer-name=grep -start-insert grep:!<cr>
+    nnoremap <leader>g :<C-u>Unite -buffer-name=grep -start-insert grep:.<cr>
+    nnoremap <leader>y :Unite history/yank<CR>
+
+    call unite#custom#source(
+                \ 'file_rec,file_rec/async', 
+                \ 'ignore_pattern', 
+                \ '\(\.svn\|\.git\|\.gradle\|node_modules\|bower_components\)')
+
+    call unite#custom#source(
+                \ 'file,file_rec,file_rec/async', 'matchers',
+                \ ['matcher_glob', 'matcher_hide_hidden_files',
+                \  'matcher_hide_current_file'])
+" endif
+
 "
-" Most of this configuration, and more good stuff (I think) from:
-" http://www.codeography.com/2013/06/17/replacing-all-the-things-with-unite-vim.html
+" On OS X install ag (a.k.a the silver searcher) to enhance performance 
+" (unite detects it automatically). Can be installed via brew.
 "
-
-let g:unite_source_history_yank_enable = 1
-
-" NOTE: '!' means project dir.
-
-"nnoremap <leader>F :<C-u>UniteWithProjectDir -buffer-name=files -start-insert file_rec/async<cr>
-nnoremap <leader>F :<C-u>Unite -buffer-name=files -start-insert file_rec/async:!<cr>
-nnoremap <leader>f :<C-u>Unite -buffer-name=files -start-insert file_rec/async<cr>
-nnoremap <leader>G :<C-u>Unite -buffer-name=grep -start-insert grep:!<cr>
-nnoremap <leader>g :<C-u>Unite -buffer-name=grep -start-insert grep:.<cr>
-nnoremap <leader>y :Unite history/yank<CR>
-
-call unite#custom#source(
-            \ 'file_rec,file_rec/async', 
-            \ 'ignore_pattern', 
-            \ '\(\.svn\|\.git\|\.gradle\|node_modules\|bower_components\)')
-
-call unite#custom#source(
-            \ 'file,file_rec,file_rec/async', 'matchers',
-            \ ['matcher_glob', 'matcher_hide_hidden_files',
-            \  'matcher_hide_current_file'])
 
 if executable('ag')
-    let g:unite_source_grep_command='ag'
-    let g:unite_source_grep_default_opts =
-                \ '-i --line-numbers --nocolor --nogroup --hidden --ignore ' .
-                \  '''.hg'' --ignore ''.svn'' --ignore ''.git'' --ignore ''.gradle'' --ignore ''.bzr'''
-    let g:unite_source_grep_recursive_opt=''
-    let g:unite_source_rec_async_command =
-                \ 'ag --follow --nocolor --nogroup --hidden -g ""'
+
+    let g:unite_source_grep_command = 'ag'
+    let g:unite_source_grep_recursive_opt = ''
+    let g:unite_source_grep_default_opts = '-i --line-numbers --nocolor --nogroup --hidden ' .
+                \ '--ignore ''.hg'' ' .
+                \ '--ignore ''.svn'' ' .
+                \ '--ignore ''.git'' ' .
+                \ '--ignore ''.gradle'' ' .
+                \ '--ignore ''.bzr'' '
+
+    let g:unite_source_rec_async_command = 
+                \ ['ag', '--follow', '--nocolor', '--nogroup', '--hidden', '-g', '']
+
 elseif executable('ack')
-    let g:unite_source_grep_command='ack'
-    let g:unite_source_grep_default_opts='--no-heading --no-color -a'
-    let g:unite_source_grep_recursive_opt=''
-    let g:unite_source_rec_async_command = 'ack -f --nofilter'
+
+    let g:unite_source_grep_command = 'ack'
+    let g:unite_source_grep_recursive_opt = ''
+    let g:unite_source_grep_default_opts = '--no-heading --no-color -a'
+
+    let g:unite_source_rec_async_command = ['ack', '-f', '--nofilter']
+
 endif
 
 " Custom mappings for unite buffers
 autocmd FileType unite call s:unite_settings()
+
 function! s:unite_settings()
   " Play nice with supertab
   let b:SuperTabDisabled=1

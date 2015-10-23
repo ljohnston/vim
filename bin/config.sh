@@ -22,4 +22,25 @@ git clone https://github.com/Shougo/neobundle.vim $VIM_DIR/bundle/neobundle.vim
 [ -L ~/.vimrc ] && rm ~/.vimrc
 ln -s $VIM_DIR/vimfiles/vimrc ~/.vimrc
 
-$VIM_DIR/bundle/neobundle.vim/bin/neoinstall 2>&1 |grep -v vimproc\.vim
+[ -L ~/.vrapperrc ] && rm ~/.vrapperrc
+ln -s $VIM_DIR/vimfiles/vrapperrc ~/.vrapperrc
+
+#
+# Installing via the command-line can display the following warnings...
+#
+# not found in 'runtimepath': "eclim/after/plugin/*.vim"
+# not found in 'runtimepath': "autoload/vimproc.vim"
+#
+# ... many times. We can grep these out. We can also minimize them 
+# (at least the vimproc.vim ones) by specifically installing vimproc.vim 
+# first (which I think may be a good idea anyway - I see this in the 
+# neobundle help).
+#
+
+$VIM_DIR/bundle/neobundle.vim/bin/neoinstall vimproc.vim 2>&1 \
+    |grep -v 'eclim/after/plugin/\*\.vim' \
+    |grep -v 'autoload/vimproc\.vim'
+
+$VIM_DIR/bundle/neobundle.vim/bin/neoinstall 2>&1 \
+    |grep -v 'eclim/after/plugin/\*\.vim'
+
