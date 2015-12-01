@@ -175,6 +175,8 @@ NeoBundle 'flazz/vim-colorschemes'
 NeoBundle 'rodjek/vim-puppet'
 NeoBundle 'godlygeek/tabular'
 
+NeoBundle 'markcornick/vim-terraform'
+
 NeoBundle 'vimwiki/vimwiki'
 
 call neobundle#end()
@@ -390,7 +392,8 @@ endfunction
     let g:airline_powerline_fonts = 1
 
     let g:airline_solarized_bg = 'light'
-    let g:airline_theme = 'solarized'
+    " let g:airline_theme = 'solarized'
+    let g:airline_theme = 'bubblegum'
 
 " }
 
@@ -511,9 +514,11 @@ endfunction
 " GUI {
     if has("gui_running")
 
-        set background=light
+        " set background=light
 
-        colorscheme molokai 
+        " colorscheme molokai 
+        " colorscheme solarized 
+        colorscheme professional 
 
         "
         " I'm not interested in creating my own versions of various color
@@ -536,6 +541,10 @@ endfunction
     
             " Default visual selection needs more contrast.
             highlight Visual guifg=Gray30 guibg=NavajoWhite
+        elseif cname == 'solarized'
+            highlight ColorColumn guibg=DarkSlateGray
+        elseif cname == 'professional'
+            highlight ColorColumn guibg=BlanchedAlmond
         endif
 
         " Enable rainbow (can toggle via :RainbowToggle).
@@ -553,7 +562,7 @@ endfunction
         "
 
         if has('gui_macvim') 
-            set transparency=10
+            set transparency=1
             set guifont=Sauce\ Code\ Powerline:h14
             set columns=220
             set lines=50
