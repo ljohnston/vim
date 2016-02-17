@@ -1,4 +1,3 @@
-
 " TODO {
 
 "   - Refactor/Reformat.
@@ -649,6 +648,9 @@ endfunction
     "
     
     let g:unite_source_history_yank_enable = 1
+    
+    let g:unite_source_rec_max_cache_files = 0
+    call unite#custom#source('file_rec,file_rec/async', 'max_candidates', 0)
     
     " NOTE: '!' means project dir.
     
