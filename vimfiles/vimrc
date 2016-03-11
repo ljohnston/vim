@@ -2,17 +2,6 @@
 
 "   - Refactor/Reformat.
 "
-"   - I use C-L and C-H to go back and forth between buffers.
-"   When I hit a netrw buffer, however, these keys are remapped to
-"   something else. Ideally, I'd like the netrw buffer to just go
-"   away when I select a file.
-"
-"   - How can I "close" a netrw buffer (:bd doesn't even work!).
-"
-"   - Figure out how to get :bnext, :bprev to ignore directory buffers.
-"   If I do this, would also want to figure out how to get buftabs to
-"   not include directory tabs in its list.
-"
 "   - buftabs might be cool (I tried it for a while), but I can't get it 
 "   to restore the status line after switching tabs (which it claims is
 "   the standard behavior). Also, I can't get it to sort the buffers
@@ -420,14 +409,17 @@ endfunction
 " Netrw {
     let g:netrw_keepdir = 0
     let g:netrw_special_syntax = 1
+    let g:netrw_altfile = 1
+    let g:netrw_banner = 0
 " }
 
 
 " SuperTab {
+    " <c-space> is gobally mapped to :buffer#, but there seems
+    " to be no conflict here.
     let g:SuperTabMappingForward = '<c-space>'
     let g:SuperTabMappingBackward = '<s-c-space>'
 
-    "let g:SuperTabDefaultCompletionType = '<c-n>'
     let g:SuperTabDefaultCompletionType = "context"
     let g:SuperTabContextDefaultCompletionType = "<c-n>"
 
@@ -445,7 +437,7 @@ endfunction
     silent! nunmap <leader>w<leader>t
     silent! nunmap <leader>w<leader>w
     silent! nunmap <leader>w<leader>i
-
+     
     nmap <leader>vw <Plug>VimwikiIndex
     nmap <leader>vt <Plug>VimwikiTabIndex
     nmap <leader>vs <Plug>VimwikiUISelect
@@ -454,6 +446,10 @@ endfunction
     nmap <leader>dt <Plug>VimwikiTabMakeDiaryNote
     nmap <leader>dn <Plug>VimwikiMakeDiaryNote
     nmap <leader>dg <Plug>VimwikiDiaryGenerateLinks
+
+    " Must remap this one as vimwiki maps it to <c-space> by default
+    " which I want mapped to ":buffer#" everywhere.
+    nmap <leader>tt <Plug>VimwikiToggleListItem
 " }
 
 " Keys {
@@ -472,6 +468,8 @@ endfunction
     " Write buffers.
     nmap <leader>w :w!<cr>
     nmap <leader>W :wa!<cr>
+    
+    nmap <C-space> :buffer#<cr>
 
     " Build with gradle.
     nmap ,gb :compiler gradlew<CR> :make build<CR>
@@ -587,32 +585,6 @@ endfunction
 
     endif
 " }
-
-
-"
-" Wanted to have something I could use to go to the last visited
-" buffer (so I could map to a single key to bounce back and forth 
-" between the two most recent buffers). Way harder than I expected.
-" Abandoning this for now, but holding onto it just in case I want
-" to revisit.
-"
-"let g:toggle_buffer_next = 0
-"
-"function! ToggleMruBuffer()
-"    if g:toggle_buffer_next
-"        silent! BuffergatorMruCycleNext
-"        if &buftype == 'nofile'
-"            ToggleMruBuffer() 
-"        endif
-"        let g:toggle_buffer_next = 0
-"    else
-"        silent! BuffergatorMruCyclePrev
-"        if &buftype == 'nofile'
-"            ToggleMruBuffer() 
-"        endif
-"        let g:toggle_buffer_next = 1
-"    endif
-"endfunction
 
 
 "------------------------------------------------------------
@@ -802,4 +774,5 @@ function! FormatCss()
 endfunction
 
 nmap <silent> _c :call FormatCss()<CR>
+
 
