@@ -6,7 +6,7 @@ My vim config/setup project.
 To setup a new vim:
 
 $ git clone git@github.com:ljohnston/vim.git ~/.vim
-$ ~/.vim/bin/config.sh
+$ ~/.vim/bin/setup install
 
 Done.
 
@@ -19,34 +19,16 @@ separately. See TODOs below for more info.
 TODO
 ====
 
-- gradlew clean|build|updateBundles
-
-  How do build and updateBundles differ?
-
-- gradlew installFonts
-
-  ... and wire into bin/config.sh?
-
-  Installing fonts in os x:
-
-  ```
-  # cp <project_root>/fonts/powerline-fonts-SourceCodePro/*.otf /Library/Fonts
-  ```
-
-  Installing fonts in ubuntu:
-
-  ```
-  # cp -r <project_root>/fonts/powerline-fonts-SourceCodePro/*.otf /usr/local/share/fonts/truetype
-  # fc-cache /usr/local/share/fonts/truetype/
-  ```
-
 - Automate eclim install. This is non-trivial but via some command-line
 calls to wget to get the right eclim jar, java to execute it, etc. we
 can do it. By default, eclim, runs a gui installer, that, in addition
 to installing the eclim vim plugin, will make sure eclipse dependencies
 are satisfied. The eclim installer can be run in an automated fashion,
-but then it doesn't install the eclipse stuff. We can even automate
-that, however, via something like the following:
+but then it doesn't install the eclipse stuff. Which I think we can
+simply do separately.
+
+Seems possbile we can even automate the eclipse install, however, via 
+something like the following:
 
   ```
   $ java -Xmx256m -XX:MaxPermSize=128m \
@@ -57,7 +39,7 @@ that, however, via something like the following:
         -uninstallIU org.eclim.installer.feature.group
   ```
 
-I got the above from the console after running the gui installer.
-Seems it would take some serious doin' to figure out what to
-install and what the actual arguments in something liek the above
+I got the above fro the console after running the gui installer.
+Seems it would take some serious doin', however, to figure out what to
+install and what the actual arguments in something like the above
 would need to be.
