@@ -3,6 +3,18 @@ vim
 
 My vim config/setup project.
 
+PREREQUISITES
+=============
+
+On linux, may need additional build tools installed:
+
+    $ sudo apt-get install build-essential
+
+TODO: non-debian linux OS requirements?
+
+SETUP
+=====
+
 To setup a new vim:
 
 $ git clone git@github.com:ljohnston/vim.git ~/.vim
@@ -39,7 +51,7 @@ something like the following:
         -uninstallIU org.eclim.installer.feature.group
   ```
 
-I got the above fro the console after running the gui installer.
+I got the above from the console after running the gui installer.
 Seems it would take some serious doin', however, to figure out what to
 install and what the actual arguments in something like the above
 would need to be.

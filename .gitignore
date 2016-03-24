@@ -4,9 +4,16 @@ autoload/
 bundle/
 plugin
 
-# gradle ignores
-.gradle/
+.backup
+!.backup/README.md
 
-# vim ignores
+.swp
+!.swp/README.md
+
+.undo
+!.undo/README.md
+
+.view
+!.view/README.md
+
 .netrwhist
-*.swp

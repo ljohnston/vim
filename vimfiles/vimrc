@@ -1,117 +1,18 @@
-" TODO {
+" Modeline & Notes {{{
+" vim: set sw=4 ts=4 sts=4 et tw=79 foldlevel=0 foldmethod=marker foldmarker={{{,}}}:
+"
+" My .vimrc - Always needs lots of work. See the TODO section for things on
+" the list.
+"
+" Development Notes {{{
+"   Debugging: Can insert 'echom "<msg>"' to show mesages in the cmd window.
+"   These typically will disappear when output from .vimrc but can be
+"   displayed with ':messages'.
+"
+" }}}
+" }}}
 
-"   - Refactor/Reformat.
-"
-"   - buftabs might be cool (I tried it for a while), but I can't get it 
-"   to restore the status line after switching tabs (which it claims is
-"   the standard behavior). Also, I can't get it to sort the buffers
-"   (ideally, I'd like it to be mru).
-"
-"   - Groovy (gradle) syntax highlighting, indenting. Currently this pretty
-"   much sucks. Added the groovy.vim for indenting, but doesn't seem to do
-"   _anything_. I'll leave it here, but this needs to be dealt with.
-"
-"   - Copy character from line above (below?).
-"
-"   - Need a keystroke to go to matching paren (or...). Default is %.
-"   FIXED: Mapped it to tab.
-"
-"   - Fix issue with ';' after a 'f' waiting for the leader delay.
-"   FIXED: Had key maps that started with ';' (FormatCss()). Changed
-"   the key mapping.
-"
-"   - Need to setup some keystrokes and/or function for using diff while
-"   in vim. Vim can do this no problem, but the user experience is kind
-"   of a pain in the ass. Here's (one way) how it works:
-"     - open two buffers in vertical or horizontal split
-"     - go to one buffer and do ':diffthis'
-"     - go to other buffer and do ':diffthis'
-"     - do your merges/edits (]c, [c to jump diffs, :diffget, :diffput
-"     to merge across buffers
-"     - go to one buffer and do ':diffoff'
-"     - go to other buffer and do ':diffoff'
-"   Wow, really? That kinda sucks. Here's my wishlist:
-"     - if in a split, keystroke will start diff for the two buffers in
-"     the split
-"     - if NOT in a split, keystroke will ~horizontally~ extend the
-"     window and open the prior buffer in a vertical split
-"     - while in the diff, a keystroke will turn off diff in both buffers,
-"     closing the split (~ideally~ only if it opened the split to begin)
-"     - while in diff mode, some handy dandy keystroke mappings would be
-"     nice
-"
-"   - Add keystroke/functionality to insert a snippet for my code section
-"   "headers". For example:
-"
-"   //----------------------------------------------------------------------
-"   // [some text]
-"   //----------------------------------------------------------------------
-"
-"   Hmmm... how to get comment characters for the above?
-"
-"   - plugins to look at:
-"     - snipmate/ultisnips/neosnippet or something similar
-"     - personal wiki (mostly for note taking, searching, etc. - looked at
-"     xolox/notes.vim... no good)
-"     - nerd-commenter (or something like it)
-"     - fugitive (git plugin)
-"     - yankring or yankstack (or will unite suffice?)
-"
-"   - Really need to get netrw whipped into shape, which seems to be
-"     a much bigger pain in the ass than it should be. From this link...
-"
-"     http://vim.1045645.n5.nabble.com/Getting-out-of-netrw-td1156403.html
-"
-"     ... some things that might be useful:
-"
-"     function MyExplore()
-"       tabnew
-"       Explore
-"       nmap <buffer> <leader>q :q<cr>
-"     endfunction 
-"
-"     Run this ':topleft vsplit .'
-"
-"     And from...
-"
-"       http://stackoverflow.com/questions/21996768/how-do-you-change-the-root-of-the-netrw-tree-in-vim
-"
-"     ... when in tree mode, you can use :Ntree to reset the head of the
-"     tree.
-"
-"   - Some interesting things I see in Nate Neff's vim github
-"     project:
-"
-"     <Space>    Show recent buffers at bottom of screen.
-"                Use 'f' and 'b' to move back & forth between them.
-"                Thanks to bufmru plugin author!
-"
-"     # NERD Commenter
-"     
-"      <leader>ci      Comment / Uncomment line(s)
-"      <leader>cu      UN-comment line(s)
-"      <leader>cl      Comment lines
-"     
-"     # Source Control
-"     
-"     (From VCSCommand.vim)
-"     
-"      <leader>nvc     Commit current file
-"      <leader>nvd     Diff current file w/repository version
-"      <leader>nvv     VimDiff current file w/repository version
-"     
-" }
-"
-
-"
-" DEBUGGING/TROUBLESHOOTING - Can use 'echom "<msg>" for messages that
-" may show up in the cmd window (if it exceeds cmdheight) and/or can be 
-" displayed with :messages.
-"
-
-"
-" NeoBundle Setup
-"
+" NeoBundle Setup & Plugins {{{
 
 if &compatible
     set nocompatible
@@ -119,24 +20,12 @@ endif
 
 set runtimepath^=~/.vim/bundle/neobundle.vim/
 
-" Required
 call neobundle#begin(expand('~/.vim/bundle/'))
 
-" Let NeoBundle manage NeoBundle
+" Let NeoBundle manage NeoBundle.
 NeoBundleFetch 'Shougo/neobundle.vim'
 
-NeoBundle 'Shougo/neocomplete'
-NeoBundle 'Shougo/neosnippet'
-NeoBundle 'Shougo/neosnippet-snippets'
-
-"
-" Unite
-" 
-
 NeoBundle 'Shougo/unite.vim' 
-"
-" " Installed this for unite.vim async features, but I think there
-" " are other plugins that use this if installed.
 NeoBundle 'Shougo/vimproc.vim', {
 \ 'build' : {
 \     'windows' : 'tools\\update-dll-mingw',
@@ -147,22 +36,30 @@ NeoBundle 'Shougo/vimproc.vim', {
 \    },
 \ }
 
+NeoBundle 'Shougo/neocomplete'
+NeoBundle 'Shougo/neosnippet'
+NeoBundle 'Shougo/neosnippet-snippets'
+
+NeoBundle 'Shougo/neoyank.vim'
+NeoBundle 'Shougo/neopairs.vim'
+
 NeoBundle 'tpope/vim-abolish'
 NeoBundle 'tpope/vim-surround'
+
+NeoBundle 'vim-airline/vim-airline'
+NeoBundle 'vim-airline/vim-airline-themes'
+
+NeoBundle 'flazz/vim-colorschemes'
+NeoBundle 'jeetsukumaran/vim-buffergator'     
+
+NeoBundle 'rodjek/vim-puppet'
+NeoBundle 'markcornick/vim-terraform'
 
 NeoBundle 'luochen1990/rainbow'
 NeoBundle 'ervandew/supertab'
 NeoBundle 'scrooloose/syntastic'
-NeoBundle 'tomtom/tcomment_vim'
-NeoBundle 'vim-airline/vim-airline'
-NeoBundle 'vim-airline/vim-airline-themes'
-NeoBundle 'jeetsukumaran/vim-buffergator'
-NeoBundle 'flazz/vim-colorschemes'
-
-NeoBundle 'rodjek/vim-puppet'
 NeoBundle 'godlygeek/tabular'
-
-NeoBundle 'markcornick/vim-terraform'
+NeoBundle 'tomtom/tcomment_vim'
 
 NeoBundle 'vimwiki/vimwiki'
 
@@ -175,245 +72,338 @@ filetype plugin indent on
 " you to install them.
 NeoBundleCheck
 
-" TODO: Would like to solve the issue of line wrapping in various filetypes.
-" For some wordwrap configurations this is not a big deal. For example
-" '.txt' files I'd be happy to have just wrap (inserting a newline) at
-" 78 characters (textwidth=78). For other filetypes, however, (specifically
-" vimwiki), I don't want wrapping via inserting linebreaks. This can only
-" be achieved in vim by setting 'wrapmargin=', which unfotunately is
-" dependent on the current window width. Need to figure out how to use
-" something like the following to respond to the resizing accordingly.
+" }}}
 
-"function! ResizeEvent()
-"   let &lines = &lines - 1
-"   execute '!echo "resizing "'.&columns . ' >> ~/test.txt'
-"endfunction
-"
-"autocmd VimResized * call ResizeEvent()
-    
-" Set this right up front so we know it's available for all references.
+" Environment {{{
+
+silent function! OSX()
+    return has('macunix')
+endfunction
+
+silent function! LINUX()
+    return has('unix') && !has('macunix') && !has('win32unix')
+endfunction
+
+silent function! WINDOWS()
+    return  (has('win32') || has('win64'))
+endfunction
+
+" Don't see myself ever using windows again, but you never know... this may
+" come in handy.
+" if WINDOWS()
+"   set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
+" endif
+" }}}
+
+" General {{{
+syntax on
+
+set fileformats=unix 
+set history=100
+set ttyfast                             
+
+set ruler                               "show cursor position
+
+set scrolloff=3                         "context lines when scrolling
+set sidescrolloff=5                     "context columns when scrolling
+
+set laststatus=2                        "always show status line
+set showmode                            "display mode at bottom of screen
+set showcmd                             "show commands at bottom of screen
+
+set cursorline                          "hightlight current line
+set colorcolumn=81                      "make 80 columns obvious
+
+set nostartofline                       "try to leave cursor in same column
+set virtualedit=all                     "allow cursor where no actual characters exist
+
+set backspace=indent,eol,start          "a better backspace
+
+set autoread                            "detect external file changes
+set hidden                              "change buffers without saving
+
+set showmatch                           "show matching character pair
+
+set wildmenu                            "enhanced autocomplete
+set wildmode=longest,list,full          "autocomplete behavior
+
+set ignorecase                          "ignore case in search, regex
+set smartcase                           "only ignore case if patter is all lower
+
+set hlsearch                            "highlight search results
+set incsearch                           "search incremntally
+
+set cmdheight=3                         "(try to) silence 'Press ENTER or type command to continue' prompt
+
+autocmd BufEnter * silent! lcd %:p:h    "cwd tracks current current file
+
+" Silence the damn bell
+set noerrorbells visualbell t_vb=
+autocmd GUIEnter * set visualbell t_vb=
+
+"System clipboard integration.
+if has('unix') && exists('+xterm_clipboard')
+    set clipboard+=unnamedplus
+else
+    set clipboard+=unnamed
+endif
+
+if OSX() || LINUX()
+    " The ^= will prepend our setting to any the existing list.
+    " The // at the end will fully qualify the filenames used for each.
+    set backupdir^=~/.vim/.backup//
+    set directory^=~/.vim/.swp//
+    set undodir^=~/.vim/.undo//
+
+    " Don't want to prepend this one, nor can we use // here.
+    set viewdir=~/.vim/.view
+endif
+" }}}
+
+" Indenting & Tabs {{{
+    set autoindent
+    set smartindent
+
+    set expandtab
+    set shiftwidth=4
+    set softtabstop=4
+" }}}
+
+" Keys {{{
+
 let mapleader = "\<Space>"
 let g:mapleader = "\<Space>"
 
 "
-" TODO: Refactor this. Needs to be up here so it's available when
-" we need it.
+" NOTE: Many keys in vim are not mapable. For example, would like to 
+" have keys for the following, but these particular keys (and several 
+" others) can't be remapped. More here:
 "
-" LOJ: Got the following colorscheme stuff from:
+" http://vim.1045645.n5.nabble.com/How-to-map-Ctrl-td1192843.html
 "
-" https://github.com/megaannum/colorschemer/blob/master/autoload/colorschemer/viewer.vim
+"map <C-,> #
+"map <C-.> *
+"nnoremap <C-/> :bdelete<cr>
 "
 
-" used to capture the Color Scheme name in GetColorSchemeName
-let s:colorsname = ""
+" Not sure I like this. :-/
+inoremap kj <esc>
 
-"---------------------------------------------------------------------------
-" s:GetColorSchemeName: {{{3
-" Returns the current Color Scheme name.
-" If g:colors_name exists, then return it otherwise return
-" the result of the the command line: colorscheme.
-" parameters: None
-"---------------------------------------------------------------------------
-function! s:GetColorSchemeName()
-  if exists("g:colors_name")
-    return g:colors_name
-  else
-    if exists("s:colorsname")
-      unlet s:colorsname
-    endif
+nnoremap B ^
+nnoremap E $
 
-" capture result of executing ":highlight"
-    execute "redir => s:colorsname"
-    silent execute "colorscheme"
-    execute "redir END"
-    let s:colorsname = s:colorsname[1:]
-    return s:colorsname
-  endif
-endfunction
+" Write buffers.
+nmap <leader>w :w!<cr>
+nmap <leader>W :wa!<cr>
 
-" General {
-    syntax on
+" Last buffer.
+nmap <C-space> :buffer#<cr>
 
-    set autoindent
-    set smartindent
+" Build with gradle.
+nmap ,gb :compiler gradlew<CR> :make compile<CR>
+nmap ,gt :compiler gradlew<CR> :make test<CR>
 
-    set ttyfast "fast terminal connection
+"
+" <C-o> instead of <esc> to reduce side-effects. More here:
+"
+"   http://vim.wikia.com/wiki/Use_Ctrl-O_instead_of_Esc_in_insert_mode_mappings
+"
 
-    " (Mostly) bash-like autocompletion.
-    set wildmenu
-    set wildmode=longest,list,full
+nmap <C-\> :set cursorcolumn!<cr>
+imap <C-\> <C-o><C-\>
 
-    set backspace=indent,eol,start "a better backspace
-    set fileformats=unix 
-    set hidden "change buffers without saving
+" <tab> to move to matching paren, bracket, etc.
+nnoremap <tab> %
+vnoremap <tab> %
 
-    set history=100
+" Toggle line numbers.
+nmap <C-n> :call CycleNumber()<cr>
+imap <C-n> <C-o><C-n>
 
-    set ignorecase
-    set smartcase
-    set incsearch
-    set showmatch
+" Turn current highlight off.
+nmap <silent> <leader>/ :noh<cr>
 
-    " Detect external file changes
-    set autoread
+nmap <leader>e :Explore<cr>
 
-    " Silence the damn bell
-    "set noerrorbells 
-    "set visualbell
-    "set t_vb=
-    set noerrorbells visualbell t_vb=
-    autocmd GUIEnter * set visualbell t_vb=
+" Search for my section headers.
+nmap <leader>s /^.*-\{40,80}\n^.*\[.*\]\s*\_.\{-}-\{40,80}\s*$<cr>
+" }}}
 
-    " This will help keep netrw from displaying the annoying
-    " 'Press ENTER or type command to continue' prompt all the time.
-    " This solution, however, is generally annoying.
-    set cmdheight=3
+" Autocommands {{{
+" Ruby {{{
+    " ruby standard 2 spaces, always
+    autocmd BufRead,BufNewFile *.rb,*.rhtml setlocal shiftwidth=2 
+    autocmd BufRead,BufNewFile *.rb,*.rhtml setlocal softtabstop=2 
+" }}}
 
-    " This seems to cause problems in console vim.
-    "if exists('+autochdir')
-    "  set autochdir "always switch to current buffer directory 
-    "endif
-    autocmd BufEnter * silent! lcd %:p:h
+" gradle {
+    autocmd BufNewFile,BufRead *.gradle setf groovy
+" }
 
-    "System clipboard integration.
-    if has('unix') && exists('+xterm_clipboard')
-        set clipboard+=unnamedplus
+" shell scripts {
+"    autocmd FileType sh setlocal shiftwidth=2
+"    autocmd FileType sh setlocal softtabstop=2
+" }
+
+" reread .vimrc on save
+autocmd! BufWritePost .vimrc source % 
+
+" prevent our .vimrc modeline from closing all our folds on save
+autocmd! BufWritePre .vimrc setlocal nomodeline
+
+"
+" wrap lines in .txt files.
+" When writing text-based documentation, automatically wrap text.
+" Ideally _don't_ wrap text for entering strings to be entered on
+" the command-line. We should be able to achieve this by setting
+" # and $ as comment characters and not including 'c' in the
+" formatoptions. Looks like I may be understanding this incorrectly
+" and it may not be possible. Rather it appears that 't' is _all_
+" text (including comments), and 'c' is comments only.
+"
+
+autocmd BufRead,BufNewFile *.txt setlocal textwidth=72
+autocmd BufRead,BufNewFile *.txt setlocal formatoptions=tq
+
+"
+" Turn off handling of '-' as a bullet (sort of).
+" Without this, we get (for wrapped lines):
+" - some text ...
+"   another line ...
+" yet another line.
+"
+" Note that we can get _all_ of the above lines to indent within
+" the paragraph by setting 'autoindent'.
+"
+
+autocmd BufRead,BufNewFile *.txt setlocal comments-=fb:-
+
+" python comment indents are all hosed up. This will fix it.
+" See: http://stackoverflow.com/questions/2360249
+autocmd BufRead,BufNewFile *.py inoremap # X<c-h>#<space>
+"}}}
+
+" GUI {{{
+if has("gui_running")
+
+    " Enable rainbow (can toggle via :RainbowToggle).
+    let g:rainbow_active = 1
+
+    " 
+    " For a good resource regarding how to pick and set a font, see:
+    "
+    "   http://www.scholarslab.org/grad-student-research/vim-gui-font-magic/
+    "
+
+    if OSX()
+        set transparency=1
+        set guifont=Sauce\ Code\ Powerline:h14
+        set columns=220
+        set lines=50
+    elseif LINUX()
+        set guifont=Source\ Code\ Pro\ for\ Powerline\ Medium\ 10
+        set columns=120
+        set lines=52
     else
-        set clipboard+=unnamed
+        set guifont="Courier 10 Pitch":h10
+        set columns=120
+        set lines=64
     endif
 
-    if has('unix') || has('gui_macvim') 
-        " Removing this from the list first will ensure it gets
-        " pre-pended to the list in the ^= line (if it's already
-        " anywhere in the list that line is a no-op).
-        set directory-=~/tmp
-        set directory^=~/tmp//
+    set guioptions-=T           " turn off the toolbar
+    set guioptions-=L           " no scrollbars on the left
+endif
+" }}}
 
-        set backupdir-=~/tmp
-        set backupdir^=~/tmp//
+" Colors {{{
+
+if has("gui_running")
+
+    "
+    " Got the following colorscheme stuff from:
+    "
+    " https://github.com/megaannum/colorschemer/blob/master/autoload/colorschemer/viewer.vim
+    "
+    
+    " used to capture the Color Scheme name in GetColorSchemeName
+    let s:colorsname = ""
+    
+    function! s:GetColorSchemeName()
+      if exists("g:colors_name")
+        return g:colors_name
+      else
+        if exists("s:colorsname")
+          unlet s:colorsname
+        endif
+    
+        execute "redir => s:colorsname"
+        silent execute "colorscheme"
+        execute "redir END"
+        let s:colorsname = s:colorsname[1:]
+        return s:colorsname
+      endif
+    endfunction
+
+    " set background=light
+
+    " colorscheme molokai 
+    " colorscheme solarized 
+    colorscheme professional 
+
+    "
+    " I'm not interested in creating my own versions of various color
+    " schemes. I do, however, want to be able to tweak the ones I use if
+    " necessary, so we'll do that here.
+    "
+    " TODO: Is there a better way to achieve the tweaks we want?
+    " 
+
+    let cname = s:GetColorSchemeName()
+
+    if cname == 'molokai'
+        " Better cursor line colors.
+        highlight CursorLine guibg=Gray25
+        highlight CursorColumn guibg=Gray25
+
+        " Default column color (i.e. column 80 indicator) sucks (it's red!).
+        highlight ColorColumn guibg=DarkSlateGray
+
+        " Default comment color too dark.
+        highlight Comment guifg=SkyBlue3  
+
+        " Default visual selection needs more contrast.
+        highlight Visual guifg=Gray30 guibg=NavajoWhite
+    elseif cname == 'solarized'
+        highlight ColorColumn guibg=DarkSlateGray
+    elseif cname == 'professional'
+        highlight ColorColumn guibg=BlanchedAlmond
     endif
-" }
+endif
 
+" }}}
 
-
-" UI {
-    set hlsearch
-    set ruler "show cursor position
-    set scrolloff=3 "context lines when scrolling
-    set sidescrolloff=5 "context columns when scrolling
-    set guioptions-=T "turn off the toolbar
-
-    set laststatus=2 "always show status line
-    set showmode "display mode at bottom of screen
-    set showcmd "show useful stuff at bottom of screen
-    
-    " cursor movement
-    set nostartofline
-    set virtualedit=all
-" }
-
-
-
-" Formatting {
-    set expandtab
-    set shiftwidth=4
-    set softtabstop=4
-" }
-
-
-
-" Autocommands {
-    " Ruby {
-        " ruby standard 2 spaces, always
-        autocmd BufRead,BufNewFile *.rb,*.rhtml setlocal shiftwidth=2 
-        autocmd BufRead,BufNewFile *.rb,*.rhtml setlocal softtabstop=2 
-    " }
-
-    " gradle {
-        autocmd BufNewFile,BufRead *.gradle setf groovy
-    " }
-    
-    " shell scripts {
-    "    autocmd FileType sh setlocal shiftwidth=2
-    "    autocmd FileType sh setlocal softtabstop=2
-    " }
-
-    " reread .vimrc on save
-    autocmd! BufWritePost .vimrc source % 
-
-    "
-    " wrap lines in .txt files.
-    " When writing text-based documentation, automatically wrap text.
-    " Ideally _don't_ wrap text for entering strings to be entered on
-    " the command-line. We should be able to achieve this by setting
-    " # and $ as comment characters and not including 'c' in the
-    " formatoptions. Looks like I may be understanding this incorrectly
-    " and it may not be possible. Rather it appears that 't' is _all_
-    " text (including comments), and 'c' is comments only.
-    "
-
-    autocmd BufRead,BufNewFile *.txt setlocal textwidth=72
-    autocmd BufRead,BufNewFile *.txt setlocal formatoptions=tq
-
-    "
-    " Turn off handling of '-' as a bullet (sort of).
-    " Without this, we get (for wrapped lines):
-    " - some text ...
-    "   another line ...
-    " yet another line.
-    "
-    " Note that we can get _all_ of the above lines to indent within
-    " the paragraph by setting 'autoindent'.
-    "
-
-    autocmd BufRead,BufNewFile *.txt setlocal comments-=fb:-
-
-    " python comment indents are all hosed up. This will fix it.
-    " See: http://stackoverflow.com/questions/2360249
-    autocmd BufRead,BufNewFile *.py inoremap # X<c-h>#<space>
-"}
-
-
-" Airline {
-
-    let g:airline_powerline_fonts = 1
-
-    let g:airline_solarized_bg = 'light'
-    " let g:airline_theme = 'solarized'
+" Airline {{{
     let g:airline_theme = 'bubblegum'
+    let g:airline_powerline_fonts = has("gui_running") ? 1 : 0
+" }}}
 
-" }
-
-
-" Buffergator {
-
-    " Don't allow buffergator to extend window.
+" Buffergator {{{
     let g:buffergator_autoexpand_on_split = 0
-
-    " Sort buffer list.
-    "let g:buffergator_sort_regime = "basename"
-    "let g:buffergator_sort_regime = "filepath"
-    let g:buffergator_sort_regime = "mru"
-
-    " Though I'd prefer the viewport on the left, it's not
-    " wide enough (nor is it practical to _make_ it wide enough)
-    " to show full file details.
+    let g:buffergator_sort_regime = "filepath"
     let g:buffergator_viewport_split_policy = "T"
     let g:buffergator_split_size = 15
 
-    " TODO: Unmap buffergator's tab handling keys.
-" }
+    " TODO: Unmap buffergator's tab handling keys. Why did I add this?
+" }}}
 
-
-" Netrw {
+" Netrw {{{
     let g:netrw_keepdir = 0
     let g:netrw_special_syntax = 1
     let g:netrw_altfile = 1
     let g:netrw_banner = 0
-" }
+" }}}
 
-
-" SuperTab {
+" SuperTab {{{
     " <c-space> is gobally mapped to :buffer#, but there seems
     " to be no conflict here.
     let g:SuperTabMappingForward = '<c-space>'
@@ -421,13 +411,9 @@ endfunction
 
     let g:SuperTabDefaultCompletionType = "context"
     let g:SuperTabContextDefaultCompletionType = "<c-n>"
-" }
+" }}}
 
-" Syntastic {
-
-" }
-
-" VimWiki {
+" VimWiki {{{
     silent! nunmap <leader>ww
     silent! nunmap <leader>wi
     silent! nunmap <leader>ws
@@ -448,160 +434,16 @@ endfunction
     " Must remap this one as vimwiki maps it to <c-space> by default
     " which I want mapped to ":buffer#" everywhere.
     nmap <leader>tt <Plug>VimwikiToggleListItem
-" }
+" }}}
 
-" Keys {
-
-    "
-    " NOTE: Many keys in vim are not mapable. For example, would like to 
-    " have keys for the following, but these particular keys (and several 
-    " others) can't be remapped. More here:
-    "
-    " http://vim.1045645.n5.nabble.com/How-to-map-Ctrl-td1192843.html
-    "
-    "map <C-,> #
-    "map <C-.> *
-    "nnoremap <C-/> :bdelete<cr>
-    "
-
-    " Not sure I like this. :-/
-    inoremap kj <esc>
-
-    " Write buffers.
-    nmap <leader>w :w!<cr>
-    nmap <leader>W :wa!<cr>
-    
-    nmap <C-space> :buffer#<cr>
-
-    " Build with gradle.
-    nmap ,gb :compiler gradlew<CR> :make build<CR>
-    nmap ,gt :compiler gradlew<CR> :make test<CR>
-
-    "
-    " <C-o> instead of escape to reduce side-effects. More here:
-    "
-    "   http://vim.wikia.com/wiki/Use_Ctrl-O_instead_of_Esc_in_insert_mode_mappings
-    "
-    " Really wanted this to be ctrl-i, but vim sees that the same as tab.
-    "
-    
-    nmap <C-\> :set cursorcolumn!<cr>
-    imap <C-\> <C-o><C-\>
-
-    " <tab> to move to matching paren, bracket, etc., but
-    " ~only~ in normal and visual modes.
-    nmap <tab> %
-    vmap <tab> %
-    
-    " Toggle line numbers.
-    nmap <C-n> :call CycleNumber()<cr>
-    imap <C-n> <C-o><C-n>
-
-    " Buffer switching (Buffergator here as :bp and :bn don't honor mru).
-    nmap <C-l> :BuffergatorMruCycleNext<cr>
-    nmap <C-h> :BuffergatorMruCyclePrev<cr>
-
-    " Turn current highlight off.
-    nmap <silent> <leader>/ :noh<cr>
-
-    nmap <leader>e :Explore<cr>
-
-    " Search for my section headers.
-    nmap <leader>s /^.*-\{40,80}\n^.*\[.*\]\s*\_.\{-}-\{40,80}\s*$<cr>
-" }
-
-" GUI {
-    if has("gui_running")
-
-        " set background=light
-
-        " colorscheme molokai 
-        " colorscheme solarized 
-        colorscheme professional 
-
-        "
-        " I'm not interested in creating my own versions of various color
-        " schemes. I do, however, want to be able to tweak the ones I use if
-        " necessary, so we'll do that here.
-        "
-        " TODO: Is there a better way to achieve the tweaks we want?
-        " 
-
-        let cname = s:GetColorSchemeName()
-
-        if cname == 'molokai'
-            " Better cursor line colors.
-            highlight CursorLine guibg=Gray25
-            highlight CursorColumn guibg=Gray25
-
-            " Default column color (i.e. column 80 indicator) sucks (it's red!).
-            highlight ColorColumn guibg=DarkSlateGray
-    
-            " Default comment color too dark.
-            highlight Comment guifg=SkyBlue3  
-    
-            " Default visual selection needs more contrast.
-            highlight Visual guifg=Gray30 guibg=NavajoWhite
-        elseif cname == 'solarized'
-            highlight ColorColumn guibg=DarkSlateGray
-        elseif cname == 'professional'
-            highlight ColorColumn guibg=BlanchedAlmond
-        endif
-
-        " Enable rainbow (can toggle via :RainbowToggle).
-        let g:rainbow_active = 1
-
-        " 
-        " For a good resource regarding how to pick and set a font, see:
-        "
-        "   http://www.scholarslab.org/grad-student-research/vim-gui-font-magic/
-        "
-        
-        "
-        " NOTE: 'gui_macvim' and 'unix' are not exclusive (i.e.
-        " has('gui_macvim') also has('unix')).
-        "
-
-        if has('gui_macvim') 
-            set transparency=1
-            set guifont=Sauce\ Code\ Powerline:h14
-            set columns=220
-            set lines=50
-        elseif has('unix') 
-            set guifont=Source\ Code\ Pro\ for\ Powerline\ Medium\ 10
-            set columns=120
-            set lines=52
-        else
-            set guifont="Courier 10 Pitch":h10
-            set columns=120
-            set lines=64
-        endif
-
-        " This is primarily to keep buffergator (assuming it comes up
-        " on the left side of the screen... which it does) from adding
-        " a scrollbar to its window.
-        set guioptions-=L
-    
-        " hightlight current line
-        set cursorline
-
-        set colorcolumn=81
-
-    endif
-" }
-
-
-"------------------------------------------------------------
-" [Unite]
-"------------------------------------------------------------
+" Unite {{{
 
 "
-" When we're bootstrapping our vim setup (via bin/config.sh in
-" our vim git project), we can run into a chicke/egg sort of thing
-" here that throws some warnings. Seems when installing via the
-" neobundle command line call, that .vimrc gets entirely read
-" before plugins get installed. We can eliminate these warnings
-" with the following if statement.
+" When we're bootstrapping our vim setup (via bin/setup in our vim git
+" project), we can run into a chicke/egg sort of thing here that throws some
+" warnings. Seems when installing via the neobundle command line call, that
+" .vimrc gets entirely read before plugins get installed. We can eliminate
+" these warnings with the following if statement.
 "
 
 if exists(":Unite")
@@ -621,14 +463,11 @@ if exists(":Unite")
     " http://www.codeography.com/2013/06/17/replacing-all-the-things-with-unite-vim.html
     "
     
-    let g:unite_source_history_yank_enable = 1
-    
     let g:unite_source_rec_max_cache_files = 0
     call unite#custom#source('file_rec,file_rec/async', 'max_candidates', 0)
     
     " NOTE: '!' means project dir.
     
-    "nnoremap <leader>F :<C-u>UniteWithProjectDir -buffer-name=files -start-insert file_rec/async<cr>
     nnoremap <leader>F :<C-u>Unite -buffer-name=files -start-insert file_rec/async:!<cr>
     nnoremap <leader>f :<C-u>Unite -buffer-name=files -start-insert file_rec/async<cr>
     nnoremap <leader>G :<C-u>Unite -buffer-name=grep -start-insert grep:!<cr>
@@ -688,11 +527,9 @@ if exists(":Unite")
     endfunction
 
 endif
+" }}}
 
-"------------------------------------------------------------
-" [Utility functions]
-"------------------------------------------------------------
-
+" Custom Functions {{{
 "
 " Wanted to have <c-n> run invnumber and <c-r> run invrelativenumber
 " so I could toggle these independently, but <c-r> is redo and I didn't
@@ -777,5 +614,108 @@ function! FormatCss()
 endfunction
 
 nmap <silent> _c :call FormatCss()<CR>
+" }}}
 
+" TODO / etc {{{
+"   - Groovy (gradle) syntax highlighting, indenting. Currently this pretty
+"   much sucks.
+"
+"   - Copy character from line above (below?).
+"
+"   - Need to setup some keystrokes and/or function for using diff while
+"   in vim. Vim can do this no problem, but the user experience is kind
+"   of a pain in the ass. Here's (one way) how it works:
+"     - open two buffers in vertical or horizontal split
+"     - go to one buffer and do ':diffthis'
+"     - go to other buffer and do ':diffthis'
+"     - do your merges/edits (]c, [c to jump diffs, :diffget, :diffput
+"     to merge across buffers
+"     - go to one buffer and do ':diffoff'
+"     - go to other buffer and do ':diffoff'
+"
+"   Wow, really? That kinda sucks. Here's my wish(ywashy)list:
+"     - if in a split, keystroke will start diff for the two buffers in
+"     the split
+"     - if NOT in a split, keystroke will ~horizontally~ extend the
+"     window and open the prior buffer in a vertical split
+"     - while in the diff, a keystroke will turn off diff in both buffers,
+"     closing the split (~ideally~ only if it opened the split to begin)
+"     - while in diff mode, some handy dandy keystroke mappings would be
+"     nice
+"
+"   - Add keystroke/functionality to insert a snippet for my code section
+"   "headers". For example:
+"
+"   //----------------------------------------------------------------------
+"   // [some text]
+"   //----------------------------------------------------------------------
+"
+"   Hmmm... how to get comment characters for the above? Should this be a
+"   snippet?
+"
+"   - plugins to look at:
+"     - snipmate/ultisnips/neosnippet or something similar
+"     - fugitive (git plugin)
+"     - yankring or yankstack (or will unite suffice?)
+"
+"   - Better line wrapping in various filetypes. For some wordwrap
+"   configurations this is not a big deal. For example '.txt' files I'd be
+"   happy to have just wrap (inserting a newline) at 78 characters
+"   (textwidth=78). For other filetypes, however, (specifically vimwiki), I
+"   don't want wrapping via inserting linebreaks. This can only be achieved in
+"   vim by setting 'wrapmargin=', which unfotunately is dependent on the
+"   current window width. Need to figure out how to use something like the
+"   following to respond to the resizing accordingly.
+"
+"   function! ResizeEvent()
+"      let &lines = &lines - 1
+"      execute '!echo "resizing "'.&columns . ' >> ~/test.txt'
+"   endfunction
+"   
+"   autocmd VimResized * call ResizeEvent()
+"
+"   - Really need to get netrw whipped into shape, which seems to be
+"     a much bigger pain in the ass than it should be. From this link...
+"
+"     http://vim.1045645.n5.nabble.com/Getting-out-of-netrw-td1156403.html
+"
+"     ... some things that might be useful:
+"
+"     function MyExplore()
+"       tabnew
+"       Explore
+"       nmap <buffer> <leader>q :q<cr>
+"     endfunction 
+"
+"     Run this ':topleft vsplit .'
+"
+"     And from...
+"
+"       http://stackoverflow.com/questions/21996768/how-do-you-change-the-root-of-the-netrw-tree-in-vim
+"
+"     ... when in tree mode, you can use :Ntree to reset the head of the
+"     tree.
+"
+"   - Some interesting things I see in Nate Neff's vim github project:
+"
+"     <Space>    Show recent buffers at bottom of screen.
+"                Use 'f' and 'b' to move back & forth between them.
+"                Thanks to bufmru plugin author!
+"
+"     # NERD Commenter
+"     
+"      <leader>ci      Comment / Uncomment line(s)
+"      <leader>cu      UN-comment line(s)
+"      <leader>cl      Comment lines
+"     
+"     # Source Control
+"     
+"     (From VCSCommand.vim)
+"     
+"      <leader>nvc     Commit current file
+"      <leader>nvd     Diff current file w/repository version
+"      <leader>nvv     VimDiff current file w/repository version
+"     
+" }}}
 
+" I (or preceeding blank) am only here to ensure last fold doesn't misbehave.
