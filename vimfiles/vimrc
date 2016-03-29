@@ -189,6 +189,9 @@ let g:mapleader = "\<Space>"
 " Not sure I like this. :-/
 inoremap kj <esc>
 
+:nnoremap <leader>ev :vsplit $MYVIMRC<cr>
+
+" Beginning / end of line.
 nnoremap B ^
 nnoremap E $
 
@@ -198,6 +201,10 @@ nmap <leader>W :wa!<cr>
 
 " Last buffer.
 nmap <C-space> :buffer#<cr>
+    
+" Cycle buffers.
+nmap <C-l> :BuffergatorMruCycleNext<cr>
+nmap <C-h> :BuffergatorMruCyclePrev<cr>
 
 " Build with gradle.
 nmap ,gb :compiler gradlew<CR> :make compile<CR>
@@ -317,74 +324,81 @@ endif
 
 " Colors {{{
 
-if has("gui_running")
+"
+" Got the following colorscheme stuff from:
+"
+" https://github.com/megaannum/colorschemer/blob/master/autoload/colorschemer/viewer.vim
+"
 
-    "
-    " Got the following colorscheme stuff from:
-    "
-    " https://github.com/megaannum/colorschemer/blob/master/autoload/colorschemer/viewer.vim
-    "
-    
-    " used to capture the Color Scheme name in GetColorSchemeName
-    let s:colorsname = ""
-    
-    function! s:GetColorSchemeName()
-      if exists("g:colors_name")
-        return g:colors_name
-      else
-        if exists("s:colorsname")
-          unlet s:colorsname
-        endif
-    
-        execute "redir => s:colorsname"
-        silent execute "colorscheme"
-        execute "redir END"
-        let s:colorsname = s:colorsname[1:]
-        return s:colorsname
-      endif
-    endfunction
+" used to capture the Color Scheme name in GetColorSchemeName
+let s:colorsname = ""
 
-    " set background=light
-
-    " colorscheme molokai 
-    " colorscheme solarized 
-    colorscheme professional 
-
-    "
-    " I'm not interested in creating my own versions of various color
-    " schemes. I do, however, want to be able to tweak the ones I use if
-    " necessary, so we'll do that here.
-    "
-    " TODO: Is there a better way to achieve the tweaks we want?
-    " 
-
-    let cname = s:GetColorSchemeName()
-
-    if cname == 'molokai'
-        " Better cursor line colors.
-        highlight CursorLine guibg=Gray25
-        highlight CursorColumn guibg=Gray25
-
-        " Default column color (i.e. column 80 indicator) sucks (it's red!).
-        highlight ColorColumn guibg=DarkSlateGray
-
-        " Default comment color too dark.
-        highlight Comment guifg=SkyBlue3  
-
-        " Default visual selection needs more contrast.
-        highlight Visual guifg=Gray30 guibg=NavajoWhite
-    elseif cname == 'solarized'
-        highlight ColorColumn guibg=DarkSlateGray
-    elseif cname == 'professional'
-        highlight ColorColumn guibg=BlanchedAlmond
+function! s:GetColorSchemeName()
+  if exists("g:colors_name")
+    return g:colors_name
+  else
+    if exists("s:colorsname")
+      unlet s:colorsname
     endif
+
+    execute "redir => s:colorsname"
+    silent execute "colorscheme"
+    execute "redir END"
+    let s:colorsname = s:colorsname[1:]
+    return s:colorsname
+  endif
+endfunction
+
+" set background=light
+
+" I like these colorschemes, and have customizations setup for them below.
+" Commented out here so I have a convenient list.
+" colorscheme molokai 
+" colorscheme solarized 
+" colorscheme professional 
+
+if has("gui_running")
+    colorscheme professional
+    " colorscheme molokai
+else
+    colorscheme molokai
+endif
+
+"
+" I'm not interested in creating my own versions of various color
+" schemes. I do, however, want to be able to tweak the ones I use if
+" necessary, so we'll do that here.
+"
+" TODO: Is there a better way to achieve the tweaks we want?
+" 
+
+let cname = s:GetColorSchemeName()
+
+if cname == 'molokai'
+    " Better cursor line colors.
+    " highlight CursorLine guibg=Gray25
+    " highlight CursorColumn guibg=Gray25
+
+    " Default column color (i.e. column 80 indicator) sucks (it's red!).
+    " highlight ColorColumn guibg=DarkSlateGray
+
+    " Default comment color too dark.
+    highlight Comment guifg=SkyBlue4
+    highlight Comment ctermfg=24
+
+    " Default visual selection needs more contrast.
+    " highlight Visual guifg=Gray30 guibg=NavajoWhite
+elseif cname == 'solarized'
+    highlight ColorColumn guibg=DarkSlateGray
+elseif cname == 'professional'
+    highlight ColorColumn guibg=BlanchedAlmond
 endif
 
 " }}}
 
 " Airline {{{
     let g:airline_theme = 'bubblegum'
-    let g:airline_powerline_fonts = has("gui_running") ? 1 : 0
+    let g:airline_powerline_fonts = 1
 " }}}
 
 " Buffergator {{{
