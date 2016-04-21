@@ -174,26 +174,31 @@ endif
 let mapleader = "\<Space>"
 let g:mapleader = "\<Space>"
 
-"
-" NOTE: Many keys in vim are not mapable. For example, would like to 
-" have keys for the following, but these particular keys (and several 
-" others) can't be remapped. More here:
-"
-" http://vim.1045645.n5.nabble.com/How-to-map-Ctrl-td1192843.html
-"
-"map <C-,> #
-"map <C-.> *
-"nnoremap <C-/> :bdelete<cr>
-"
+:nnoremap <leader>ve :vsplit $MYVIMRC<cr>
 
-" Not sure I like this. :-/
-inoremap kj <esc>
+" Wrapped lines goes down/up to next row, rather than next line in file.
+noremap j gj
+noremap k gk
 
-:nnoremap <leader>ev :vsplit $MYVIMRC<cr>
+" Some cool stuff I got from http://howivim.com/2015/steve-francia/ {{
+" Visual shifting (does not exit Visual mode)
+vnoremap < <gv
+vnoremap > >gv
+
+" Allow using the repeat operator with a visual selection (!)
+vnoremap . :normal .<CR>
+
+" Yank from the cursor to the end of the line, to be consistent with C and D.
+nnoremap Y y$
+
+" Tab navigation.
+map <S-H> gT
+map <S-L> gt
+" }}
 
 " Beginning / end of line.
-nnoremap B ^
-nnoremap E $
+nnoremap <c-h> ^
+nnoremap <c-l> $
 
 " Write buffers.
 nmap <leader>w :w!<cr>
@@ -201,14 +206,10 @@ nmap <leader>W :wa!<cr>
 
 " Last buffer.
 nmap <C-space> :buffer#<cr>
-    
-" Cycle buffers.
-nmap <C-l> :BuffergatorMruCycleNext<cr>
-nmap <C-h> :BuffergatorMruCyclePrev<cr>
 
 " Build with gradle.
-nmap ,gb :compiler gradlew<CR> :make compile<CR>
-nmap ,gt :compiler gradlew<CR> :make test<CR>
+nmap <leader>gb :compiler gradlew<CR> :make compile<CR>
+nmap <leader>gt :compiler gradlew<CR> :make test<CR>
 
 "
 " <C-o> instead of <esc> to reduce side-effects. More here:
@@ -460,7 +461,8 @@ endif
 " these warnings with the following if statement.
 "
 
-if exists(":Unite")
+" if exists(":Unite")
+function! ConfigureUnite()
     
     "
     " I don't really understand how to use this plugin, some things
@@ -491,7 +493,7 @@ if exists(":Unite")
     call unite#custom#source(
                 \ 'file_rec,file_rec/async', 
                 \ 'ignore_pattern', 
-                \ '\(\.svn\|\.git\|\.gradle\|node_modules\|bower_components\)')
+                \ '\(\.svn\|\.git\|^\.gradle\|node_modules\|bower_components\)')
     
     call unite#custom#source(
                 \ 'file,file_rec,file_rec/async', 'matchers',
@@ -540,10 +542,48 @@ if exists(":Unite")
       imap <buffer> <C-q>   <Plug>(unite_exit)
     endfunction
 
-endif
+" endif
+endfunction
+" }}}
+
+" Lazy Config {{{
+
+function! g:LazyConfig()
+    if exists(":Unite")
+        call ConfigureUnite()
+    endif
+endfunction
+
+augroup lazy_config
+    autocmd!
+    autocmd VimEnter * call LazyConfig()
+augroup END
+
 " }}}
 
 " Custom Functions {{{
+
+"
+" Dump output of an ex command to a new buffer in a new tab. Primarily useful
+" for searching ex command output.
+" Example:  TabMessage map
+"
+
+function! TabMessage(cmd)
+  redir => message
+  silent execute a:cmd
+  redir END
+  if empty(message)
+    echoerr "no output"
+  else
+    " use "new" instead of "tabnew" below if you prefer split windows instead of tabs
+    tabnew
+    setlocal buftype=nofile bufhidden=wipe noswapfile nobuflisted nomodified
+    silent put=message
+  endif
+endfunction
+command! -nargs=+ -complete=command TabMessage call TabMessage(<q-args>)
+
 "
 " Wanted to have <c-n> run invnumber and <c-r> run invrelativenumber
 " so I could toggle these independently, but <c-r> is redo and I didn't

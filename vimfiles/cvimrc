@@ -1,0 +1,11 @@
+let configpath = '/Users/lance.johnston/.cvimrc'
+set localconfig
+
+set noautofocus
+set smoothscroll
+
+let scrollstep = 25
+
+let barposition = "bottom"
+
+

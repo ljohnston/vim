@@ -89,6 +89,10 @@ install_dotfiles() {
     # Vrapper is the eclipse vim plugin
     [ -L ~/.vrapperrc ] && rm ~/.vrapperrc
     ln -s $VIM_DIR/vimfiles/vrapperrc ~/.vrapperrc
+    
+    # cVim is the google vim plugin
+    [ -L ~/.cvimrc ] && rm ~/.cvimrc
+    ln -s $VIM_DIR/vimfiles/cvimrc ~/.cvimrc
 }
 
 

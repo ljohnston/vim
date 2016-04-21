@@ -1,10 +1,8 @@
-vim
-===
+# vim
 
 My vim config/setup project.
 
-PREREQUISITES
-=============
+## PREREQUISITES
 
 On linux, may need additional build tools installed:
 
@@ -12,8 +10,7 @@ On linux, may need additional build tools installed:
 
 TODO: non-debian linux OS requirements?
 
-SETUP
-=====
+## SETUP
 
 To setup a new vim:
 
@@ -22,14 +19,67 @@ $ ~/.vim/bin/setup install
 
 Done.
 
-NOTES
-=====
+## NOTES
 
-- If this vim needs eclim (and what doesn't?), that has to be installed
+### cVim
+
+cVim is a Vim extension for Google Chrome. It can support an external file for
+specifying configuration, much like a .vimrc file. Getting this to work,
+however, is a pain in the ass. 
+
+The .cvimrc file (or actually, whatever you want to call it) doesn't support
+comment characters or else I'd have documented it this there. At any reate,
+here's how to get cVim working with a config file:
+
+- Install cVim in Chrome.
+- In Chrome, type :settings, which should take you to the configuration page
+  for cVim, where you can add the following to the "cVimrc" section:
+
+  let configpath = '<absolutepath>/.cvimrc'
+  set localconfig
+
+  NOTE that the above two lines should also be in the '.cvimrc' file iteslf as
+  this makes managing changes to it easier. See below for more.
+
+- Hit "Save".
+- Browse to 'chrome://extensions/'.
+- Click "Allow access to file URLs" for the cVim extension.
+- Restart Chrome.
+- Type :settings. You should see the contents of your cvimrc file there.
+
+Note that if there is change to the .cvimrc file, it won't automatically be
+reloaded by cVim. This is where putting the 'configpath' and 'localconfig' in
+the .cvimrc file becomes important, as after a change we can simply do the
+following to load up its new content:
+
+:settings
+
+### eclim
+
+If this vim needs eclim (and what doesn't?), that has to be installed
 separately. See TODOs below for more info.
 
-TODO
-====
+### Vimballs
+
+There don't seem to be a lot of plugins that are distributed as vimballs, but
+some, including netrw which always seems to be introducing and fixing bugs. We
+can install a vimball as follows:
+
+$ vim somevimball.vba[.gz]
+:so %
+:q
+
+We can automate the above via:
+
+$ vim -c 'so %' -c 'q' somevimball.vba[.gz]
+
+In the specific case of netrw, when we find one that works, we may want to
+commit it to this project's vimballs directory, after which we can run the
+following:
+
+$ vim -c 'so %' -c 'q' vimballs/netrw.vba.gz
+
+## TODO
 
 - Automate eclim install. This is non-trivial but via some command-line
 calls to wget to get the right eclim jar, java to execute it, etc. we
@@ -55,3 +105,5 @@ I got the above from the console after running the gui installer.
 Seems it would take some serious doin', however, to figure out what to
 install and what the actual arguments in something like the above
 would need to be.
+
+- Automate vimball installs? Not sure about that one...
