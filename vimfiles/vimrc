@@ -556,7 +556,7 @@ endfunction
 
 augroup lazy_config
     autocmd!
-    autocmd VimEnter * call LazyConfig()
+    autocmd VimEnter * call g:LazyConfig()
 augroup END
 
 " }}}
