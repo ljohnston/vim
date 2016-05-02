@@ -191,25 +191,33 @@ vnoremap . :normal .<CR>
 " Yank from the cursor to the end of the line, to be consistent with C and D.
 nnoremap Y y$
 
+" Overwrite current character with one from line above. NOTE that this ONLY
+" works with "virtualedit" equals "all". To do this right, we'd probably need a
+" function that could save, set, restore vitualedit.
+nnoremap <c-k> kyljv"0pl
+inoremap <c-k> <esc>lkyljv"0pli
+
 " Tab navigation.
-map <S-H> gT
-map <S-L> gt
+nnoremap <S-H> gT
+nnoremap <S-L> gt
 " }}
 
 " Beginning / end of line.
 nnoremap <c-h> ^
 nnoremap <c-l> $
+inoremap <c-h> <esc>^i
+inoremap <c-l> <esc>$li
 
 " Write buffers.
-nmap <leader>w :w!<cr>
-nmap <leader>W :wa!<cr>
+nnoremap <leader>w :w!<cr>
+nnoremap <leader>W :wa!<cr>
 
 " Last buffer.
-nmap <C-space> :buffer#<cr>
+nnoremap <C-space> :buffer#<cr>
 
 " Build with gradle.
-nmap <leader>gb :compiler gradlew<CR> :make compile<CR>
-nmap <leader>gt :compiler gradlew<CR> :make test<CR>
+nnoremap <leader>gb :compiler gradlew<CR> :make compile<CR>
+nnoremap <leader>gt :compiler gradlew<CR> :make test<CR>
 
 "
 " <C-o> instead of <esc> to reduce side-effects. More here:
@@ -217,24 +225,24 @@ nmap <leader>gt :compiler gradlew<CR> :make test<CR>
 "   http://vim.wikia.com/wiki/Use_Ctrl-O_instead_of_Esc_in_insert_mode_mappings
 "
 
-nmap <C-\> :set cursorcolumn!<cr>
-imap <C-\> <C-o><C-\>
+nnoremap <C-\> :set cursorcolumn!<cr>
+nnoremap <C-\> <C-o><C-\>
 
 " <tab> to move to matching paren, bracket, etc.
 nnoremap <tab> %
 vnoremap <tab> %
 
 " Toggle line numbers.
-nmap <C-n> :call CycleNumber()<cr>
-imap <C-n> <C-o><C-n>
+nnoremap <C-n> :call CycleNumber()<cr>
+inoremap <C-n> <C-o><C-n>
 
 " Turn current highlight off.
-nmap <silent> <leader>/ :noh<cr>
+nnoremap <silent> <leader>/ :noh<cr>
 
-nmap <leader>e :Explore<cr>
+nnoremap <leader>e :Explore<cr>
 
 " Search for my section headers.
-nmap <leader>s /^.*-\{40,80}\n^.*\[.*\]\s*\_.\{-}-\{40,80}\s*$<cr>
+nnoremap <leader>s /^.*-\{40,80}\n^.*\[.*\]\s*\_.\{-}-\{40,80}\s*$<cr>
 " }}}
 
 " Autocommands {{{
@@ -437,18 +445,18 @@ endif
     silent! nunmap <leader>w<leader>w
     silent! nunmap <leader>w<leader>i
      
-    nmap <leader>vw <Plug>VimwikiIndex
-    nmap <leader>vt <Plug>VimwikiTabIndex
-    nmap <leader>vs <Plug>VimwikiUISelect
-    nmap <leader>vr <Plug>VimwikiRenameLink
-    nmap <leader>dw <Plug>VimwikiDiaryIndex
-    nmap <leader>dt <Plug>VimwikiTabMakeDiaryNote
-    nmap <leader>dn <Plug>VimwikiMakeDiaryNote
-    nmap <leader>dg <Plug>VimwikiDiaryGenerateLinks
+    nnoremap <leader>vw <Plug>VimwikiIndex
+    nnoremap <leader>vt <Plug>VimwikiTabIndex
+    nnoremap <leader>vs <Plug>VimwikiUISelect
+    nnoremap <leader>vr <Plug>VimwikiRenameLink
+    nnoremap <leader>dw <Plug>VimwikiDiaryIndex
+    nnoremap <leader>dt <Plug>VimwikiTabMakeDiaryNote
+    nnoremap <leader>dn <Plug>VimwikiMakeDiaryNote
+    nnoremap <leader>dg <Plug>VimwikiDiaryGenerateLinks
 
     " Must remap this one as vimwiki maps it to <c-space> by default
     " which I want mapped to ":buffer#" everywhere.
-    nmap <leader>tt <Plug>VimwikiToggleListItem
+    nnoremap <leader>tt <Plug>VimwikiToggleListItem
 " }}}
 
 " Unite {{{
@@ -537,9 +545,9 @@ function! ConfigureUnite()
       let b:SuperTabDisabled=1
     
       " Enable navigation with control-j and control-k in insert mode
-      imap <buffer> <C-j>   <Plug>(unite_select_next_line)
-      imap <buffer> <C-k>   <Plug>(unite_select_previous_line)
-      imap <buffer> <C-q>   <Plug>(unite_exit)
+      inoremap <buffer> <C-j>   <Plug>(unite_select_next_line)
+      inoremap <buffer> <C-k>   <Plug>(unite_select_previous_line)
+      inoremap <buffer> <C-q>   <Plug>(unite_exit)
     endfunction
 
 " endif
@@ -584,6 +592,7 @@ function! TabMessage(cmd)
 endfunction
 command! -nargs=+ -complete=command TabMessage call TabMessage(<q-args>)
 
+
 "
 " Wanted to have <c-n> run invnumber and <c-r> run invrelativenumber
 " so I could toggle these independently, but <c-r> is redo and I didn't
@@ -602,13 +611,6 @@ function! CycleNumber()
     endif
 endfunction
 
-
-function! OverwriteCharAbove()
-    k y l
-    j
-    P
-endfunction
-"nmap <silent>  ;t  :call OverwriteCharAbove()<CR>
 
 function! FormatCss()
 
