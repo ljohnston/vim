@@ -174,6 +174,8 @@ endif
 let mapleader = "\<Space>"
 let g:mapleader = "\<Space>"
 
+" It's tempting to make the <leader>ve, but that results in our :Explore key
+" maping (<leader>e) not responding like we'd like it to.
 :nnoremap <leader>ve :vsplit $MYVIMRC<cr>
 
 " Wrapped lines goes down/up to next row, rather than next line in file.
@@ -193,14 +195,13 @@ nnoremap Y y$
 
 " Overwrite current character with one from line above. NOTE that this ONLY
 " works with "virtualedit" equals "all". To do this right, we'd probably need a
-" function that could save, set, restore vitualedit.
+" functiontthat could save, set, restore vitualedit.
 nnoremap <c-k> kyljv"0pl
 inoremap <c-k> <esc>lkyljv"0pli
 
 " Tab navigation.
 nnoremap <S-H> gT
 nnoremap <S-L> gt
-" }}
 
 " Beginning / end of line.
 nnoremap <c-h> ^
@@ -208,12 +209,28 @@ nnoremap <c-l> $
 inoremap <c-h> <esc>^i
 inoremap <c-l> <esc>$li
 
+" Command mode mappings.
+cnoremap <c-j> <down>
+cnoremap <c-k> <up>
+cnoremap <c-h> <home>
+cnoremap <c-l> <end>
+cnoremap <c-b> <s-left>
+cnoremap <c-w> <s-right>
+cnoremap <c-x> <del>
+cnoremap <c-d> <c-w>
+
 " Write buffers.
 nnoremap <leader>w :w!<cr>
 nnoremap <leader>W :wa!<cr>
 
 " Last buffer.
-nnoremap <C-space> :buffer#<cr>
+" TODO: Would like to have this in insert mode, but that presents issues.
+" Specifically, we have to leave insert mode in this buffer to switch buffers.
+" We could reset ourselves to insert mode _after_ we switch buffers, but then
+" we'd be in insert mode in the buffer we switch to, which is probably not what
+" we want. Rather, we probably want to move around in that buffer and then come
+" back to the original buffer, picking up where we left off in insert mode.
+nnoremap <C-space> :call AlternateBuffer()<CR>
 
 " Build with gradle.
 nnoremap <leader>gb :compiler gradlew<CR> :make compile<CR>
@@ -252,14 +269,27 @@ nnoremap <leader>s /^.*-\{40,80}\n^.*\[.*\]\s*\_.\{-}-\{40,80}\s*$<cr>
     autocmd BufRead,BufNewFile *.rb,*.rhtml setlocal softtabstop=2 
 " }}}
 
+" Strip trailing whitespace from these files.
+autocmd FileType java,python,ruby,puppet autocmd BufWritePre <buffer> %s/\s\+$//e
+
+
 " gradle {
-    autocmd BufNewFile,BufRead *.gradle setf groovy
+    autocmd BufNewFile,BufRead *.gradle setfiletype groovy
 " }
 
 " shell scripts {
 "    autocmd FileType sh setlocal shiftwidth=2
 "    autocmd FileType sh setlocal softtabstop=2
 " }
+
+"
+" This still doesn't really do what I want. If I open a netrw buffer and quit
+" it with q, I'd like to just go back to the previous buffer. Seems I may need
+" to do something on enter to save the current buffer and restore it on leave.
+"
+
+autocmd Filetype netrw setlocal bufhidden=wipe
+autocmd Filetype netrw map <buffer> <nowait> q :bdelete<cr>
 
 " reread .vimrc on save
 autocmd! BufWritePost .vimrc source % 
@@ -297,6 +327,9 @@ autocmd BufRead,BufNewFile *.txt setlocal comments-=fb:-
 " python comment indents are all hosed up. This will fix it.
 " See: http://stackoverflow.com/questions/2360249
 autocmd BufRead,BufNewFile *.py inoremap # X<c-h>#<space>
+
+autocmd FileType vimwiki,puppet setlocal textwidth=78
+
 "}}}
 
 " GUI {{{
@@ -445,14 +478,14 @@ endif
     silent! nunmap <leader>w<leader>w
     silent! nunmap <leader>w<leader>i
      
-    nnoremap <leader>vw <Plug>VimwikiIndex
-    nnoremap <leader>vt <Plug>VimwikiTabIndex
-    nnoremap <leader>vs <Plug>VimwikiUISelect
-    nnoremap <leader>vr <Plug>VimwikiRenameLink
-    nnoremap <leader>dw <Plug>VimwikiDiaryIndex
-    nnoremap <leader>dt <Plug>VimwikiTabMakeDiaryNote
-    nnoremap <leader>dn <Plug>VimwikiMakeDiaryNote
-    nnoremap <leader>dg <Plug>VimwikiDiaryGenerateLinks
+    nmap <leader>vw <Plug>VimwikiIndex
+    nmap <leader>vt <Plug>VimwikiTabIndex
+    nmap <leader>vs <Plug>VimwikiUISelect
+    nmap <leader>vr <Plug>VimwikiRenameLink
+    nmap <leader>dw <Plug>VimwikiDiaryIndex
+    nmap <leader>dt <Plug>VimwikiTabMakeDiaryNote
+    nmap <leader>dn <Plug>VimwikiMakeDiaryNote
+    nmap <leader>dg <Plug>VimwikiDiaryGenerateLinks
 
     " Must remap this one as vimwiki maps it to <c-space> by default
     " which I want mapped to ":buffer#" everywhere.
@@ -469,7 +502,6 @@ endif
 " these warnings with the following if statement.
 "
 
-" if exists(":Unite")
 function! ConfigureUnite()
     
     "
@@ -488,7 +520,7 @@ function! ConfigureUnite()
     "
     
     let g:unite_source_rec_max_cache_files = 0
-    call unite#custom#source('file_rec,file_rec/async', 'max_candidates', 0)
+    call unite#custom#source('file_rec,file_rec/async,grep', 'max_candidates', 0)
     
     " NOTE: '!' means project dir.
     
@@ -499,9 +531,9 @@ function! ConfigureUnite()
     nnoremap <leader>y :Unite history/yank<CR>
     
     call unite#custom#source(
-                \ 'file_rec,file_rec/async', 
+                \ 'file_rec,file_rec/async,grep', 
                 \ 'ignore_pattern', 
-                \ '\(\.svn\|\.git\|^\.gradle\|node_modules\|bower_components\)')
+                \ '\(\.svn\|\.git\|^\.gradle\|\Wbuild\/\|\Wvendor\/\|\Wnode_modules\/\|\Wbower_components\/\)')
     
     call unite#custom#source(
                 \ 'file,file_rec,file_rec/async', 'matchers',
@@ -545,12 +577,11 @@ function! ConfigureUnite()
       let b:SuperTabDisabled=1
     
       " Enable navigation with control-j and control-k in insert mode
-      inoremap <buffer> <C-j>   <Plug>(unite_select_next_line)
-      inoremap <buffer> <C-k>   <Plug>(unite_select_previous_line)
-      inoremap <buffer> <C-q>   <Plug>(unite_exit)
+      imap <buffer> <C-j> <Plug>(unite_select_next_line)
+      imap <buffer> <C-k> <Plug>(unite_select_previous_line)
+      imap <buffer> <C-q> <Plug>(unite_exit)
     endfunction
 
-" endif
 endfunction
 " }}}
 
@@ -570,6 +601,34 @@ augroup END
 " }}}
 
 " Custom Functions {{{
+
+"
+" If there is no alternate file, go the next file. 
+"
+" This was created almost entirely to try and deal with the pain associated
+" with netrw buffers and the "alternate file" (i.e. that last file you were
+" editing). Unfortunately, netrw has a tendency to leave buffers around that
+" essentially become the alternate file, but in no scenario do I want to "go
+" back to the last file I was editing" and end up in a netrw buffer. Note that
+" there is a netrw setting called netrw_altfile to modify this behavior.
+" However, that setting seems to no effect in two scenarios:
+"
+" - You open a netrw buffer with ':e <some_directory>'.
+" - You open a netrw buffer with ':Ex', don't select a file and just go to
+"   another buffer from there.
+"
+" I chose to try and deal with this netrw problem by "wiping" the netrw
+" buffers, but then trying to go to alternate file would error becase what vim
+" knew as the alternate file did exist anymore. This function addresses that.
+"
+
+function! AlternateBuffer()
+  if expand('#')=="" | silent! next | silent! bnext
+  else
+    exe "normal! \<c-^>"
+  endif
+endfunction
+
 
 "
 " Dump output of an ex command to a new buffer in a new tab. Primarily useful
