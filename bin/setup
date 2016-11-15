@@ -86,6 +86,10 @@ install_dotfiles() {
     [ -L ~/.vimrc ] && rm ~/.vimrc
     ln -s $VIM_DIR/vimfiles/vimrc ~/.vimrc
     
+    # Vimperator is the firefox vim plugin
+    [ -L ~/.vimperatorrc ] && rm ~/.vimperatorrc
+    ln -s $VIM_DIR/vimfiles/vimperatorrc ~/.vimperatorrc
+    
     # Vrapper is the eclipse vim plugin
     [ -L ~/.vrapperrc ] && rm ~/.vrapperrc
     ln -s $VIM_DIR/vimfiles/vrapperrc ~/.vrapperrc
