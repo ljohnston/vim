@@ -131,14 +131,18 @@ install_plugins() {
         |grep -v "not found in 'packpath'" 
 }
 
+link_vimwiki() {
+    [ -d ~/Google\ Drive/vimwiki ] && [ ! -L ~/vimwiki ] && ln -s ~/Google\ Drive/vimwiki/ ~/vimwiki
+}
+
 
 install() {
    install_neobundle
    install_fonts
    install_dotfiles
    install_plugins
+   link_vimwiki
 }
-
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 VIM_DIR="$( cd $SCRIPT_DIR/.. && pwd )"
@@ -157,10 +161,3 @@ case "$1" in
         echo "Unknown option '$1'. Aborting..."
         exit 1
 esac
-
-echo
-
-exit 
-rm -rf $VIM_DIR/bundle 2>/dev/null
-mkdir -p $VIM_DIR/bundle
-
