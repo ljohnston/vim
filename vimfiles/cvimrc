@@ -8,4 +8,20 @@ let scrollstep = 25
 
 let barposition = "bottom"
 
+map <C-f> scrollFullPageDown
+map <C-b> scrollFullPageUp
 
+" Delete current tab.
+map <C-d> :quit<cr>
+
+" I believe that to use strings on the command-line, 
+" they must be referenced as variables.
+let @@google = 'https://google.com'
+
+map gh :open @@google<cr>
+map gH :tabnew @@google<cr>
+
+" This doesn't seem to be working.
+site '*://*google.com' {
+    set autofocus
+}
