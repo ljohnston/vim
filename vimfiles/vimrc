@@ -43,15 +43,18 @@ NeoBundle 'Shougo/neosnippet-snippets'
 NeoBundle 'Shougo/neoyank.vim'
 NeoBundle 'Shougo/neopairs.vim'
 
+NeoBundle 'Shougo/vimfiler.vim'
+
 NeoBundle 'tpope/vim-abolish'
 NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'tpope/vim-surround'
+
+NeoBundle 'jeetsukumaran/vim-buffergator'     
 
 NeoBundle 'vim-airline/vim-airline'
 NeoBundle 'vim-airline/vim-airline-themes'
 
 NeoBundle 'flazz/vim-colorschemes'
-NeoBundle 'jeetsukumaran/vim-buffergator'     
 
 NeoBundle 'rodjek/vim-puppet'
 NeoBundle 'markcornick/vim-terraform'
@@ -226,6 +229,9 @@ cnoremap <c-d> <c-w>
 nnoremap <leader>w :w!<cr>
 nnoremap <leader>W :wa!<cr>
 
+" Delete buffer.
+nnoremap Q :bdelete<cr>
+
 " Last buffer.
 " TODO: Would like to have this in insert mode, but that presents issues.
 " Specifically, we have to leave insert mode in this buffer to switch buffers.
@@ -233,7 +239,7 @@ nnoremap <leader>W :wa!<cr>
 " we'd be in insert mode in the buffer we switch to, which is probably not what
 " we want. Rather, we probably want to move around in that buffer and then come
 " back to the original buffer, picking up where we left off in insert mode.
-nnoremap <C-space> :call AlternateBuffer()<CR>
+nnoremap <C-space> <C-^>
 
 " Build with gradle.
 nnoremap <leader>gb :compiler gradlew<CR> :make compile<CR>
@@ -246,7 +252,7 @@ nnoremap <leader>gt :compiler gradlew<CR> :make test<CR>
 "
 
 nnoremap <C-\> :set cursorcolumn!<cr>
-nnoremap <C-\> <C-o><C-\>
+imap <C-\> <C-o><C-\>
 
 " <tab> to move to matching paren, bracket, etc.
 nnoremap <tab> %
@@ -259,7 +265,7 @@ inoremap <C-n> <C-o><C-n>
 " Turn current highlight off.
 nnoremap <silent> <leader>/ :noh<cr>
 
-nnoremap <leader>e :Explore<cr>
+nnoremap <leader>e :VimFilerBufferDir<cr>
 
 " Search for my section headers.
 nnoremap <leader>s /^.*-\{40,80}\n^.*\[.*\]\s*\_.\{-}-\{40,80}\s*$<cr>
@@ -270,6 +276,11 @@ nnoremap <leader>s /^.*-\{40,80}\n^.*\[.*\]\s*\_.\{-}-\{40,80}\s*$<cr>
     " ruby standard 2 spaces, always
     autocmd BufRead,BufNewFile *.rb,*.rhtml setlocal shiftwidth=2 
     autocmd BufRead,BufNewFile *.rb,*.rhtml setlocal softtabstop=2 
+" }}}
+
+" Terrafrom {{{
+    autocmd FileType terraform setlocal shiftwidth=2 
+    autocmd FileType terraform setlocal softtabstop=2 
 " }}}
 
 " Strip trailing whitespace from these files.
@@ -291,8 +302,8 @@ autocmd FileType java,python,ruby,puppet autocmd BufWritePre <buffer> %s/\s\+$//
 " to do something on enter to save the current buffer and restore it on leave.
 "
 
-autocmd Filetype netrw setlocal bufhidden=wipe
-autocmd Filetype netrw map <buffer> <nowait> q :bdelete<cr>
+" autocmd Filetype netrw setlocal bufhidden=wipe
+" autocmd Filetype netrw map <buffer> <nowait> q :bdelete<cr>
 
 " reread .vimrc on save
 autocmd! BufWritePost .vimrc source % 
@@ -348,7 +359,7 @@ if has("gui_running")
     "
 
     if OSX()
-        set transparency=1
+        " set transparency=1
         set guifont=Sauce\ Code\ Powerline:h14
         set columns=180
         set lines=50
@@ -403,8 +414,10 @@ endfunction
 " colorscheme professional 
 
 if has("gui_running")
+    colorscheme onedark
     " colorscheme professional
-    colorscheme molokai
+    " colorscheme molokai
+    " colorscheme solarized
 else
     colorscheme molokai
 endif
@@ -421,18 +434,18 @@ let cname = s:GetColorSchemeName()
 
 if cname == 'molokai'
     " Better cursor line colors.
-    " highlight CursorLine guibg=Gray25
-    " highlight CursorColumn guibg=Gray25
+    highlight CursorLine guibg=Gray27 ctermbg=238
+    highlight CursorColumn guibg=Gray27 ctermbg=238
 
     " Default column color (i.e. column 80 indicator) sucks (it's red!).
     " highlight ColorColumn guibg=DarkSlateGray
 
     " Default comment color too dark.
-    highlight Comment guifg=SkyBlue4
-    highlight Comment ctermfg=24
+    highlight Comment guifg=SkyBlue4 ctermfg=67
 
     " Default visual selection needs more contrast.
     " highlight Visual guifg=Gray30 guibg=NavajoWhite
+    " highlight Visual guibg=gray30
 elseif cname == 'solarized'
     highlight ColorColumn guibg=DarkSlateGray
 elseif cname == 'professional'
@@ -442,7 +455,8 @@ endif
 " }}}
 
 " Airline {{{
-    let g:airline_theme = 'bubblegum'
+    " let g:airline_theme = 'bubblegum'
+    let g:airline_theme = 'onedark'
     let g:airline_powerline_fonts = 1
 " }}}
 
@@ -455,12 +469,14 @@ endif
     " TODO: Unmap buffergator's tab handling keys. Why did I add this?
 " }}}
 
-" Netrw {{{
-    let g:netrw_keepdir = 0
-    let g:netrw_special_syntax = 1
-    let g:netrw_altfile = 1
-    let g:netrw_banner = 0
-" }}}
+" NOTE: Temporarily replacing netrw with vimfiler. May make this permanent.
+let g:vimfiler_as_default_explorer = 1
+" " Netrw {{{
+"     let g:netrw_keepdir = 0
+"     let g:netrw_special_syntax = 1
+"     let g:netrw_altfile = 1
+"     let g:netrw_banner = 0
+" " }}}
 
 " SuperTab {{{
     " <c-space> is gobally mapped to :buffer#, but there seems
@@ -494,6 +510,23 @@ endif
     " which I want mapped to ":buffer#" everywhere.
     nnoremap <leader>tt <Plug>VimwikiToggleListItem
 " }}}
+
+call vimfiler#custom#profile('default', 'context', {
+           \  'force_quit': 1,
+           \ })
+
+" Custom mappings for vimfiler buffers
+autocmd FileType vimfiler call s:vimfiler_settings()
+
+function! s:vimfiler_settings()
+  " <Space> is my leader key and I don't want it to get taken over here.
+  silent! nunmap <buffer> <Space>
+
+  " By default <Space> toggles file mark, but we just unmapped that.
+  nmap <buffer> gm <Plug>(vimfiler_toggle_mark_current_line)
+
+  map <buffer> - <Plug>(vimfiler_switch_to_parent_directory)
+endfunction
 
 " Unite {{{
 
@@ -593,9 +626,9 @@ function! ConfigureUnite()
       imap <buffer> <C-k> <Plug>(unite_select_previous_line)
       imap <buffer> <C-q> <Plug>(unite_exit)
     endfunction
-
 endfunction
 " }}}
+
 
 " Lazy Config {{{
 
@@ -611,35 +644,6 @@ augroup lazy_config
 augroup END
 
 " }}}
-
-" Custom Functions {{{
-
-"
-" If there is no alternate file, go the next file. 
-"
-" This was created almost entirely to try and deal with the pain associated
-" with netrw buffers and the "alternate file" (i.e. that last file you were
-" editing). Unfortunately, netrw has a tendency to leave buffers around that
-" essentially become the alternate file, but in no scenario do I want to "go
-" back to the last file I was editing" and end up in a netrw buffer. Note that
-" there is a netrw setting called netrw_altfile to modify this behavior.
-" However, that setting seems to no effect in two scenarios:
-"
-" - You open a netrw buffer with ':e <some_directory>'.
-" - You open a netrw buffer with ':Ex', don't select a file and just go to
-"   another buffer from there.
-"
-" I chose to try and deal with this netrw problem by "wiping" the netrw
-" buffers, but then trying to go to alternate file would error becase what vim
-" knew as the alternate file did exist anymore. This function addresses that.
-"
-
-function! AlternateBuffer()
-  if expand('#')=="" | silent! next | silent! bnext
-  else
-    exe "normal! \<c-^>"
-  endif
-endfunction
 
 
 "
