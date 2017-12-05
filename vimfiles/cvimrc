@@ -14,6 +14,9 @@ map <C-b> scrollFullPageUp
 " Delete current tab.
 map <C-d> :quit<cr>
 
+map - goUpUrl
+map <C--> goToRootUrl
+
 " I believe that to use strings on the command-line, 
 " they must be referenced as variables.
 let @@google = 'https://google.com'
