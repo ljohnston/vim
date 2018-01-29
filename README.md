@@ -28,7 +28,7 @@ specifying configuration, much like a .vimrc file. Getting this to work,
 however, is a pain in the ass. 
 
 The .cvimrc file (or actually, whatever you want to call it) doesn't support
-comment characters or else I'd have documented it this there. At any reate,
+comment characters or else I'd have documented it this there. At any rate,
 here's how to get cVim working with a config file:
 
 - Install cVim in Chrome.

@@ -215,22 +215,37 @@ nnoremap <c-l> $
 inoremap <c-h> <esc>^i
 inoremap <c-l> <esc>$li
 
+"
 " Command mode mappings.
+" Note that these match cvim.
+"
+
+" forward/backward char
+cnoremap <c-l> <right>
+cnoremap <c-h> <left>
+
+" forward/backward word
+cnoremap <c-y> <s-left>
+cnoremap <c-o> <s-right>
+
+" begin/end of line
+" default begin: <c-b> 
+"   default end: <c-e> 
+
+" up/down line
 cnoremap <c-j> <down>
 cnoremap <c-k> <up>
-cnoremap <c-h> <home>
-cnoremap <c-l> <end>
-cnoremap <c-b> <s-left>
-cnoremap <c-w> <s-right>
+
+" delete char / word
 cnoremap <c-x> <del>
-cnoremap <c-d> <c-w>
+" default word: <c-w>
 
 " Write buffers.
 nnoremap <leader>w :w!<cr>
 nnoremap <leader>W :wa!<cr>
 
 " Delete buffer.
-nnoremap Q :bdelete<cr>
+nnoremap <c-q> :bdelete<cr>
 
 " Last buffer.
 " TODO: Would like to have this in insert mode, but that presents issues.
@@ -594,7 +609,8 @@ function! ConfigureUnite()
     
         let g:unite_source_grep_command = 'ag'
         let g:unite_source_grep_recursive_opt = ''
-        let g:unite_source_grep_default_opts = '-i --line-numbers --nocolor --nogroup --hidden ' .
+        let g:unite_source_grep_default_opts = 
+                    \ '-i --line-numbers --nocolor --nogroup --hidden ' .
                     \ '--ignore ''.hg'' ' .
                     \ '--ignore ''.svn'' ' .
                     \ '--ignore ''.git'' ' .
