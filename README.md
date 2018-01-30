@@ -28,8 +28,8 @@ specifying configuration, much like a .vimrc file. Getting this to work,
 however, is a pain in the ass. 
 
 The .cvimrc file (or actually, whatever you want to call it) doesn't support
-comment characters or else I'd have documented it this there. At any rate,
-here's how to get cVim working with a config file:
+comment characters or else I'd have documented it there. At any rate, here's
+how to get cVim working with a config file:
 
 - Install cVim in Chrome.
 - In Chrome, type :settings, which should take you to the configuration page
@@ -53,6 +53,27 @@ the .cvimrc file becomes important, as after a change we can simply do the
 following to load up its new content:
 
 :settings
+
+Also, because of the way Chrome works, there are some pages where cVim can't
+work and is disabled. That makes the mapping of browser-level keys (to do
+things like close tabs for example) rather important. See the Opera section
+below for more.
+
+### Opera
+
+Lately I've been using Opera (which is Chromium-based like Chrome) because
+Vimperator no longer works in Firefox and Chrome's keyboard customization
+capabilities on OS X are non-existent (which somewhat defeats the purpose of
+using an extension like cVim).
+
+In Opera, configure the following keys:
+
+Focus page: Ctrl-Command-J
+Focus address bar: Ctrl-Command-K
+
+Note that we also need to be able to close tabs via the keyboard, but it seems
+cVim's mapping of Ctrl-D to :quit seems to be doing the trick, even on pages
+where cVim is disabled.
 
 ### eclim
 
