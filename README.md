@@ -23,6 +23,16 @@ Done.
 
 ### cVim
 
+NOTE: As described below, the .cvimrc file must be referenced as an absolute
+path. This is a pain in the ass if used on multiple computers iwith a different
+user account name (i.e. a different absolute path). One way to manage this is
+by updating the absolute path for non 'lance.johnston' accounts, and then doing
+the following to update from remote repository:
+
+    $ git stash 
+    $ git pull
+    $ git stash pop
+
 cVim is a Vim extension for Google Chrome. It can support an external file for
 specifying configuration, much like a .vimrc file. Getting this to work,
 however, is a pain in the ass. 
