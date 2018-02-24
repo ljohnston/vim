@@ -80,10 +80,10 @@ In Opera, configure the following keys:
 
 Focus page: Ctrl-Command-J
 Focus address bar: Ctrl-Command-K
+Close the current tab: Ctrl-D ***
 
-Note that we also need to be able to close tabs via the keyboard, but it seems
-cVim's mapping of Ctrl-D to :quit seems to be doing the trick, even on pages
-where cVim is disabled.
+*** Oddly enough, the Opera preferences page has a cVim section where we can
+configure keyboard shortcuts.
 
 ### eclim
 
