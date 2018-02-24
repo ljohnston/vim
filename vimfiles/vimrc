@@ -201,9 +201,10 @@ nnoremap Y y$
 
 " Overwrite current character with one from line above. NOTE that this ONLY
 " works with "virtualedit" equals "all". To do this right, we'd probably need a
-" functiontthat could save, set, restore vitualedit.
-nnoremap <c-k> kyljv"0pl
-inoremap <c-k> <esc>lkyljv"0pli
+" functiontthat could save, set, restore vitualedit. And would (hopefully?) be
+" more efficient (as this is VERY slow).
+" nnoremap <c-k> kyljv"0pl
+" inoremap <c-k> <esc>lkyljv"0pli
 
 " Tab navigation.
 nnoremap <S-H> gT
@@ -255,6 +256,21 @@ nnoremap <c-q> :bdelete<cr>
 " we want. Rather, we probably want to move around in that buffer and then come
 " back to the original buffer, picking up where we left off in insert mode.
 nnoremap <C-space> <C-^>
+
+" Ideally, used in split window with desired diff buffers open.
+nnoremap <leader>dt :windo diffthis<CR>
+nnoremap <leader>do :windo diffoff<CR>
+nnoremap <leader>du :diffupdate<CR>
+
+augroup VimDiff
+    autocmd!
+    autocmd VimEnter,FileWritePre * 
+        \   nnoremap <expr> <C-j> &diff ? ']c' : '<Nop>' 
+        \ | nnoremap <expr> <C-k> &diff ? '[c' : '<Nop>'
+        \ | nnoremap <expr> <leader>dg &diff ? ':diffget<CR>' : '<Nop>'
+        \ | nnoremap <expr> <leader>dp &diff ? ':diffput<CR>' : '<Nop>'
+        \ | if &diff | set diffopt=filler,context=10000 | endif
+augroup END
 
 " Build with gradle.
 nnoremap <leader>gb :compiler gradlew<CR> :make compile<CR>
@@ -513,13 +529,13 @@ let g:vimfiler_as_default_explorer = 1
     silent! nunmap <leader>w<leader>i
      
     nmap <leader>vw <Plug>VimwikiIndex
-    nmap <leader>vt <Plug>VimwikiTabIndex
+    nmap <leader>vi <Plug>VimwikiTabIndex
     nmap <leader>vs <Plug>VimwikiUISelect
     nmap <leader>vr <Plug>VimwikiRenameLink
-    nmap <leader>dw <Plug>VimwikiDiaryIndex
-    nmap <leader>dt <Plug>VimwikiTabMakeDiaryNote
-    nmap <leader>dn <Plug>VimwikiMakeDiaryNote
-    nmap <leader>dg <Plug>VimwikiDiaryGenerateLinks
+    nmap <leader>vdw <Plug>VimwikiDiaryIndex
+    nmap <leader>vdt <Plug>VimwikiTabMakeDiaryNote
+    nmap <leader>vdn <Plug>VimwikiMakeDiaryNote
+    nmap <leader>vdg <Plug>VimwikiDiaryGenerateLinks
 
     " Must remap this one as vimwiki maps it to <c-space> by default
     " which I want mapped to ":buffer#" everywhere.
