@@ -137,4 +137,6 @@ Seems it would take some serious doin', however, to figure out what to
 install and what the actual arguments in something like the above
 would need to be.
 
+This definitely looks doable. See here:  http://eclim.org/install.html#installer-automated
+
 - Automate vimball installs? Not sure about that one...

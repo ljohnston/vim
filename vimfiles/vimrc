@@ -188,6 +188,10 @@ let g:mapleader = "\<Space>"
 noremap j gj
 noremap k gk
 
+" scroll up/down without moving the cursor
+noremap <c-k> 1<c-u>
+noremap <c-j> 1<c-d>
+
 " Some cool stuff I got from http://howivim.com/2015/steve-francia/ {{
 " Visual shifting (does not exit Visual mode)
 vnoremap < <gv
@@ -297,6 +301,7 @@ inoremap <C-n> <C-o><C-n>
 nnoremap <silent> <leader>/ :noh<cr>
 
 nnoremap <leader>e :VimFilerBufferDir<cr>
+nnoremap <leader>E :VimFilerSplit<cr>
 
 " Search for my section headers.
 nnoremap <leader>s /^.*-\{40,80}\n^.*\[.*\]\s*\_.\{-}-\{40,80}\s*$<cr>
@@ -315,7 +320,7 @@ nnoremap <leader>s /^.*-\{40,80}\n^.*\[.*\]\s*\_.\{-}-\{40,80}\s*$<cr>
 " }}}
 
 " Strip trailing whitespace from these files.
-autocmd FileType java,python,ruby,puppet autocmd BufWritePre <buffer> %s/\s\+$//e
+autocmd FileType groovy,java,python,puppet,ruby,terraform autocmd BufWritePre <buffer> %s/\s\+$//e
 
 
 " gradle {
@@ -326,15 +331,6 @@ autocmd FileType java,python,ruby,puppet autocmd BufWritePre <buffer> %s/\s\+$//
 "    autocmd FileType sh setlocal shiftwidth=2
 "    autocmd FileType sh setlocal softtabstop=2
 " }
-
-"
-" This still doesn't really do what I want. If I open a netrw buffer and quit
-" it with q, I'd like to just go back to the previous buffer. Seems I may need
-" to do something on enter to save the current buffer and restore it on leave.
-"
-
-" autocmd Filetype netrw setlocal bufhidden=wipe
-" autocmd Filetype netrw map <buffer> <nowait> q :bdelete<cr>
 
 " reread .vimrc on save
 autocmd! BufWritePost .vimrc source % 
@@ -390,8 +386,8 @@ if has("gui_running")
     "
 
     if OSX()
-        " set transparency=1
-        set guifont=Sauce\ Code\ Powerline:h14
+        " set transparency=10
+        set guifont=Sauce\ Code\ Powerline:h15
         set columns=180
         set lines=50
     elseif LINUX()
@@ -445,9 +441,9 @@ endfunction
 " colorscheme professional 
 
 if has("gui_running")
-    colorscheme onedark
+    " colorscheme onedark
     " colorscheme professional
-    " colorscheme molokai
+    colorscheme molokai
     " colorscheme solarized
 else
     colorscheme molokai
@@ -463,7 +459,9 @@ endif
 
 let cname = s:GetColorSchemeName()
 
-if cname == 'molokai'
+if cname == 'onedark'
+    highlight Comment guifg=SlateGray4 ctermfg=67
+elseif cname == 'molokai'
     " Better cursor line colors.
     highlight CursorLine guibg=Gray27 ctermbg=238
     highlight CursorColumn guibg=Gray27 ctermbg=238
@@ -487,8 +485,12 @@ endif
 
 " Airline {{{
     " let g:airline_theme = 'bubblegum'
-    let g:airline_theme = 'onedark'
+    "let g:airline_theme = 'onedark'
     let g:airline_powerline_fonts = 1
+    if !exists('g:airline_symbols')
+        let g:airline_symbols = {}
+    endif
+    let g:airline_symbols.space = "\ua0"
 " }}}
 
 " Buffergator {{{
@@ -502,6 +504,7 @@ endif
 
 " NOTE: Temporarily replacing netrw with vimfiler. May make this permanent.
 let g:vimfiler_as_default_explorer = 1
+let g:vimfiler_restore_alternate_file = 1
 " " Netrw {{{
 "     let g:netrw_keepdir = 0
 "     let g:netrw_special_syntax = 1
@@ -548,6 +551,7 @@ call vimfiler#custom#profile('default', 'context', {
 
 " Custom mappings for vimfiler buffers
 autocmd FileType vimfiler call s:vimfiler_settings()
+autocmd FileType vimfiler setlocal nobuflisted
 
 function! s:vimfiler_settings()
   " <Space> is my leader key and I don't want it to get taken over here.
@@ -555,8 +559,7 @@ function! s:vimfiler_settings()
 
   " By default <Space> toggles file mark, but we just unmapped that.
   nmap <buffer> gm <Plug>(vimfiler_toggle_mark_current_line)
-
-  map <buffer> - <Plug>(vimfiler_switch_to_parent_directory)
+  map  <buffer> -  <Plug>(vimfiler_switch_to_parent_directory)
 endfunction
 
 " Unite {{{
