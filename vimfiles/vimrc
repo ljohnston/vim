@@ -177,8 +177,10 @@ endif
 
 " Keys {{{
 
-let mapleader = "\<Space>"
-let g:mapleader = "\<Space>"
+"let mapleader = "\<Space>"
+"let g:mapleader = "\<Space>"
+let mapleader = ","
+let g:mapleader = ","
 
 " It's tempting to make the <leader>ve, but that results in our :Explore key
 " maping (<leader>e) not responding like we'd like it to.
@@ -199,6 +201,10 @@ vnoremap > >gv
 
 " Allow using the repeat operator with a visual selection (!)
 vnoremap . :normal .<CR>
+
+" Use the black hole register to paste without overwriting the unnamed
+" register.
+vnoremap p "_dP
 
 " Yank from the cursor to the end of the line, to be consistent with C and D.
 nnoremap Y y$
@@ -470,10 +476,10 @@ elseif cname == 'molokai'
     " highlight ColorColumn guibg=DarkSlateGray
 
     " Default comment color too dark.
-    highlight Comment guifg=SkyBlue4 ctermfg=67
+    highlight Comment guifg=SkyBlue3 ctermfg=67
 
     " Default visual selection needs more contrast.
-    " highlight Visual guifg=Gray30 guibg=NavajoWhite
+    highlight Visual guifg=Gray30 guibg=NavajoWhite
     " highlight Visual guibg=gray30
 elseif cname == 'solarized'
     highlight ColorColumn guibg=DarkSlateGray
