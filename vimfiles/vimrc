@@ -65,6 +65,8 @@ NeoBundle 'scrooloose/syntastic'
 NeoBundle 'godlygeek/tabular'
 NeoBundle 'tomtom/tcomment_vim'
 
+NeoBundle 'jiangmiao/auto-pairs'
+
 NeoBundle 'vim-scripts/groovyindent-unix'
 
 NeoBundle 'vimwiki/vimwiki'
@@ -199,6 +201,9 @@ noremap <c-j> 1<c-d>
 vnoremap < <gv
 vnoremap > >gv
 
+nnoremap < <l
+nnoremap > >l
+
 " Allow using the repeat operator with a visual selection (!)
 vnoremap . :normal .<CR>
 
@@ -211,7 +216,7 @@ nnoremap Y y$
 
 " Overwrite current character with one from line above. NOTE that this ONLY
 " works with "virtualedit" equals "all". To do this right, we'd probably need a
-" functiontthat could save, set, restore vitualedit. And would (hopefully?) be
+" functiont that could save, set, restore vitualedit. And would (hopefully?) be
 " more efficient (as this is VERY slow).
 " nnoremap <c-k> kyljv"0pl
 " inoremap <c-k> <esc>lkyljv"0pli
@@ -223,8 +228,10 @@ nnoremap <S-L> gt
 " Beginning / end of line.
 nnoremap <c-h> ^
 nnoremap <c-l> $
-inoremap <c-h> <esc>^i
-inoremap <c-l> <esc>$li
+
+" These become useful when using an auto-close plugin.
+inoremap <c-h> <c-o>h
+inoremap <c-l> <c-o>l
 
 "
 " Command mode mappings.
@@ -265,7 +272,8 @@ nnoremap <c-q> :bdelete<cr>
 " we'd be in insert mode in the buffer we switch to, which is probably not what
 " we want. Rather, we probably want to move around in that buffer and then come
 " back to the original buffer, picking up where we left off in insert mode.
-nnoremap <C-space> <C-^>
+" nnoremap <C-space> <C-^>
+nnoremap <leader>, <C-^>
 
 " Ideally, used in split window with desired diff buffers open.
 nnoremap <leader>dt :windo diffthis<CR>
@@ -323,6 +331,7 @@ nnoremap <leader>s /^.*-\{40,80}\n^.*\[.*\]\s*\_.\{-}-\{40,80}\s*$<cr>
 " Terrafrom {{{
     autocmd FileType terraform setlocal shiftwidth=2 
     autocmd FileType terraform setlocal softtabstop=2 
+    autocmd FileType terraform setlocal commentstring=#\ %s
 " }}}
 
 " Strip trailing whitespace from these files.
@@ -393,9 +402,9 @@ if has("gui_running")
 
     if OSX()
         " set transparency=10
-        set guifont=Sauce\ Code\ Powerline:h15
-        set columns=180
-        set lines=50
+        set guifont=Sauce\ Code\ Powerline:h16
+        set columns=160
+        set lines=48
     elseif LINUX()
         set guifont=Source\ Code\ Pro\ for\ Powerline\ Medium\ 10
         set columns=120
@@ -449,8 +458,9 @@ endfunction
 if has("gui_running")
     " colorscheme onedark
     " colorscheme professional
-    colorscheme molokai
+    " colorscheme molokai
     " colorscheme solarized
+    colorscheme desert
 else
     colorscheme molokai
 endif
@@ -466,7 +476,7 @@ endif
 let cname = s:GetColorSchemeName()
 
 if cname == 'onedark'
-    highlight Comment guifg=SlateGray4 ctermfg=67
+    " highlight Comment guifg=SlateGray4 ctermfg=67
 elseif cname == 'molokai'
     " Better cursor line colors.
     highlight CursorLine guibg=Gray27 ctermbg=238
@@ -481,7 +491,7 @@ elseif cname == 'molokai'
     " Default visual selection needs more contrast.
     highlight Visual guifg=Gray30 guibg=NavajoWhite
     " highlight Visual guibg=gray30
-elseif cname == 'solarized'
+elseif cname == 'solarized' || cname == 'desert'
     highlight ColorColumn guibg=DarkSlateGray
 elseif cname == 'professional'
     highlight ColorColumn guibg=BlanchedAlmond
@@ -490,8 +500,8 @@ endif
 " }}}
 
 " Airline {{{
-    " let g:airline_theme = 'bubblegum'
-    "let g:airline_theme = 'onedark'
+    let g:airline_theme = 'bubblegum'
+    " let g:airline_theme = 'onedark'
     let g:airline_powerline_fonts = 1
     if !exists('g:airline_symbols')
         let g:airline_symbols = {}
