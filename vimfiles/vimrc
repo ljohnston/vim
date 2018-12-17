@@ -460,7 +460,8 @@ if has("gui_running")
     " colorscheme professional
     " colorscheme molokai
     " colorscheme solarized
-    colorscheme desert
+    " colorscheme desert
+    colorscheme neodark
 else
     colorscheme molokai
 endif
@@ -477,6 +478,8 @@ let cname = s:GetColorSchemeName()
 
 if cname == 'onedark'
     " highlight Comment guifg=SlateGray4 ctermfg=67
+elseif cname == 'neodark'
+    highlight Normal guibg=gray17
 elseif cname == 'molokai'
     " Better cursor line colors.
     highlight CursorLine guibg=Gray27 ctermbg=238
@@ -500,7 +503,8 @@ endif
 " }}}
 
 " Airline {{{
-    let g:airline_theme = 'bubblegum'
+    " let g:airline_theme = 'bubblegum'
+    let g:airline_theme = 'molokai'
     " let g:airline_theme = 'onedark'
     let g:airline_powerline_fonts = 1
     if !exists('g:airline_symbols')
