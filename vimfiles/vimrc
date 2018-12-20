@@ -479,7 +479,7 @@ let cname = s:GetColorSchemeName()
 if cname == 'onedark'
     " highlight Comment guifg=SlateGray4 ctermfg=67
 elseif cname == 'neodark'
-    highlight Normal guibg=gray17
+    highlight Normal guibg=gray18
 elseif cname == 'molokai'
     " Better cursor line colors.
     highlight CursorLine guibg=Gray27 ctermbg=238
