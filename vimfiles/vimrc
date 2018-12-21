@@ -1,22 +1,28 @@
 if &compatible
   set nocompatible
 endif
+
 " Add the dein installation directory into runtimepath
 set runtimepath+=~/.vim/bundles/repos/github.com/Shougo/dein.vim
 
 if dein#load_state('~/.vim/bundles')
   call dein#begin('~/.vim/bundles')
 
+  " dein setup {{
   call dein#add('~/.vim/bundles/repos/github.com/Shougo/dein.vim')
   call dein#add('Shougo/deoplete.nvim')
+
   if !has('nvim')
     call dein#add('roxma/nvim-yarp')
     call dein#add('roxma/vim-hug-neovim-rpc')
   endif
+  " }}
 
   call dein#add('vim-airline/vim-airline')
   call dein#add('vim-airline/vim-airline-themes')
   call dein#add('flazz/vim-colorschemes')
+
+  call dein#add('Shougo/denite.nvim', { 'rev': '1.1' })
 
   call dein#end()
   call dein#save_state()
@@ -24,6 +30,13 @@ endif
 
 filetype plugin indent on
 syntax enable
+
+" General
+
+set wildmenu
+set wildmode=longest,full
+
+autocmd BufEnter * silent! lcd %:p:h    "cwd tracks current file (better than autochdir)
 
 set guifont=Sauce\ Code\ Powerline:h16
 
@@ -35,3 +48,5 @@ let g:airline_symbols.space = "\ua0"
 let g:airline_theme = 'molokai'
 
 colorscheme quantum
+
+source ~/.vim/config/denite.vim
