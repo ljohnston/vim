@@ -25,7 +25,7 @@ Done.
 
 Surfingkeys is a (awesome!) Vim extension for Chrome and Firefox. In Chrome, it
 can support an external file for specifying configuration, much like a .vimrc
-file.  Getting this to work, however, is not entirely straighforward.
+file. Getting this to work, however, is not entirely straighforward.
 
 #### Chrome
 
@@ -73,9 +73,10 @@ the current tab, or navigate history).
 
 Unfortunately, on OS X, neither Chrome or Firefox offer extensive key mapping
 capabilities. As a result, I tend to prefer alternative browsers that _do_
-support key mappings (and can install the Surfingkeys extension). For a while,
-this was Opera, but recent release has really hosed up Surfingkeys behavior.
-Vivaldi to the rescue! It support all kinds of custom key mapping. Refer to the
+support cutome key mappings (and Surfingkeys). For a while, this was Opera, but
+recent releases have really hosed up Surfingkeys behavior. Vivaldi to the
+rescue... it supports all kinds of custom key mappings. Refer to comments in
+.surfingkeysrc for key mapping details.
 
 ### eclim
 
