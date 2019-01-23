@@ -41,8 +41,8 @@ file. Getting this to work, however, is not entirely straighforward.
     - Click "Save".
 
     IMPORTANT!!! Changes to .surfingkeysrc won't automatically get picked up
-    the the browser. When making a change, do the following to ensure the
-    changes get picked up:
+    by the browser. To ensure they are, do the following in all applicable
+    browsers:
 
     - Click on the Surfingkeys icon (browser toolbar) > Settings
     - Click "Save".
