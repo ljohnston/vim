@@ -22,22 +22,25 @@
 // all sites. Ideally, however, we'd like as many of our key mappings as 
 // possible to work on all sites. If we're using a browser that supports 
 // customizable key mappings (e.g.  Vivaldi or Opera), configure browser
-// shortcuts to match our SurfingKeys mappings where it makes sense (e.g
-// closing the current tab).
+// shortcuts to match our SurfingKeys mappings where it makes sense.
 //
 // In addition, if the browser supports setting focus to the address bar and
 // the page, configure shortcuts for those as well (at least the latter) so 
-// that we don't have to use the mouse to get to current page. Typically, I 
-// set these as follows:
+// that we don't have to use the mouse to get to current page.
+//
+// Set the following browser shortcuts:
+//
+// - Page focus
 //
 //   Shift-Cmd-K: focus address bar
 //   Shift-Cmd-J: focus page
 //
-
-unmap('<Ctrl-y>');
-mapkey('<Ctrl-y>', 'Show me the money', function() {
-    Front.showPopup('a well-known phrase uttered by characters in the 1996 film Jerry Maguire (Escape to close).');
-});
+// - To match Surfingkeys
+//
+//   Ctrl-d: close current tab
+//   H (Shift-h): Backward history
+//   L (Shift-l): Forward history
+//
 
 // Close current tab (configure in browser).
 map('<Ctrl-d>', 'x');
@@ -119,9 +122,6 @@ map('F', 'af');
 
 // Go back to last active tab.
 map(',,', '<Ctrl-6>');
-
-// an example to remove mapkey `Ctrl-i`
-unmap('<Ctrl-i>');
 
 // set theme
 settings.theme = `
