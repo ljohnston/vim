@@ -2,7 +2,7 @@
 " TODO:
 " - grep (for text):
 "   - what command?
-"   - when searching, it search in found text. I want to search filenames.
+"   - when searching, it searches in found text. I want to search filenames.
 "
 
 if executable('rg')
@@ -16,6 +16,9 @@ if executable('rg')
   call denite#custom#var('grep', 'default_opts',
         \ ['-i', '--vimgrep', '--no-heading'])
 endif
+
+call denite#custom#source('grep',
+      \ 'converters', ['converter/abbr_word'])
 
 " Change mappings.
 call denite#custom#map(
