@@ -334,6 +334,12 @@ nnoremap <leader>s /^.*-\{40,80}\n^.*\[.*\]\s*\_.\{-}-\{40,80}\s*$<cr>
     autocmd FileType terraform setlocal commentstring=#\ %s
 " }}}
 
+" yaml {{{
+    autocmd FileType yaml setlocal shiftwidth=2 
+    autocmd FileType yaml setlocal softtabstop=2 
+    autocmd FileType yaml setlocal commentstring=#\ %s
+" }}}
+
 " Strip trailing whitespace from these files.
 autocmd FileType groovy,java,python,puppet,ruby,terraform autocmd BufWritePre <buffer> %s/\s\+$//e
 
