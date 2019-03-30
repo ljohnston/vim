@@ -36,6 +36,7 @@ file. Getting this to work, however, is not entirely straighforward.
             - Chrome: Window > Extentions > Surfingkeys > Details.
         - Enable "Allow access to file URLs"
     - Click on the Surfingkeys icon (browser toolbar) > Settings
+    - Click "Advanced mode".
     - "Load settings from:": Specify the absolute path to .surfingkeysrc (~ is
       not supported).
     - Click "Save".

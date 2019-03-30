@@ -21,7 +21,7 @@
 // Because of the nature of the webextensions API, SurfingKeys can't work on 
 // all sites. Ideally, however, we'd like as many of our key mappings as 
 // possible to work on all sites. If we're using a browser that supports 
-// customizable key mappings (e.g.  Vivaldi or Opera), configure browser
+// customizable key mappings (e.g. Vivaldi or Opera), configure browser
 // shortcuts to match our SurfingKeys mappings where it makes sense.
 //
 // In addition, if the browser supports setting focus to the address bar and
@@ -32,12 +32,12 @@
 //
 // - Page focus
 //
-//   Shift-Cmd-K: focus address bar
-//   Shift-Cmd-J: focus page
+//   Shift-Cmd-K: Focus Address Bar/Field
+//   Shift-Cmd-J: Focus Page
 //
 // - To match Surfingkeys
 //
-//   Ctrl-d: close current tab
+//   Ctrl-d: Close Tab
 //   H (Shift-h): Backward history
 //   L (Shift-l): Forward history
 //
