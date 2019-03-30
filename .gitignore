@@ -2,6 +2,7 @@
 # project ignores
 autoload/
 bundle/
+bundles/
 plugin
 
 .backup
