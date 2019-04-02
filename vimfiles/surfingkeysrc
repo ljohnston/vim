@@ -30,16 +30,18 @@
 //
 // Set the following browser shortcuts:
 //
-// - Page focus
+//   Settings / Tabs / Keyboard
 //
-//   Shift-Cmd-K: Focus Address Bar/Field
-//   Shift-Cmd-J: Focus Page
+//     - Page focus
 //
-// - To match Surfingkeys
+//       Shift-Cmd-K: Focus Address Bar/Field
+//       Shift-Cmd-J: Focus Page
 //
-//   Ctrl-d: Close Tab
-//   H (Shift-h): Backward history
-//   L (Shift-l): Forward history
+//     - To match Surfingkeys
+//
+//       Ctrl-d: Close Tab
+//       H (Shift-h): Backward history
+//       L (Shift-l): Forward history
 //
 
 // Close current tab (configure in browser).

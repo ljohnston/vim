@@ -38,7 +38,7 @@ file. Getting this to work, however, is not entirely straighforward.
     - Click on the Surfingkeys icon (browser toolbar) > Settings
     - Click "Advanced mode".
     - "Load settings from:": Specify the absolute path to .surfingkeysrc (~ is
-      not supported).
+      not supported). For example: file:///Users/lance.johnston/.surfingkeysrc
     - Click "Save".
 
     IMPORTANT!!! Changes to .surfingkeysrc won't automatically get picked up
@@ -74,7 +74,7 @@ the current tab, or navigate history).
 
 Unfortunately, on OS X, neither Chrome or Firefox offer extensive key mapping
 capabilities. As a result, I tend to prefer alternative browsers that _do_
-support cutome key mappings (and Surfingkeys). For a while, this was Opera, but
+support custome key mappings (and Surfingkeys). For a while, this was Opera, but
 recent releases have really hosed up Surfingkeys behavior. Vivaldi to the
 rescue... it supports all kinds of custom key mappings. Refer to comments in
 .surfingkeysrc for key mapping details.
