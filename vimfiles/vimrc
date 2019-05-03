@@ -23,6 +23,7 @@ if dein#load_state('~/.vim/bundles')
   call dein#add('flazz/vim-colorschemes')
 
   call dein#add('Shougo/denite.nvim', { 'rev': '1.1' })
+  call dein#add('Shougo/defx.nvim', { 'rev': '1.0' })
 
   call dein#end()
   call dein#save_state()
