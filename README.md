@@ -21,69 +21,63 @@ Done.
 
 ## NOTES
 
-### cVim
+### Surfingkeys
 
-NOTE: As described below, the .cvimrc file must be referenced as an absolute
-path. This is a pain in the ass if used on multiple computers iwith a different
-user account name (i.e. a different absolute path). One way to manage this is
-by updating the absolute path for non 'lance.johnston' accounts, and then doing
-the following to update from remote repository:
+Surfingkeys is a (awesome!) Vim extension for Chrome and Firefox. In Chrome, it
+can support an external file for specifying configuration, much like a .vimrc
+file. Getting this to work, however, is not entirely straighforward.
 
-    $ git stash 
-    $ git pull
-    $ git stash pop
+#### Chrome
 
-cVim is a Vim extension for Google Chrome. It can support an external file for
-specifying configuration, much like a .vimrc file. Getting this to work,
-however, is a pain in the ass. 
+    - Install Surfingkeys.
+    - Permissions:
+        - Per browser:
+            - Vivaldi: Tools > Extentions > Surfingkeys > Details.
+            - Chrome: Window > Extentions > Surfingkeys > Details.
+        - Enable "Allow access to file URLs"
+    - Click on the Surfingkeys icon (browser toolbar) > Settings
+    - Click "Advanced mode".
+    - "Load settings from:": Specify the absolute path to .surfingkeysrc (~ is
+      not supported). For example: file:///Users/lance.johnston/.surfingkeysrc
+    - Click "Save".
 
-The .cvimrc file (or actually, whatever you want to call it) doesn't support
-comment characters or else I'd have documented it there. At any rate, here's
-how to get cVim working with a config file:
+    IMPORTANT!!! Changes to .surfingkeysrc won't automatically get picked up
+    by the browser. To ensure they are, do the following in all applicable
+    browsers:
 
-- Install cVim in Chrome.
-- In Chrome, type :settings, which should take you to the configuration page
-  for cVim, where you can add the following to the "cVimrc" section:
+    - Click on the Surfingkeys icon (browser toolbar) > Settings
+    - Click "Save".
 
-  let configpath = '<absolutepath>/.cvimrc'
-  set localconfig
+#### Firefox
 
-  NOTE that the above two lines should also be in the '.cvimrc' file iteslf as
-  this makes managing changes to it easier. See below for more.
+    At this time, Firefox does not have a File API, so it cannot load
+    Surfingkeys configuration from .surfingkeysrc.
 
-- Hit "Save".
-- Browse to 'chrome://extensions/'.
-- Click "Allow access to file URLs" for the cVim extension.
-- Restart Chrome.
-- Type :settings. You should see the contents of your cvimrc file there.
+    - Install Surfingkeys.
+    - Click on the Surfingkeys icon (browser toolbar) > Settings
+    - Copy and paste the content of .surfingkeysrc into the textfield.
+    - Click "Save".
 
-Note that if there is change to the .cvimrc file, it won't automatically be
-reloaded by cVim. This is where putting the 'configpath' and 'localconfig' in
-the .cvimrc file becomes important, as after a change we can simply do the
-following to load up its new content:
+    IMPORTANT!!! Note that the settings in Firefox must be copy and pasted from
+    .surfingkeysrc on every change to that file to keep them in sync.
 
-:settings
+#### Browser Key Mappings
 
-Also, because of the way Chrome works, there are some pages where cVim can't
-work and is disabled. That makes the mapping of browser-level keys (to do
-things like close tabs for example) rather important. See the Opera section
-below for more.
+Since the advent of the WebExtensions API standard, browser plugins can't take
+total control of the browser (the way Firefox could prior to their adoption of
+the WebExtensions API). As a result, there are some pages where Surfingkeys
+won't work. That makes the mapping of browser-level key shortcuts rather
+important. Ideally, we'd like to set the browser-level shortcuts to match the
+Surfingkeys mappings, so that even if we're on a page where Surfingkeys can't
+operate, we still have at least some of the same mappings available (e.g. close
+the current tab, or navigate history).
 
-### Opera
-
-Lately I've been using Opera (which is Chromium-based like Chrome) because
-Vimperator no longer works in Firefox and Chrome's keyboard customization
-capabilities on OS X are non-existent (which somewhat defeats the purpose of
-using an extension like cVim).
-
-In Opera, configure the following keys:
-
-Focus page: Ctrl-Command-J
-Focus address bar: Ctrl-Command-K
-Close the current tab: Ctrl-D ***
-
-*** Oddly enough, the Opera preferences page has a cVim section where we can
-configure keyboard shortcuts.
+Unfortunately, on OS X, neither Chrome or Firefox offer extensive key mapping
+capabilities. As a result, I tend to prefer alternative browsers that _do_
+support custome key mappings (and Surfingkeys). For a while, this was Opera, but
+recent releases have really hosed up Surfingkeys behavior. Vivaldi to the
+rescue... it supports all kinds of custom key mappings. Refer to comments in
+.surfingkeysrc for key mapping details.
 
 ### eclim
 

@@ -1,0 +1,166 @@
+
+//
+// Browser-specific notes.
+//
+// * Vivaldi
+//   
+//   * By default, Vivaldi puts the focus in the address bar when opening a
+//     new tab (even when opening a new tab for a specified URL). Very 
+//     annoying. Fortunately, Vivaldi is extremely customizable:
+//
+//       Settings / Tabs / Tab Handling: Focus Page Content on New Tab
+//
+//   * New tab position - We set the 'newTabPosition' setting here to 'right'.
+//     In Vivaldi, however, this seems to be overridden by the following 
+//     preferences option (set it to 'After Active Tab' to duplicate 'right'):
+//  
+//       Settings / Tabs / New Tab Position
+//
+
+//
+// Because of the nature of the webextensions API, SurfingKeys can't work on 
+// all sites. Ideally, however, we'd like as many of our key mappings as 
+// possible to work on all sites. If we're using a browser that supports 
+// customizable key mappings (e.g. Vivaldi or Opera), configure browser
+// shortcuts to match our SurfingKeys mappings where it makes sense.
+//
+// In addition, if the browser supports setting focus to the address bar and
+// the page, configure shortcuts for those as well (at least the latter) so 
+// that we don't have to use the mouse to get to current page.
+//
+// Set the following browser shortcuts:
+//
+//   Settings / Tabs / Keyboard
+//
+//     - Page focus
+//
+//       Shift-Cmd-K: Focus Address Bar/Field
+//       Shift-Cmd-J: Focus Page
+//
+//     - To match Surfingkeys
+//
+//       Ctrl-d: Close Tab
+//       H (Shift-h): Backward history
+//       L (Shift-l): Forward history
+//
+
+// Close current tab (configure in browser).
+map('<Ctrl-d>', 'x');
+
+// Forward/backward history (configure in browser).
+map('H', 'S');
+map('L', 'D');
+
+map('<Ctrl-[>', '<Esc>');
+cmap('<Ctrl-[>', '<Esc>');
+imap('<Ctrl-[>', '<Esc>');
+vmap('<Ctrl-[>', '<Esc>');
+
+// Page scrolling.
+map('<Ctrl-b>', 'e');
+map('<Ctrl-f>', 'd');
+
+// Omnibar open in current tab.
+map('o', 'go');
+
+// Seems this is the way, but not working.
+// aceVimMap('<Ctrl-[>', '<Esc>', 'normal');
+
+//
+// NOTE: Can prefix the description with the section of the help screen 
+// where you want the key to show up (i.e. '?'). For example:
+//
+//   mapkey('gH', '#1Open google in a new tab', function() { ... }
+//
+// No prefix will cause it to show up in the 'Misc' section.
+//
+
+mapkey('gh', "Open google in the current tab", function() {
+    window.location.href = 'https://google.com';
+});
+
+mapkey('gH', 'Open google in a new tab', function() {
+    tabOpenLink('https://google.com');
+});
+
+// Flip flop the 'su' and 'sU' mappings. {{
+unmap('su');
+unmap('sU');
+
+mapkey('su', '#4Edit current URL with vim editor, and reload', function() {
+    Front.showEditor(window.location.href, function(data) {
+        window.location.href = data;
+    }, 'url');
+});
+
+mapkey('sU', '#4Edit current URL with vim editor, and open in new tab', function() {
+    Front.showEditor(window.location.href, function(data) {
+        tabOpenLink(data);
+    }, 'url');
+});
+// }}
+
+// Default is 'center'.
+settings.hintAlign = 'left';
+
+// Default is 70.
+settings.scrollStepSize = 40;
+
+// Display tabs in natural order.
+settings.tabsMRUOrder = false;
+
+// Doesn't seem to work (at least in Vivaldi, which has prefrences for where to open new tabs).
+settings.newTabPosition = 'right';
+
+// Surfingkeys internally maintains a tab order and maps the following keys to
+// navigate based on that order (search default mappings for 'historyTab').
+unmap('F');
+unmap('B');
+unmap('gt');
+unmap('gT');
+
+// Show links, open in new tab.
+map('F', 'af');
+
+// Go back to last active tab.
+map(',,', '<Ctrl-6>');
+
+// set theme
+settings.theme = `
+.sk_theme {
+    font-family: Input Sans Condensed, Charcoal, sans-serif;
+    font-size: 10pt;
+    background: #24272e;
+    color: #abb2bf;
+}
+.sk_theme tbody {
+    color: #fff;
+}
+.sk_theme input {
+    color: #d0d0d0;
+}
+.sk_theme .url {
+    color: #61afef;
+}
+.sk_theme .annotation {
+    color: #56b6c2;
+}
+.sk_theme .omnibar_highlight {
+    color: #528bff;
+}
+.sk_theme .omnibar_timestamp {
+    color: #e5c07b;
+}
+.sk_theme .omnibar_visitcount {
+    color: #98c379;
+}
+.sk_theme #sk_omnibarSearchResult>ul>li:nth-child(odd) {
+    background: #303030;
+}
+.sk_theme #sk_omnibarSearchResult>ul>li.focused {
+    background: #3e4452;
+}
+#sk_status, #sk_find {
+    font-size: 20pt;
+}`;
+// click `Save` button to make above settings to take effect.

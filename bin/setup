@@ -86,17 +86,13 @@ install_dotfiles() {
     [ -L ~/.vimrc ] && rm ~/.vimrc
     ln -s $VIM_DIR/vimfiles/vimrc ~/.vimrc
     
-    # Vimperator is the firefox vim plugin
-    [ -L ~/.vimperatorrc ] && rm ~/.vimperatorrc
-    ln -s $VIM_DIR/vimfiles/vimperatorrc ~/.vimperatorrc
+    # Surfingkeys is firefox/chrome vim plugin.
+    [ -L ~/.surfingkeysrc ] && rm ~/.surfingkeysrc
+    ln -s $VIM_DIR/vimfiles/surfingkeysrc ~/.surfingkeysrc
     
     # Vrapper is the eclipse vim plugin
     [ -L ~/.vrapperrc ] && rm ~/.vrapperrc
     ln -s $VIM_DIR/vimfiles/vrapperrc ~/.vrapperrc
-    
-    # cVim is the google vim plugin
-    [ -L ~/.cvimrc ] && rm ~/.cvimrc
-    ln -s $VIM_DIR/vimfiles/cvimrc ~/.cvimrc
 }
 
 
