@@ -408,7 +408,7 @@ if has("gui_running")
 
     if OSX()
         " set transparency=10
-        set guifont=Sauce\ Code\ Powerline:h16
+        set guifont=Sauce\ Code\ Powerline:h18
         set columns=160
         set lines=48
     elseif LINUX()
