@@ -29,6 +29,11 @@ if dein#load_state('~/.vim/bundles')
   call dein#save_state()
 endif
 
+" Use an asdf-managed python
+set pythonthreehome=$HOME/.asdf/installs/python/3.7.3-framework-vim/Python.framework/Versions/3.7
+set pythonthreedll=$HOME/.asdf/installs/python/3.7.3-framework-vim/Python.framework/Versions/3.7/lib/libpython3.7.dylib
+let $PATH = $HOME . '/.asdf/installs/python/3.7.3-framework-vim/bin:' . $PATH
+
 filetype plugin indent on
 syntax enable
 
