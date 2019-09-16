@@ -58,8 +58,10 @@ NeoBundle 'flazz/vim-colorschemes'
 
 NeoBundle 'rodjek/vim-puppet'
 NeoBundle 'markcornick/vim-terraform'
+NeoBundle 'lmeijvogel/vim-yaml-helper'
 
 NeoBundle 'luochen1990/rainbow'
+NeoBundle 'mtth/scratch.vim'
 NeoBundle 'ervandew/supertab'
 NeoBundle 'scrooloose/syntastic'
 NeoBundle 'godlygeek/tabular'
@@ -518,6 +520,8 @@ endif
     endif
     let g:airline_symbols.space = "\ua0"
 " }}}
+
+let g:vim_yaml_helper#auto_display_path = 1
 
 " Buffergator {{{
     let g:buffergator_autoexpand_on_split = 0
