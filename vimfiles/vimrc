@@ -1,990 +1,776 @@
+" Modeline & Notes {{{
+" vim: set sw=4 ts=4 sts=4 et tw=79 foldlevel=0 foldmethod=marker foldmarker={{{,}}}:
 "
-" I'd really like to reorganize this so that it's not just one big ass file.
-" Here's some resources:
+" My .vimrc - Always needs lots of work. See the TODO section for things on
+" the list.
 "
-"   https://www.hiteshpaul.com/posts/1378/
-"   https://vimways.org/2018/from-vimrc-to-vim/
-"   https://begriffs.com/posts/2019-07-19-history-use-vim.html
+"   Development Notes {{{
+"     Debugging: Can insert 'echom "<msg>"' to show mesages in the cmd window.
+"     These typically will disappear when output from .vimrc but can be
+"     displayed with ':messages'.
 "
-" An interesting vim debugging link:
+"     An interesting vim debugging link:
+"         https://codeinthehole.com/tips/debugging-vim-by-example/
 "
-"   https://codeinthehole.com/tips/debugging-vim-by-example/
-"
-
-if &compatible
-  set nocompatible
-endif
-
-" Add the dein installation directory into runtimepath
-set runtimepath+=~/.vim/bundles/repos/github.com/Shougo/dein.vim
-
-if dein#load_state('~/.vim/bundles')
-  call dein#begin('~/.vim/bundles')
-
-  " dein setup {{
-  call dein#add('~/.vim/bundles/repos/github.com/Shougo/dein.vim')
-  call dein#add('Shougo/deoplete.nvim')
-
-  if !has('nvim')
-    call dein#add('roxma/nvim-yarp')
-    call dein#add('roxma/vim-hug-neovim-rpc')
-  endif
-  " }}
-
-  call dein#add('vim-airline/vim-airline')
-  call dein#add('vim-airline/vim-airline-themes')
-  call dein#add('flazz/vim-colorschemes')
-
-  call dein#add('Shougo/denite.nvim', { 'rev': '1.1' })
-  call dein#add('Shougo/defx.nvim', { 'rev': '1.0' })
-
-  call dein#add('tpope/vim-abolish')
-  call dein#add('tpope/vim-fugitive')
-  call dein#add('tpope/vim-surround')
-
-  call dein#add('jeetsukumaran/vim-buffergator')
-
-  call dein#add('rodjek/vim-puppet')
-  call dein#add('markcornick/vim-terraform')
-  call dein#add('lmeijvogel/vim-yaml-helper')
-
-  call dein#add('luochen1990/rainbow')
-  call dein#add('mtth/scratch.vim')
-  call dein#add('ervandew/supertab')
-  call dein#add('scrooloose/syntastic')
-  call dein#add('godlygeek/tabular')
-  call dein#add('tomtom/tcomment_vim')
-
-  call dein#add('jiangmiao/auto-pairs')
-
-  call dein#add('vim-scripts/groovyindent-unix')
-
-  call dein#add('vimwiki/vimwiki')
-
-  call dein#end()
-  call dein#save_state()
-endif
-
-" Python required for all the shougo deXXX plugins.
-if !exists('s:python_initialized')
-    " Use an asdf-managed python
-    set pythonthreehome=$HOME/.asdf/installs/python/3.7.3-framework-vim/Python.framework/Versions/3.7
-    set pythonthreedll=$HOME/.asdf/installs/python/3.7.3-framework-vim/Python.framework/Versions/3.7/lib/libpython3.7.dylib
-    let $PATH = $HOME . '/.asdf/installs/python/3.7.3-framework-vim/bin:' . $PATH
-
-    let s:python_initialized = 1
-endif
-
-filetype plugin indent on
-
-" General
-
-autocmd BufEnter * silent! lcd %:p:h    "cwd tracks current file (better than autochdir)
-
-set guifont=Sauce\ Code\ Powerline:h16
-
-let g:airline_powerline_fonts = 1
-if !exists('g:airline_symbols')
-    let g:airline_symbols = {}
-endif
-let g:airline_symbols.space = "\ua0"
-let g:airline_theme = 'molokai'
-
-colorscheme quantum
-
-autocmd FileType defx call s:DefxSettings()
-
-function! s:DefxSettings() abort
-
-  " Define mappings
-  nnoremap <silent><buffer><expr> <CR>  defx#do_action('open')
-  nnoremap <silent><buffer><expr> ~     defx#do_action('cd')
-  nnoremap <silent><buffer><expr> -     defx#do_action('cd', ['..'])
-  nnoremap <silent><buffer><expr> u     defx#do_action('cd', ['..'])
-  nnoremap <silent><buffer><expr> t     defx#do_action('open_or_close_tree')
-  nnoremap <silent><buffer><expr> T     defx#do_action('open_tree_recursive')
-  nnoremap <silent><buffer><expr> .     defx#do_action('toggle_ignored_files')
-  nnoremap <silent><buffer><expr> yy    defx#do_action('yank_path')
-  nnoremap <silent><buffer><expr> <esc> defx#do_action('quit')
-  nnoremap <silent><buffer><expr> q     defx#do_action('quit')
-  nnoremap <silent><buffer><expr> N     defx#do_action('new_file')
-  nnoremap <silent><buffer><expr> K     defx#do_action('new_directory')
-  nnoremap <silent><buffer><expr> D     defx#do_action('remove')
-
-endfunction
-
-source ~/.vim/config/denite.vim
+"   }}}
+" }}}
 
 " Environment {{{
+    if &compatible
+      set nocompatible
+    endif
 
-silent function! OSX()
-    return has('macunix')
-endfunction
+    silent function! OSX()
+        return has('macunix')
+    endfunction
 
-silent function! LINUX()
-    return has('unix') && !has('macunix') && !has('win32unix')
-endfunction
+    silent function! LINUX()
+        return has('unix') && !has('macunix') && !has('win32unix')
+    endfunction
 
-silent function! WINDOWS()
-    return  (has('win32') || has('win64'))
-endfunction
+    silent function! WINDOWS()
+        return  (has('win32') || has('win64'))
+    endfunction
 
-" Don't see myself ever using windows again, but you never know... this may
-" come in handy.
-" if WINDOWS()
-"   set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
-" endif
+    if WINDOWS()
+      set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
+    endif
+
+    if isdirectory($HOME . '/.vim/python') && !exists('s:python_initialized')
+        set pythonthreehome=$HOME/.vim/python
+        set pythonthreedll=$HOME/.vim/python/lib/libpython3.7.dylib
+        let $PATH = $HOME . '/.vim/python/bin:' . $PATH
+        let s:python_initialized = 1
+    endif
+" }}}
+
+" Install Plugins {{{
+    call plug#begin('~/.vim/plugged')
+
+        Plug 'Shougo/deoplete.nvim'
+
+        if !has('nvim')
+        Plug 'roxma/nvim-yarp'
+        Plug 'roxma/vim-hug-neovim-rpc'
+        endif
+
+        Plug 'vim-airline/vim-airline'
+        Plug 'vim-airline/vim-airline-themes'
+        Plug 'flazz/vim-colorschemes'
+
+        Plug 'Shougo/denite.nvim', { 'tag': '3.0' }
+        Plug 'Shougo/defx.nvim', { 'tag': '1.0' }
+
+        Plug 'tpope/vim-abolish'
+        Plug 'tpope/vim-fugitive'
+        Plug 'tpope/vim-surround'
+
+        Plug 'jeetsukumaran/vim-buffergator'
+
+        Plug 'rodjek/vim-puppet'
+        Plug 'markcornick/vim-terraform'
+        Plug 'lmeijvogel/vim-yaml-helper'
+
+        Plug 'luochen1990/rainbow'
+        Plug 'mtth/scratch.vim'
+        Plug 'ervandew/supertab'
+        Plug 'scrooloose/syntastic'
+        Plug 'godlygeek/tabular'
+        Plug 'tomtom/tcomment_vim'
+
+        Plug 'jiangmiao/auto-pairs'
+
+        Plug 'vim-scripts/groovyindent-unix'
+
+        Plug 'vimwiki/vimwiki'
+    call plug#end()
 " }}}
 
 " General {{{
-syntax enable
+    filetype plugin indent on
+    syntax enable
+    scriptencoding utf-8
 
-set fileformats=unix 
-set history=100
-set ttyfast                             
+    set fileformats=unix 
+    set history=100
+    set ttyfast                             
 
-set ruler                               "show cursor position
+    set ruler                               "show cursor position
 
-set scrolloff=3                         "context lines when scrolling
-set sidescrolloff=5                     "context columns when scrolling
+    set scrolloff=3                         "context lines when scrolling
+    set sidescrolloff=5                     "context columns when scrolling
 
-set laststatus=2                        "always show status line
-set showmode                            "display mode at bottom of screen
-set showcmd                             "show commands at bottom of screen
+    set laststatus=2                        "always show status line
+    set showmode                            "display mode at bottom of screen
+    set showcmd                             "show commands at bottom of screen
 
-set cursorline                          "hightlight current line
-set colorcolumn=81                      "make 80 columns obvious
+    set cursorline                          "hightlight current line
+    set colorcolumn=81                      "make 80 columns obvious
 
-set nostartofline                       "try to leave cursor in same column
-set virtualedit=all                     "allow cursor where no actual characters exist
+    set nostartofline                       "try to leave cursor in same column
+    set virtualedit=all                     "allow cursor where no actual characters exist
 
-set backspace=indent,eol,start          "a better backspace
+    set backspace=indent,eol,start          "a better backspace
 
-set autoread                            "detect external file changes
-set hidden                              "change buffers without saving
+    set autoread                            "detect external file changes
+    set hidden                              "change buffers without saving
 
-set showmatch                           "show matching character pair
+    set showmatch                           "show matching character pair
 
-"set wildmenu                            "enhanced autocomplete
-"set wildmode=longest,list,full          "autocomplete behavior
-set wildmenu
-set wildmode=longest,full
+    "set wildmenu                            "enhanced autocomplete
+    "set wildmode=longest,list,full          "autocomplete behavior
+    set wildmenu                            "enhanced autocomplete
+    set wildmode=longest,full               "autocomplete behavior
 
-set ignorecase                          "ignore case in search, regex
-set smartcase                           "only ignore case if patter is all lower
+    set ignorecase                          "ignore case in search, regex
+    set smartcase                           "only ignore case if pattern is all lower
 
-set hlsearch                            "highlight search results
-set incsearch                           "search incremntally
+    set hlsearch                            "highlight search results
+    set incsearch                           "search incremntally
 
-set cmdheight=3                         "(try to) silence 'Press ENTER or type command to continue' prompt
+    set shortmess+=filmnrxoOtT              "abbreviate messages (avoids 'hit enter')
+    set cmdheight=1                         "command line rows
 
-"autocmd BufEnter * silent! lcd %:p:h    "cwd tracks current current file
+    set autoindent                          "indent at same level as previous line
+    set smartindent                         "add indent for code blocks
 
-" Can be useful for debugging...
-" autocmd VimEnter * echom('========== VimEnter:' . expand('%'))
-" autocmd BufEnter * echom('========== BufEnter:' . expand('%'))
-" autocmd BufNew   * echom('========== BufNew:' . expand('%'))
-" autocmd BufLeave * echom('========== BufLeave:' . expand('%'))
-
-"
-" This is all about implementing some sort of sane buffer handling for for
-" file browsing. That is:
-"
-" - Fully replace netrw with defx.
-" - Proper alternate buffer handling when using defx (i.e. the defx buffer
-"   _never_ becomes the alternate file.
-"
-
-"autocmd FileType defx setlocal bufhidden=wipe
-
-let s:alt_buf = ''
-
-augroup defx_buffers
-  autocmd BufEnter,VimEnter,BufNew
-        \ * execute s:explore(expand('<amatch>'))
-augroup END
-
-function s:explore(path)
-
-    augroup FileExplorer
-        autocmd!
-    augroup END
-
-    " Not sure why, but sometimes we get a defx buffer whithout the 
-    " filetype being properly set.
-    if &filetype ==# 'defx' || bufname('%') =~ '\[defx\]'
-        return
-    endif
-    
-    if @# != ''
-        let s:alt_buf = expand('#')
-    else
-        let s:alt_buf = expand('%')
-    endif
-
-    if isdirectory(a:path) 
-        execute 'Defx' . expand("<amatch>") 
-    endif
-endfunction
-
-autocmd BufLeave * 
-    \  if &filetype ==# 'defx' && s:alt_buf != '' 
-    \|     let @# = bufnr(s:alt_buf) 
-    \| endif
-
-" Silence the damn bell
-set noerrorbells visualbell t_vb=
-autocmd GUIEnter * set visualbell t_vb=
-
-"System clipboard integration.
-if has('unix') && exists('+xterm_clipboard')
-    set clipboard+=unnamedplus
-else
-    set clipboard+=unnamed
-endif
-
-if OSX() || LINUX()
-    " The ^= will prepend our setting to any the existing list.
-    " The // at the end will fully qualify the filenames used for each.
-    set backupdir^=~/.vim/.backup//
-    set directory^=~/.vim/.swp//
-    set undodir^=~/.vim/.undo//
-
-    " Don't want to prepend this one, nor can we use // here.
-    set viewdir=~/.vim/.view
-endif
-" }}}
-
-" Indenting & Tabs {{{
-    set autoindent
-    set smartindent
-
-    set expandtab
+    set expandtab                           "tabs as spaces
     set shiftwidth=4
     set softtabstop=4
+
+    autocmd BufEnter * silent! lcd %:p:h    "cwd tracks current file
+
+    " Silence the bell.
+    set noerrorbells visualbell t_vb=
+    autocmd GUIEnter * set visualbell t_vb=
+
+    if has('clipboard')
+        if has('unnamedplus')  
+            " When possible use + register for copy-paste
+            set clipboard=unnamed,unnamedplus
+        else         
+            " On mac and Windows, use * register for copy-paste
+            set clipboard=unnamed
+        endif
+    endif
+
+    " Directories
+    set backupdir=~/.vim/.backup//
+    set directory=~/.vim/.swp//
+    set undodir=~/.vim/.undo//
+    set viewdir=~/.vim/.view
+
+    " Strip trailing whitespace from these files.
+    autocmd FileType groovy,java,python,puppet,ruby,terraform 
+        \ autocmd BufWritePre <buffer> %s/\s\+$//e
+" }}}
+
+" UI {{{
+
+    " GUI {{{
+
+        if has("gui_running")
+
+           " 
+           " For a good resource regarding how to pick and set a font, see:
+           "
+           "   http://www.scholarslab.org/grad-student-research/vim-gui-font-magic/
+           "
+
+           if OSX()
+               set guifont=Sauce\ Code\ Powerline:h18
+               set columns=160
+               set lines=48
+           elseif LINUX()
+               set guifont=Source\ Code\ Pro\ for\ Powerline\ Medium\ 10
+               set columns=120
+               set lines=52
+           else
+               set guifont="Courier 10 Pitch":h10
+               set columns=120
+               set lines=64
+           endif
+
+           set guioptions-=T           " turn off the toolbar
+           set guioptions-=l           " no scrollbars on the left
+           set guioptions-=L           " no scrollbars on the left
+           set guioptions-=r           " no scrollbars on the right
+           set guioptions-=R           " no scrollbars on the right
+        endif
+    " }}}
+
+    " {{{ colorscheme 
+        " set background=light
+
+        if has("gui_running")
+            " colorscheme onedark
+            " colorscheme professional
+            " colorscheme molokai
+            " colorscheme solarized
+            " colorscheme desert
+            " colorscheme neodark
+            colorscheme quantum
+        else
+            colorscheme molokai
+        endif
+        
+        "
+        " I'm not interested in creating my own versions of various color
+        " schemes. I do, however, want to be able to tweak the ones I use if
+        " necessary, so we'll do that here.
+        "
+        " TODO: Is there a better way to achieve the tweaks we want?
+        " 
+
+        "
+        " Got the following colorscheme stuff from:
+        "
+        " https://github.com/megaannum/colorschemer/blob/master/autoload/colorschemer/viewer.vim
+        "
+
+        let s:colorsname = ""
+
+        function! s:GetColorSchemeName()
+          if exists("g:colors_name")
+            return g:colors_name
+          else
+            if exists("s:colorsname")
+              unlet s:colorsname
+            endif
+
+            execute "redir => s:colorsname"
+            silent execute "colorscheme"
+            execute "redir END"
+            let s:colorsname = s:colorsname[1:]
+            return s:colorsname
+          endif
+        endfunction
+        
+        let cname = s:GetColorSchemeName()
+        
+        if cname == 'molokai'
+            " Better cursor line colors.
+            highlight CursorLine guibg=Gray27 ctermbg=238
+            highlight CursorColumn guibg=Gray27 ctermbg=238
+        
+            " Default column color (i.e. column 80 indicator) sucks (it's red!).
+            " highlight ColorColumn guibg=DarkSlateGray
+        
+            " Default comment color too dark.
+            highlight Comment guifg=SkyBlue3 ctermfg=67
+        
+            " Default visual selection needs more contrast.
+            highlight Visual guifg=Gray30 guibg=NavajoWhite
+            " highlight Visual guibg=gray30
+        elseif cname == 'neodark'
+            highlight Normal guibg=gray18
+        elseif cname == 'onedark'
+            " highlight Comment guifg=SlateGray4 ctermfg=67
+        elseif cname == 'professional'
+            highlight ColorColumn guibg=BlanchedAlmond
+        elseif cname == 'quantum'
+            highlight CursorLine guibg=gray27
+        elseif cname == 'solarized' || cname == 'desert'
+            highlight ColorColumn guibg=DarkSlateGray
+        endif
+        
+    " }}}
 " }}}
 
 " Keys {{{
+    let mapleader = "\<Space>"
+    let g:mapleader = "\<Space>"
 
-let mapleader = "\<Space>"
-let g:mapleader = "\<Space>"
-" let mapleader = ","
-" let g:mapleader = ","
+    " It's tempting to make the <leader>ve, but that results in our :Explore key
+    " maping (<leader>e) not responding like we'd like it to.
+    :nnoremap <leader>ve :vsplit $MYVIMRC<cr>
 
-" It's tempting to make the <leader>ve, but that results in our :Explore key
-" maping (<leader>e) not responding like we'd like it to.
-:nnoremap <leader>ve :vsplit $MYVIMRC<cr>
+    " Wrapped lines goes down/up to next row, rather than next line in file.
+    noremap j gj
+    noremap k gk
 
-" Wrapped lines goes down/up to next row, rather than next line in file.
-noremap j gj
-noremap k gk
+    " scroll up/down without moving the cursor
+    noremap <c-k> 1<c-u>
+    noremap <c-j> 1<c-d>
 
-" scroll up/down without moving the cursor
-noremap <c-k> 1<c-u>
-noremap <c-j> 1<c-d>
+    " Some cool stuff I got from http://howivim.com/2015/steve-francia/ {{
+    " Visual shifting (does not exit Visual mode)
+    vnoremap < <gv
+    vnoremap > >gv
 
-" Some cool stuff I got from http://howivim.com/2015/steve-francia/ {{
-" Visual shifting (does not exit Visual mode)
-vnoremap < <gv
-vnoremap > >gv
+    nnoremap < <l
+    nnoremap > >l
 
-nnoremap < <l
-nnoremap > >l
+    " Allow using the repeat operator with a visual selection (!)
+    vnoremap . :normal .<CR>
 
-" Allow using the repeat operator with a visual selection (!)
-vnoremap . :normal .<CR>
+    " Use the black hole register to paste without overwriting the unnamed
+    " register.
+    vnoremap p "_dP
 
-" Use the black hole register to paste without overwriting the unnamed
-" register.
-vnoremap p "_dP
+    " Yank from the cursor to the end of the line, to be consistent with C and D.
+    nnoremap Y y$
 
-" Yank from the cursor to the end of the line, to be consistent with C and D.
-nnoremap Y y$
+    " Overwrite current character with one from line above. NOTE that this ONLY
+    " works with "virtualedit" equals "all". To do this right, we'd probably need a
+    " functiont that could save, set, restore vitualedit. And would (hopefully?) be
+    " more efficient (as this is VERY slow).
+    " nnoremap <c-k> kyljv"0pl
+    " inoremap <c-k> <esc>lkyljv"0pli
 
-" Overwrite current character with one from line above. NOTE that this ONLY
-" works with "virtualedit" equals "all". To do this right, we'd probably need a
-" functiont that could save, set, restore vitualedit. And would (hopefully?) be
-" more efficient (as this is VERY slow).
-" nnoremap <c-k> kyljv"0pl
-" inoremap <c-k> <esc>lkyljv"0pli
+    " Tab navigation.
+    nnoremap <S-H> gT
+    nnoremap <S-L> gt
 
-" Tab navigation.
-nnoremap <S-H> gT
-nnoremap <S-L> gt
+    " Beginning / end of line.
+    nnoremap <c-h> ^
+    nnoremap <c-l> $
 
-" Beginning / end of line.
-nnoremap <c-h> ^
-nnoremap <c-l> $
+    " These become useful when using an auto-close plugin.
+    inoremap <c-h> <c-o>h
+    inoremap <c-l> <c-o>l
 
-" These become useful when using an auto-close plugin.
-inoremap <c-h> <c-o>h
-inoremap <c-l> <c-o>l
+    "
+    " Command mode mappings.
+    " Note that these match cvim.
+    "
 
-"
-" Command mode mappings.
-" Note that these match cvim.
-"
+    " forward/backward char
+    cnoremap <c-l> <right>
+    cnoremap <c-h> <left>
 
-" forward/backward char
-cnoremap <c-l> <right>
-cnoremap <c-h> <left>
+    " forward/backward word
+    cnoremap <c-y> <s-left>
+    cnoremap <c-o> <s-right>
 
-" forward/backward word
-cnoremap <c-y> <s-left>
-cnoremap <c-o> <s-right>
+    " begin/end of line
+    " default begin: <c-b> 
+    "   default end: <c-e> 
 
-" begin/end of line
-" default begin: <c-b> 
-"   default end: <c-e> 
+    " up/down line
+    cnoremap <c-j> <down>
+    cnoremap <c-k> <up>
 
-" up/down line
-cnoremap <c-j> <down>
-cnoremap <c-k> <up>
+    " delete char / word
+    cnoremap <c-x> <del>
+    " default word: <c-w>
 
-" delete char / word
-cnoremap <c-x> <del>
-" default word: <c-w>
+    " Write buffers.
+    nnoremap <leader>w :w!<cr>
+    nnoremap <leader>W :wa!<cr>
 
-" Write buffers.
-nnoremap <leader>w :w!<cr>
-nnoremap <leader>W :wa!<cr>
+    " Delete buffer.
+    nnoremap <c-q> :bdelete<cr>
 
-" Delete buffer.
-nnoremap <c-q> :bdelete<cr>
+    " Last buffer.
+    " TODO: Would like to have this in insert mode, but that presents issues.
+    " Specifically, we have to leave insert mode in this buffer to switch buffers.
+    " We could reset ourselves to insert mode _after_ we switch buffers, but then
+    " we'd be in insert mode in the buffer we switch to, which is probably not what
+    " we want. Rather, we probably want to move around in that buffer and then come
+    " back to the original buffer, picking up where we left off in insert mode.
+    nnoremap <leader><leader> <C-^>
 
-" Last buffer.
-" TODO: Would like to have this in insert mode, but that presents issues.
-" Specifically, we have to leave insert mode in this buffer to switch buffers.
-" We could reset ourselves to insert mode _after_ we switch buffers, but then
-" we'd be in insert mode in the buffer we switch to, which is probably not what
-" we want. Rather, we probably want to move around in that buffer and then come
-" back to the original buffer, picking up where we left off in insert mode.
-nnoremap <leader><leader> <C-^>
+    " Ideally, used in split window with desired diff buffers open.
+    nnoremap <leader>dt :windo diffthis<CR>
+    nnoremap <leader>do :windo diffoff<CR>
+    nnoremap <leader>du :diffupdate<CR>
 
-" Ideally, used in split window with desired diff buffers open.
-nnoremap <leader>dt :windo diffthis<CR>
-nnoremap <leader>do :windo diffoff<CR>
-nnoremap <leader>du :diffupdate<CR>
+    " Build with gradle.
+    nnoremap <leader>gb :compiler gradlew<CR> :make compile<CR>
+    nnoremap <leader>gt :compiler gradlew<CR> :make test<CR>
 
-augroup VimDiff
-    autocmd!
-    autocmd VimEnter,FileWritePre * 
-        \   nnoremap <expr> <C-j> &diff ? ']c' : '<Nop>' 
-        \ | nnoremap <expr> <C-k> &diff ? '[c' : '<Nop>'
-        \ | nnoremap <expr> <leader>dg &diff ? ':diffget<CR>' : '<Nop>'
-        \ | nnoremap <expr> <leader>dp &diff ? ':diffput<CR>' : '<Nop>'
-        \ | if &diff | set diffopt=filler,context=10000 | endif
-augroup END
+    "
+    " <C-o> instead of <esc> to reduce side-effects. More here:
+    "
+    "   http://vim.wikia.com/wiki/Use_Ctrl-O_instead_of_Esc_in_insert_mode_mappings
+    "
 
-" Build with gradle.
-nnoremap <leader>gb :compiler gradlew<CR> :make compile<CR>
-nnoremap <leader>gt :compiler gradlew<CR> :make test<CR>
+    nnoremap <C-\> :set cursorcolumn!<cr>
+    imap <C-\> <C-o><C-\>
 
-"
-" <C-o> instead of <esc> to reduce side-effects. More here:
-"
-"   http://vim.wikia.com/wiki/Use_Ctrl-O_instead_of_Esc_in_insert_mode_mappings
-"
+    " <tab> to move to matching paren, bracket, etc.
+    nnoremap <tab> %
+    vnoremap <tab> %
 
-nnoremap <C-\> :set cursorcolumn!<cr>
-imap <C-\> <C-o><C-\>
+    " Toggle line numbers.
+    nnoremap <C-n> :call CycleNumber()<cr>
+    inoremap <C-n> <C-o><C-n>
 
-" <tab> to move to matching paren, bracket, etc.
-nnoremap <tab> %
-vnoremap <tab> %
+    " Turn current highlight off.
+    nnoremap <silent> <leader>/ :noh<cr>
 
-" Toggle line numbers.
-nnoremap <C-n> :call CycleNumber()<cr>
-inoremap <C-n> <C-o><C-n>
+    nnoremap <leader>e :Defx<cr>
 
-" Turn current highlight off.
-nnoremap <silent> <leader>/ :noh<cr>
-
-" LOJ:
-nnoremap <leader>e :Defx<cr>
-
-" Search for my section headers.
-nnoremap <leader>s /^.*-\{40,80}\n^.*\[.*\]\s*\_.\{-}-\{40,80}\s*$<cr>
+    " Search for my section headers.
+   nnoremap <leader>s /^.*-\{40,80}\n^.*\[.*\]\s*\_.\{-}-\{40,80}\s*$<cr>
 " }}}
 
 " Autocommands {{{
-" Ruby {{{
-    " ruby standard 2 spaces, always
-    autocmd BufRead,BufNewFile *.rb,*.rhtml setlocal shiftwidth=2 
-    autocmd BufRead,BufNewFile *.rb,*.rhtml setlocal softtabstop=2 
-" }}}
 
-" Terrafrom {{{
-    autocmd FileType terraform setlocal shiftwidth=2 
-    autocmd FileType terraform setlocal softtabstop=2 
-    autocmd FileType terraform setlocal commentstring=#\ %s
-" }}}
+    " gradle {{{
+        autocmd BufNewFile,BufRead *.gradle setfiletype groovy
+    " }}}
+    
+    " python {{{
+        " python comment indents are all hosed up. This will fix it.
+        " See: http://stackoverflow.com/questions/2360249
+        autocmd BufRead,BufNewFile *.py inoremap # X<c-h>#<space>
+    " }}}
+    
+    " shell scripts {{{
+       autocmd FileType sh setlocal shiftwidth=2
+       autocmd FileType sh setlocal softtabstop=2
+    " }}}
+    
+    " ruby {{{
+        autocmd FileType ruby setlocal shiftwidth=2 
+        autocmd FileType ruby setlocal softtabstop=2 
+    " }}}
 
-" yaml {{{
-    autocmd FileType yaml setlocal shiftwidth=2 
-    autocmd FileType yaml setlocal softtabstop=2 
-    autocmd FileType yaml setlocal commentstring=#\ %s
-" }}}
+    " terrafrom {{{
+        autocmd FileType terraform setlocal shiftwidth=2 
+        autocmd FileType terraform setlocal softtabstop=2 
+        autocmd FileType terraform setlocal commentstring=#\ %s
+    " }}}
+    
+    " vimdiff {{{
+        augroup VimDiff
+            autocmd!
+            autocmd VimEnter,FileWritePre * 
+                \   nnoremap <expr> <C-j> &diff ? ']c' : '<Nop>' 
+                \ | nnoremap <expr> <C-k> &diff ? '[c' : '<Nop>'
+                \ | nnoremap <expr> <leader>dg &diff ? ':diffget<CR>' : '<Nop>'
+                \ | nnoremap <expr> <leader>dp &diff ? ':diffput<CR>' : '<Nop>'
+                \ | if &diff | set diffopt=filler,context=10000 | endif
+        augroup END
+    " }}}
 
-" Strip trailing whitespace from these files.
-autocmd FileType groovy,java,python,puppet,ruby,terraform autocmd BufWritePre <buffer> %s/\s\+$//e
+    " yaml {{{
+        autocmd FileType yaml setlocal shiftwidth=2 
+        autocmd FileType yaml setlocal softtabstop=2 
+        autocmd FileType yaml setlocal commentstring=#\ %s
+    " }}}
 
+    " .vimrc {{{
+        " reread .vimrc on save
+        autocmd! BufWritePost .vimrc source % 
 
-" gradle {
-    autocmd BufNewFile,BufRead *.gradle setfiletype groovy
-" }
+        " prevent our .vimrc modeline from closing all our folds on save
+        autocmd! BufWritePre .vimrc setlocal nomodeline
+    " }}}
 
-" shell scripts {
-"    autocmd FileType sh setlocal shiftwidth=2
-"    autocmd FileType sh setlocal softtabstop=2
-" }
+    " {{{ text
+        autocmd BufRead,BufNewFile *.txt setlocal textwidth=72
+        autocmd BufRead,BufNewFile *.txt setlocal formatoptions=tq
 
-" reread .vimrc on save
-autocmd! BufWritePost .vimrc source % 
+        " Turn off handling of '-' as a bullet (sort of).
+        autocmd BufRead,BufNewFile *.txt setlocal comments-=fb:-
+    "  }}}
 
-" prevent our .vimrc modeline from closing all our folds on save
-autocmd! BufWritePre .vimrc setlocal nomodeline
-
-"
-" wrap lines in .txt files.
-" When writing text-based documentation, automatically wrap text.
-" Ideally _don't_ wrap text for entering strings to be entered on
-" the command-line. We should be able to achieve this by setting
-" # and $ as comment characters and not including 'c' in the
-" formatoptions. Looks like I may be understanding this incorrectly
-" and it may not be possible. Rather it appears that 't' is _all_
-" text (including comments), and 'c' is comments only.
-"
-
-autocmd BufRead,BufNewFile *.txt setlocal textwidth=72
-autocmd BufRead,BufNewFile *.txt setlocal formatoptions=tq
-
-"
-" Turn off handling of '-' as a bullet (sort of).
-" Without this, we get (for wrapped lines):
-" - some text ...
-"   another line ...
-" yet another line.
-"
-" Note that we can get _all_ of the above lines to indent within
-" the paragraph by setting 'autoindent'.
-"
-
-autocmd BufRead,BufNewFile *.txt setlocal comments-=fb:-
-
-" python comment indents are all hosed up. This will fix it.
-" See: http://stackoverflow.com/questions/2360249
-autocmd BufRead,BufNewFile *.py inoremap # X<c-h>#<space>
-
-autocmd FileType vimwiki,puppet setlocal textwidth=78
-
+    " Debugging {{{
+        " autocmd VimEnter * echom('========== VimEnter:' . expand('%'))
+        " autocmd BufEnter * echom('========== BufEnter:' . expand('%'))
+        " autocmd BufNew   * echom('========== BufNew:'   . expand('%'))
+        " autocmd BufLeave * echom('========== BufLeave:' . expand('%'))
+    " }}}
 "}}}
 
-" GUI {{{
-" LOJ:
-if has("gui_running")
+" Plugin Config {{{
 
-   " Enable rainbow (can toggle via :RainbowToggle).
-   let g:rainbow_active = 1
-"
-"    " 
-"    " For a good resource regarding how to pick and set a font, see:
-"    "
-"    "   http://www.scholarslab.org/grad-student-research/vim-gui-font-magic/
-"    "
-"
-"    if OSX()
-"        " set transparency=10
-"        set guifont=Sauce\ Code\ Powerline:h18
-"        set columns=160
-"        set lines=48
-"    elseif LINUX()
-"        set guifont=Source\ Code\ Pro\ for\ Powerline\ Medium\ 10
-"        set columns=120
-"        set lines=52
-"    else
-"        set guifont="Courier 10 Pitch":h10
-"        set columns=120
-"        set lines=64
-"    endif
-"
-   set guioptions-=T           " turn off the toolbar
-   set guioptions-=l           " no scrollbars on the left
-   set guioptions-=L           " no scrollbars on the left
-   set guioptions-=r           " no scrollbars on the right
-   set guioptions-=R           " no scrollbars on the right
-endif
-" }}}
+    " Airline {{{
+        if !exists('g:airline_theme')
+            let g:airline_theme = 'molokai'
+        endif
 
-" Colors {{{
+        let g:airline_powerline_fonts = 1
+        if !exists('g:airline_symbols')
+            let g:airline_symbols = {}
+        endif
+        let g:airline_symbols.space = "\ua0"
+    " }}}
+                                     
+    " Buffergator {{{
+        let g:buffergator_autoexpand_on_split = 0
+        let g:buffergator_sort_regime = "filepath"
+        let g:buffergator_viewport_split_policy = "T"
+        let g:buffergator_split_size = 15
+    " }}}
+   
+    " Defx {{{
+        autocmd FileType defx call s:DefxSettings()
 
-"
-" Got the following colorscheme stuff from:
-"
-" https://github.com/megaannum/colorschemer/blob/master/autoload/colorschemer/viewer.vim
-"
+        function! s:DefxSettings() abort
 
-" used to capture the Color Scheme name in GetColorSchemeName
-let s:colorsname = ""
+          " Define mappings
+          nnoremap <silent><buffer><expr> <CR>  defx#do_action('open')
+          nnoremap <silent><buffer><expr> ~     defx#do_action('cd')
+          nnoremap <silent><buffer><expr> -     defx#do_action('cd', ['..'])
+          nnoremap <silent><buffer><expr> u     defx#do_action('cd', ['..'])
+          nnoremap <silent><buffer><expr> t     defx#do_action('open_or_close_tree')
+          nnoremap <silent><buffer><expr> T     defx#do_action('open_tree_recursive')
+          nnoremap <silent><buffer><expr> .     defx#do_action('toggle_ignored_files')
+          nnoremap <silent><buffer><expr> yy    defx#do_action('yank_path')
+          nnoremap <silent><buffer><expr> <esc> defx#do_action('quit')
+          nnoremap <silent><buffer><expr> q     defx#do_action('quit')
+          nnoremap <silent><buffer><expr> N     defx#do_action('new_file')
+          nnoremap <silent><buffer><expr> K     defx#do_action('new_directory')
+          nnoremap <silent><buffer><expr> D     defx#do_action('remove')
 
-function! s:GetColorSchemeName()
-  if exists("g:colors_name")
-    return g:colors_name
-  else
-    if exists("s:colorsname")
-      unlet s:colorsname
-    endif
+        endfunction
 
-    execute "redir => s:colorsname"
-    silent execute "colorscheme"
-    execute "redir END"
-    let s:colorsname = s:colorsname[1:]
-    return s:colorsname
-  endif
-endfunction
+        "
+        " The following is all about implementing some sort of sane buffer
+        " handling for for file browsing. That is:
+        "
+        " - Fully replace netrw with defx.
+        " - Proper alternate buffer handling when using defx (i.e. the defx
+        "   buffer _never_ becomes the alternate file).
+        "
 
-" set background=light
+        " let s:alt_buf = ''
 
-" I like these colorschemes, and have customizations setup for them below.
-" Commented out here so I have a convenient list.
-" colorscheme molokai 
-" colorscheme solarized 
-" colorscheme professional 
+        autocmd FileType defx setlocal bufhidden=wipe
 
-" LOJ: 
-"if has("gui_running")
-"    " colorscheme onedark
-"    " colorscheme professional
-"    " colorscheme molokai
-"    " colorscheme solarized
-"    " colorscheme desert
-"    colorscheme neodark
-"else
-"    colorscheme molokai
-"endif
-"
-""
-"" I'm not interested in creating my own versions of various color
-"" schemes. I do, however, want to be able to tweak the ones I use if
-"" necessary, so we'll do that here.
-""
-"" TODO: Is there a better way to achieve the tweaks we want?
-"" 
-"
-"let cname = s:GetColorSchemeName()
-"
-"if cname == 'onedark'
-"    " highlight Comment guifg=SlateGray4 ctermfg=67
-"elseif cname == 'neodark'
-"    highlight Normal guibg=gray18
-"elseif cname == 'molokai'
-"    " Better cursor line colors.
-"    highlight CursorLine guibg=Gray27 ctermbg=238
-"    LOJ: This is ok with quantum.
-    highlight CursorLine guibg=gray27
-"    highlight CursorColumn guibg=Gray27 ctermbg=238
-"
-"    " Default column color (i.e. column 80 indicator) sucks (it's red!).
-"    " highlight ColorColumn guibg=DarkSlateGray
-"
-"    " Default comment color too dark.
-"    highlight Comment guifg=SkyBlue3 ctermfg=67
-"
-"    " Default visual selection needs more contrast.
-"    highlight Visual guifg=Gray30 guibg=NavajoWhite
-"    " highlight Visual guibg=gray30
-"elseif cname == 'solarized' || cname == 'desert'
-"    highlight ColorColumn guibg=DarkSlateGray
-"elseif cname == 'professional'
-"    highlight ColorColumn guibg=BlanchedAlmond
-"endif
-"
-"" }}}
-"
-"" Airline {{{
-"    " let g:airline_theme = 'bubblegum'
-"    let g:airline_theme = 'molokai'
-"    " let g:airline_theme = 'onedark'
-"    let g:airline_powerline_fonts = 1
-"    if !exists('g:airline_symbols')
-"        let g:airline_symbols = {}
-"    endif
-"    let g:airline_symbols.space = "\ua0"
-"" }}}
+        augroup defx_buffers
+         autocmd BufEnter,VimEnter,BufNew
+               \ * call s:explore(expand('<amatch>'))
+        augroup END
 
-let g:vim_yaml_helper#auto_display_path = 1
+        autocmd BufLeave * 
+            \  if &filetype ==# 'defx' && s:alt_buf != '' 
+            \|     let @# = bufnr(s:alt_buf) 
+            \| endif
 
-" Buffergator {{{
-    let g:buffergator_autoexpand_on_split = 0
-    let g:buffergator_sort_regime = "filepath"
-    let g:buffergator_viewport_split_policy = "T"
-    let g:buffergator_split_size = 15
+        function s:explore(path)
 
-    " TODO: Unmap buffergator's tab handling keys. Why did I add this?
-" }}}
+           augroup FileExplorer
+               autocmd!
+           augroup END
 
-" NOTE: Temporarily replacing netrw with vimfiler. May make this permanent.
-" LOJ:
-"let g:vimfiler_as_default_explorer = 1
-"let g:vimfiler_restore_alternate_file = 1
-" " Netrw {{{
-"     let g:netrw_keepdir = 0
-"     let g:netrw_special_syntax = 1
-"     let g:netrw_altfile = 1
-"     let g:netrw_banner = 0
-" " }}}
+           " Not sure why, but sometimes we get a defx buffer whithout the 
+           " filetype being properly set.
+           if &filetype ==# 'defx' || bufname('%') =~ '\[defx\]'
+               return
+           endif
 
-" SuperTab {{{
-    " <c-space> is gobally mapped to :buffer#, but there seems
-    " to be no conflict here.
-    let g:SuperTabMappingForward = '<c-space>'
-    let g:SuperTabMappingBackward = '<s-c-space>'
+           if @# != ''
+               let s:alt_buf = expand('#')
+           else
+               let s:alt_buf = expand('%')
+           endif
 
-    let g:SuperTabDefaultCompletionType = "context"
-    let g:SuperTabContextDefaultCompletionType = "<c-n>"
-" }}}
-
-" VimWiki {{{
-    silent! nunmap <leader>ww
-    silent! nunmap <leader>wi
-    silent! nunmap <leader>ws
-    silent! nunmap <leader>wt
-    silent! nunmap <leader>w<leader>t
-    silent! nunmap <leader>w<leader>w
-    silent! nunmap <leader>w<leader>i
-
-    nmap <leader>vw <Plug>VimwikiIndex
-    nmap <leader>vi <Plug>VimwikiTabIndex
-    nmap <leader>vs <Plug>VimwikiUISelect
-    nmap <leader>vr <Plug>VimwikiRenameLink
-    nmap <leader>vdw <Plug>VimwikiDiaryIndex
-    nmap <leader>vdt <Plug>VimwikiTabMakeDiaryNote
-    nmap <leader>vdn <Plug>VimwikiMakeDiaryNote
-    nmap <leader>vdg <Plug>VimwikiDiaryGenerateLinks
-
-    " Must remap this one as vimwiki maps it to <c-space> by default
-    " which I want mapped to ":buffer#" everywhere.
-    nnoremap <leader>tt <Plug>VimwikiToggleListItem
-" }}}
-
-" LOJ:
-"call vimfiler#custom#profile('default', 'context', {
-"           \  'force_quit': 1,
-"           \ })
-"
-"" Custom mappings for vimfiler buffers
-"autocmd FileType vimfiler call s:vimfiler_settings()
-"autocmd FileType vimfiler setlocal nobuflisted
-"
-"function! s:vimfiler_settings()
-"  " <Space> is my leader key and I don't want it to get taken over here.
-"  silent! nunmap <buffer> <Space>
-"
-"  " By default <Space> toggles file mark, but we just unmapped that.
-"  nmap <buffer> gm <Plug>(vimfiler_toggle_mark_current_line)
-"  map  <buffer> -  <Plug>(vimfiler_switch_to_parent_directory)
-"endfunction
-
-" Unite {{{
-
-"
-" When we're bootstrapping our vim setup (via bin/setup in our vim git
-" project), we can run into a chicke/egg sort of thing here that throws some
-" warnings. Seems when installing via the neobundle command line call, that
-" .vimrc gets entirely read before plugins get installed. We can eliminate
-" these warnings with the following if statement.
-"
-
-" LOJ:
-"function! ConfigureUnite()
-"    
-"    "
-"    " I don't really understand how to use this plugin, some things
-"    " I've done:
-"    "
-"    " Grep cursor word from file's subdir:
-"    "   UniteWithCursorWord -silent -auto-preview -winheight=40 -no-quit grep
-"    " Grep cursor work from project root:
-"    "   UniteWithCursorWord -silent -auto-preview -winheight=40 -no-quit grep:!
-"    "
-"    
-"    "
-"    " Most of this configuration, and more good stuff (I think) from:
-"    " http://www.codeography.com/2013/06/17/replacing-all-the-things-with-unite-vim.html
-"    "
-"    
-"    let g:unite_source_rec_max_cache_files = 0
-"    call unite#custom#source('file_rec,file_rec/async,grep', 'max_candidates', 0)
-"    
-"    " NOTE: '!' means project dir.
-"    
-"    nnoremap <leader>F :<C-u>Unite -buffer-name=files -start-insert file_rec/async:!<cr>
-"    nnoremap <leader>f :<C-u>Unite -buffer-name=files -start-insert file_rec/async<cr>
-"    nnoremap <leader>G :<C-u>Unite -buffer-name=grep -start-insert grep:!<cr>
-"    nnoremap <leader>g :<C-u>Unite -buffer-name=grep -start-insert grep:.<cr>
-"    nnoremap <leader>y :Unite history/yank<CR>
-"    
-"    call unite#custom#source(
-"                \ 'file_rec,file_rec/async,grep', 
-"                \ 'ignore_pattern', join([
-"                \     '\.svn/',
-"                \     '\.git/',
-"                \     '\.gradle/',
-"                \     '\.tfstate',
-"                \     '\Wbuild/',
-"                \     '\Wvendor/',
-"                \     '\Wnode_modules/',
-"                \     '\Wbower_components/',
-"                \ ], '\|'))
-"    
-"    call unite#custom#source(
-"                \ 'file,file_rec,file_rec/async', 'matchers',
-"                \ ['matcher_glob', 
-"                \  'matcher_hide_hidden_files',
-"                \  'matcher_hide_current_file'])
-"    
-"    "
-"    " On OS X install ag (a.k.a the silver searcher) to enhance performance 
-"    " (unite detects it automatically). Can be installed via brew.
-"    "
-"    
-"    if executable('ag')
-"    
-"        let g:unite_source_grep_command = 'ag'
-"        let g:unite_source_grep_recursive_opt = ''
-"        let g:unite_source_grep_default_opts = 
-"                    \ '-i --line-numbers --nocolor --nogroup --hidden ' .
-"                    \ '--ignore ''.hg'' ' .
-"                    \ '--ignore ''.svn'' ' .
-"                    \ '--ignore ''.git'' ' .
-"                    \ '--ignore ''.gradle'' ' .
-"                    \ '--ignore ''.bzr'' '
-"    
-"        let g:unite_source_rec_async_command = 
-"                    \ ['ag', '--follow', '--nocolor', '--nogroup', '--hidden', '-g', '']
-"    
-"    elseif executable('ack')
-"    
-"        let g:unite_source_grep_command = 'ack'
-"        let g:unite_source_grep_recursive_opt = ''
-"        let g:unite_source_grep_default_opts = '--no-heading --no-color -k'
-"    
-"        let g:unite_source_rec_async_command = ['ack', '-f', '--nofilter']
-"    
-"    endif
-"    
-"    " Custom mappings for unite buffers
-"    autocmd FileType unite call s:unite_settings()
-"    
-"    function! s:unite_settings()
-"      " Play nice with supertab
-"      let b:SuperTabDisabled=1
-"    
-"      " Enable navigation with control-j and control-k in insert mode
-"      imap <buffer> <C-j> <Plug>(unite_select_next_line)
-"      imap <buffer> <C-k> <Plug>(unite_select_previous_line)
-"      imap <buffer> <C-q> <Plug>(unite_exit)
-"    endfunction
-"endfunction
-"" }}}
-
-
-" Lazy Config {{{
-
-function! g:LazyConfig()
-    if exists(":Unite")
-        call ConfigureUnite()
-    endif
-endfunction
-
-augroup lazy_config
-    autocmd!
-    autocmd VimEnter * call g:LazyConfig()
-augroup END
-
-" }}}
-
-
-"
-" Dump output of an ex command to a new buffer in a new tab. Primarily useful
-" for searching ex command output.
-" Example:  TabMessage map
-"
-
-function! TabMessage(cmd)
-  redir => message
-  silent execute a:cmd
-  redir END
-  if empty(message)
-    echoerr "no output"
-  else
-    " use "new" instead of "tabnew" below if you prefer split windows instead of tabs
-    tabnew
-    setlocal buftype=nofile bufhidden=wipe noswapfile nobuflisted nomodified
-    silent put=message
-  endif
-endfunction
-command! -nargs=+ -complete=command TabMessage call TabMessage(<q-args>)
-
-
-"
-" Wanted to have <c-n> run invnumber and <c-r> run invrelativenumber
-" so I could toggle these independently, but <c-r> is redo and I didn't
-" want to mess with that. With this function I can just cycle through
-" using a single key.
-"
-
-function! CycleNumber() 
-    if ! &number && ! &relativenumber
-        set number
-    elseif &number && ! &relativenumber
-        set relativenumber
-    else
-        set nonumber
-        set norelativenumber
-    endif
-endfunction
-
-
-function! FormatCss()
-
-    " TODO: Make sure we're in css buffer?
-
-    "
-    " Decontstruct the file to a consistent format from which
-    " we can reliably reconstruct it.
-    "
-
-    silent %s///g                       " Just in case, delete any control-M's.
-    silent %s/\s*$//g                     " Remove trailing whitespace on all lines.
-    silent %s/\s\+/ /g                    " Replace multiple whitespace with single space.
-    silent g/^\s*$/d                      " Delete all blank lines.
-    silent %s/\n//g                       " Remove all carriage returns.
-
-    "
-    " Reformat the deconstructed file.
-    "
+           if isdirectory(a:path) 
+               execute 'Defx' . expand("<amatch>") 
+           endif
+        endfunction
+    " }}}
     
-    silent %s/\*\//*\/\r\r/g              " Two newlines after comment lines.
-    silent %s/}/}\r\r/g                   " Two newlines after }.
-    silent %s/{/{\r/g                     " Newline after {.
-    silent %s/;/;\r/g                     " Newline after ;.
-    silent %s/^\(\s*\S\+.*\)}$/\1\r}/g    " Newline before ).
+    " Denite {{{
+        if executable('ag')
+            call denite#custom#var('file/rec', 'command', 
+                \ ['ag', '--follow', '--nocolor', '--nogroup', '-g', '']) 
 
-    " TODO: There's a potential issue with sorting attributes in
-    " that the original css could have multiple attributes, with
-    " the last one not being terminated with a ';'. In this case,
-    " sorting could move that attribute to the middle of the list,
-    " which, without the ';', would be invalid html. Therefore,
-    " we'll simply return here until we account for this.
+            call denite#custom#var('grep', 'default_opts', ['-i', '--vimgrep'])
+            call denite#custom#var('grep', 'final_opts', [])
+            call denite#custom#var('grep', 'pattern_opt', [])
+            call denite#custom#var('grep', 'recursive_opts', [])
+            call denite#custom#var('grep', 'separator', ['--'])
 
-    return
+        elseif executable('rg')
+            call denite#custom#var('file/rec', 'command', 
+                \ ['rg', '--files', '--glob', '!.git'])
 
+            call denite#custom#var('grep', 'command', ['rg', '--threads', '1'])
+            call denite#custom#var('grep', 'default_opts', ['--vimgrep', '--no-heading'])
+            call denite#custom#var('grep', 'final_opts', [])
+            call denite#custom#var('grep', 'pattern_opt', ['--regexp'])
+            call denite#custom#var('grep', 'recursive_opts', [])
+            call denite#custom#var('grep', 'separator', ['--'])
+        endif
+
+        call denite#custom#source('file/rec', 'matchers', ['matcher/regexp'])
+
+        call denite#custom#source('grep',
+              \ 'converters', ['converter/abbr_word'])
+
+        " Change mappings.
+        call denite#custom#map(
+              \ 'insert',
+              \ '<C-j>',
+              \ '<denite:move_to_next_line>',
+              \ 'noremap'
+              \)
+        call denite#custom#map(
+              \ 'insert',
+              \ '<C-k>',
+              \ '<denite:move_to_previous_line>',
+              \ 'noremap'
+              \)
+        call denite#custom#map(
+              \ 'insert',
+              \ '<C-f>',
+              \ '<denite:scroll_page_forwards>',
+              \ 'noremap'
+              \)
+        call denite#custom#map(
+              \ 'insert',
+              \ '<C-b>',
+              \ '<denite:scroll_page_backwards>',
+              \ 'noremap'
+              \)
+
+        nnoremap <leader>f :<C-u>Denite file     -direction=dynamictop<cr>
+        nnoremap <leader>r :<C-u>Denite file/rec -direction=dynamictop<cr>
+        nnoremap <leader>R :<C-u>Denite grep     -direction=dynamictop<cr>
+
+        nnoremap <leader>p :<C-u>DeniteProjectDir file/rec -direction=dynamictop<cr>
+        nnoremap <leader>P :<C-u>DeniteProjectDir grep     -direction=dynamictop<cr>
+    " }}}
+
+    " Miscellaneous {{{
+        let g:rainbow_active = 1
+        let g:vim_yaml_helper#auto_display_path = 1
+    " }}}
+
+    " SuperTab {{{
+        " <c-space> is gobally mapped to :buffer#, but there seems
+        " to be no conflict here.
+        let g:SuperTabMappingForward = '<c-space>'
+        let g:SuperTabMappingBackward = '<s-c-space>'
+
+        let g:SuperTabDefaultCompletionType = "context"
+        let g:SuperTabContextDefaultCompletionType = "<c-n>"
+    " }}}
+    
+    " VimWiki {{{
+        silent! nunmap <leader>ww
+        silent! nunmap <leader>wi
+        silent! nunmap <leader>ws
+        silent! nunmap <leader>wt
+        silent! nunmap <leader>w<leader>t
+        silent! nunmap <leader>w<leader>w
+        silent! nunmap <leader>w<leader>i
+
+        nmap <leader>vw <Plug>VimwikiIndex
+        nmap <leader>vi <Plug>VimwikiTabIndex
+        nmap <leader>vs <Plug>VimwikiUISelect
+        nmap <leader>vr <Plug>VimwikiRenameLink
+        nmap <leader>vdw <Plug>VimwikiDiaryIndex
+        nmap <leader>vdt <Plug>VimwikiTabMakeDiaryNote
+        nmap <leader>vdn <Plug>VimwikiMakeDiaryNote
+        nmap <leader>vdg <Plug>VimwikiDiaryGenerateLinks
+
+        autocmd FileType vimwiki setlocal textwidth=78
+    " }}}
+" }}}
+
+" Functions {{{
+
+    " Dump output of an ex command to a new buffer in a new tab. Primarily
+    " useful for searching ex command output.  
+    " Example: :TabMessage map
+    " 
+    function! TabMessage(cmd)
+      redir => message
+      silent execute a:cmd
+      redir END
+      if empty(message)
+        echoerr "no output"
+      else
+        " use "new" instead of "tabnew" below if you prefer split windows instead of tabs
+        tabnew
+        setlocal buftype=nofile bufhidden=wipe noswapfile nobuflisted nomodified
+        silent put=message
+      endif
+    endfunction
+    command! -nargs=+ -complete=command TabMessage call TabMessage(<q-args>)
+
+    " Wanted to have <c-n> run invnumber and <c-r> run invrelativenumber so I
+    " could toggle these independently, but <c-r> is redo and I didn't want to
+    " mess with that. With this function I can just cycle through using a
+    " single key.
     "
-    " Sort attributes.
-    "
+    function! CycleNumber() 
+        if ! &number && ! &relativenumber
+            set number
+        elseif &number && ! &relativenumber
+            set relativenumber
+        else
+            set nonumber
+            set norelativenumber
+        endif
+    endfunction
 
-    " Start at top of file.
-    normal gg
 
-    while search("{$", "W")
-        +1
-        let first = line(".")
+    function! FormatCss()
 
-        /}
-        -1
-        let last = line(".")
+        " TODO: Make sure we're in css buffer?
 
-        execute first . "," . last . "sort"
-    endwhile
+        "
+        " Decontstruct the file to a consistent format from which
+        " we can reliably reconstruct it.
+        "
 
-    " Indent file.
-    normal gg=G
+        silent %s///g                       " Just in case, delete any control-M's.
+        silent %s/\s*$//g                     " Remove trailing whitespace on all lines.
+        silent %s/\s\+/ /g                    " Replace multiple whitespace with single space.
+        silent g/^\s*$/d                      " Delete all blank lines.
+        silent %s/\n//g                       " Remove all carriage returns.
 
-endfunction
+        "
+        " Reformat the deconstructed file.
+        "
+        
+        silent %s/\*\//*\/\r\r/g              " Two newlines after comment lines.
+        silent %s/}/}\r\r/g                   " Two newlines after }.
+        silent %s/{/{\r/g                     " Newline after {.
+        silent %s/;/;\r/g                     " Newline after ;.
+        silent %s/^\(\s*\S\+.*\)}$/\1\r}/g    " Newline before ).
 
-nmap <silent> _c :call FormatCss()<CR>
+        " TODO: There's a potential issue with sorting attributes in
+        " that the original css could have multiple attributes, with
+        " the last one not being terminated with a ';'. In this case,
+        " sorting could move that attribute to the middle of the list,
+        " which, without the ';', would be invalid html. Therefore,
+        " we'll simply return here until we account for this.
+
+        return
+
+        "
+        " Sort attributes.
+        "
+
+        " Start at top of file.
+        normal gg
+
+        while search("{$", "W")
+            +1
+            let first = line(".")
+
+            /}
+            -1
+            let last = line(".")
+
+            execute first . "," . last . "sort"
+        endwhile
+
+        " Indent file.
+        normal gg=G
+
+    endfunction
+
+    nmap <silent> _c :call FormatCss()<CR>
+
 " }}}
 
 " TODO / etc {{{
-"   - Groovy (gradle) syntax highlighting, indenting. Currently this pretty
-"   much sucks.
 "
-"   - Copy character from line above (below?).
+"   - Snippets
 "
-"   - Need to setup some keystrokes and/or function for using diff while
-"   in vim. Vim can do this no problem, but the user experience is kind
-"   of a pain in the ass. Here's (one way) how it works:
-"     - open two buffers in vertical or horizontal split
-"     - go to one buffer and do ':diffthis'
-"     - go to other buffer and do ':diffthis'
-"     - do your merges/edits (]c, [c to jump diffs, :diffget, :diffput
-"     to merge across buffers
-"     - go to one buffer and do ':diffoff'
-"     - go to other buffer and do ':diffoff'
+"   - Tags
 "
-"   Wow, really? That kinda sucks. Here's my wish(ywashy)list:
-"     - if in a split, keystroke will start diff for the two buffers in
-"     the split
-"     - if NOT in a split, keystroke will ~horizontally~ extend the
-"     window and open the prior buffer in a vertical split
-"     - while in the diff, a keystroke will turn off diff in both buffers,
-"     closing the split (~ideally~ only if it opened the split to begin)
-"     - while in diff mode, some handy dandy keystroke mappings would be
-"     nice
-"
-"   - Add keystroke/functionality to insert a snippet for my code section
-"   "headers". For example:
-"
-"   //----------------------------------------------------------------------
-"   // [some text]
-"   //----------------------------------------------------------------------
-"
-"   Hmmm... how to get comment characters for the above? Should this be a
-"   snippet?
-"
-"   - plugins to look at:
-"     - snipmate/ultisnips/neosnippet or something similar
-"     - fugitive (git plugin)
-"     - yankring or yankstack (or will unite suffice?)
-"
-"   - Better line wrapping in various filetypes. For some wordwrap
-"   configurations this is not a big deal. For example '.txt' files I'd be
-"   happy to have just wrap (inserting a newline) at 78 characters
-"   (textwidth=78). For other filetypes, however, (specifically vimwiki), I
-"   don't want wrapping via inserting linebreaks. This can only be achieved in
-"   vim by setting 'wrapmargin=', which unfotunately is dependent on the
-"   current window width. Need to figure out how to use something like the
-"   following to respond to the resizing accordingly.
-"
-"   function! ResizeEvent()
-"      let &lines = &lines - 1
-"      execute '!echo "resizing "'.&columns . ' >> ~/test.txt'
-"   endfunction
-"   
-"   autocmd VimResized * call ResizeEvent()
-"
-"   - Really need to get netrw whipped into shape, which seems to be
-"     a much bigger pain in the ass than it should be. From this link...
-"
-"     http://vim.1045645.n5.nabble.com/Getting-out-of-netrw-td1156403.html
-"
-"     ... some things that might be useful:
-"
-"     function MyExplore()
-"       tabnew
-"       Explore
-"       nmap <buffer> <leader>q :q<cr>
-"     endfunction 
-"
-"     Run this ':topleft vsplit .'
-"
-"     And from...
-"
-"       http://stackoverflow.com/questions/21996768/how-do-you-change-the-root-of-the-netrw-tree-in-vim
-"
-"     ... when in tree mode, you can use :Ntree to reset the head of the
-"     tree.
+"   - Copy character from line above/below?.
 "
 "   - Some interesting things I see in Nate Neff's vim github project:
 "
@@ -997,14 +783,6 @@ nmap <silent> _c :call FormatCss()<CR>
 "      <leader>ci      Comment / Uncomment line(s)
 "      <leader>cu      UN-comment line(s)
 "      <leader>cl      Comment lines
-"     
-"     # Source Control
-"     
-"     (From VCSCommand.vim)
-"     
-"      <leader>nvc     Commit current file
-"      <leader>nvd     Diff current file w/repository version
-"      <leader>nvv     VimDiff current file w/repository version
 "     
 " }}}
 
