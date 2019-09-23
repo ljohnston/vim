@@ -1,20 +1,19 @@
 
 # project ignores
 autoload/
-bundle/
-bundles/
-plugin
+plugged/
+python
 
-.backup
+**/*.backup
 !.backup/README.md
 
-.swp
+**/*.swp
 !.swp/README.md
 
-.undo
+**/*.undo
 !.undo/README.md
 
-.view
+**/*.view
 !.view/README.md
 
 .netrwhist
