@@ -1,8 +1,8 @@
 
 # project ignores
 autoload/
-bundles/
-plugin
+plugged/
+python
 
 **/*.backup
 !.backup/README.md

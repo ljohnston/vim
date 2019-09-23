@@ -33,12 +33,15 @@
     endfunction
 
     if WINDOWS()
-      set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
+        set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
     endif
 
+    " Create a '~/.vim/python' symlink to python home to turn this on...
+    " python -> ~/.asdf/installs/python/3.7.3-framework-vim/Python.framework/Versions/3.7
     if isdirectory($HOME . '/.vim/python') && !exists('s:python_initialized')
         set pythonthreehome=$HOME/.vim/python
-        set pythonthreedll=$HOME/.vim/python/lib/libpython3.7.dylib
+        " Setting 'pythonthreehome' seems to be enough for the dll as well.
+        "set pythonthreedll=$HOME/.vim/python/lib/libpython3.7.dylib
         let $PATH = $HOME . '/.vim/python/bin:' . $PATH
         let s:python_initialized = 1
     endif
