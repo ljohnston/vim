@@ -53,8 +53,8 @@
         Plug 'Shougo/deoplete.nvim'
 
         if !has('nvim')
-        Plug 'roxma/nvim-yarp'
-        Plug 'roxma/vim-hug-neovim-rpc'
+            Plug 'roxma/nvim-yarp'
+            Plug 'roxma/vim-hug-neovim-rpc'
         endif
 
         Plug 'vim-airline/vim-airline'
@@ -281,11 +281,12 @@
 " }}}
 
 " Keys {{{
+    " Some useful keymappig links:
+    " - https://raddevon.com/articles/what-to-do-when-a-vim-keymap-doesnt-work/
+
     let mapleader = "\<Space>"
     let g:mapleader = "\<Space>"
 
-    " It's tempting to make the <leader>ve, but that results in our :Explore key
-    " maping (<leader>e) not responding like we'd like it to.
     :nnoremap <leader>ve :vsplit $MYVIMRC<cr>
 
     " Wrapped lines goes down/up to next row, rather than next line in file.
@@ -307,12 +308,12 @@
     " Allow using the repeat operator with a visual selection (!)
     vnoremap . :normal .<CR>
 
+    nnoremap Y y$
+    " }}
+
     " Use the black hole register to paste without overwriting the unnamed
     " register.
     vnoremap p "_dP
-
-    " Yank from the cursor to the end of the line, to be consistent with C and D.
-    nnoremap Y y$
 
     " Overwrite current character with one from line above. NOTE that this ONLY
     " works with "virtualedit" equals "all". To do this right, we'd probably need a
@@ -574,6 +575,7 @@
             call denite#custom#var('file/rec', 'command', 
                 \ ['ag', '--follow', '--nocolor', '--nogroup', '-g', '']) 
 
+            call denite#custom#var('grep', 'command', ['ag'])
             call denite#custom#var('grep', 'default_opts', ['-i', '--vimgrep'])
             call denite#custom#var('grep', 'final_opts', [])
             call denite#custom#var('grep', 'pattern_opt', [])
@@ -584,6 +586,7 @@
             call denite#custom#var('file/rec', 'command', 
                 \ ['rg', '--files', '--glob', '!.git'])
 
+            call denite#custom#var('grep', 'command', ['rg'])
             call denite#custom#var('grep', 'command', ['rg', '--threads', '1'])
             call denite#custom#var('grep', 'default_opts', ['--vimgrep', '--no-heading'])
             call denite#custom#var('grep', 'final_opts', [])
@@ -592,43 +595,39 @@
             call denite#custom#var('grep', 'separator', ['--'])
         endif
 
+        call denite#custom#option('_', 'prompt', '>')
+        call denite#custom#option('_', 'direction', 'dynamictop')
+        call denite#custom#option('_', 'filter_split_direction', 'belowright')
+
         call denite#custom#source('file/rec', 'matchers', ['matcher/regexp'])
+        call denite#custom#source('grep', 'matchers', ['matcher/regexp'])
+        call denite#custom#source('grep', 'converters', ['converter/abbr_word'])
 
-        call denite#custom#source('grep',
-              \ 'converters', ['converter/abbr_word'])
+        autocmd FileType denite call s:denite_my_settings()
 
-        " Change mappings.
-        call denite#custom#map(
-              \ 'insert',
-              \ '<C-j>',
-              \ '<denite:move_to_next_line>',
-              \ 'noremap'
-              \)
-        call denite#custom#map(
-              \ 'insert',
-              \ '<C-k>',
-              \ '<denite:move_to_previous_line>',
-              \ 'noremap'
-              \)
-        call denite#custom#map(
-              \ 'insert',
-              \ '<C-f>',
-              \ '<denite:scroll_page_forwards>',
-              \ 'noremap'
-              \)
-        call denite#custom#map(
-              \ 'insert',
-              \ '<C-b>',
-              \ '<denite:scroll_page_backwards>',
-              \ 'noremap'
-              \)
+        function! s:denite_my_settings() abort
+            nnoremap <silent><buffer><expr> <CR> denite#do_map('do_action')
+            nnoremap <silent><buffer><expr> d denite#do_map('do_action', 'delete')
+            nnoremap <silent><buffer><expr> i denite#do_map('open_filter_buffer')
+            nnoremap <silent><buffer><expr> p denite#do_map('do_action', 'preview')
+            nnoremap <silent><buffer><expr> q denite#do_map('quit')
+        endfunction
 
-        nnoremap <leader>f :<C-u>Denite file     -direction=dynamictop<cr>
-        nnoremap <leader>r :<C-u>Denite file/rec -direction=dynamictop<cr>
-        nnoremap <leader>R :<C-u>Denite grep     -direction=dynamictop<cr>
+        autocmd FileType denite-filter call s:denite_filter_my_settings()
 
-        nnoremap <leader>p :<C-u>DeniteProjectDir file/rec -direction=dynamictop<cr>
-        nnoremap <leader>P :<C-u>DeniteProjectDir grep     -direction=dynamictop<cr>
+        function! s:denite_filter_my_settings() abort
+            imap <silent><buffer> <esc> <Plug>(denite_filter_quit)
+
+            " Fully quit denite.
+	        imap <silent><buffer> <C-o> <Plug>(denite_filter_quit)qq
+        endfunction
+
+        nnoremap <leader>f :<C-u>Denite file -start-filter<cr>
+        nnoremap <leader>r :<C-u>Denite file/rec -start-filter<cr>
+        nnoremap <leader>R :<C-u>Denite grep -start-filter<cr>
+
+        nnoremap <leader>p :<C-u>DeniteProjectDir file/rec -start-filter<cr>
+        nnoremap <leader>P :<C-u>DeniteProjectDir grep -start-filter<cr>
     " }}}
 
     " Miscellaneous {{{
