@@ -630,6 +630,12 @@
 
             " Fully quit denite.
 	        imap <silent><buffer> <C-o> <Plug>(denite_filter_quit)qq
+
+            " Move cursor while in insert mode.
+            inoremap <silent><buffer> <C-j>
+                        \ <Esc><C-w>p:call cursor(line('.')+1,0)<CR><C-w>pA
+            inoremap <silent><buffer> <C-k>
+                        \ <Esc><C-w>p:call cursor(line('.')-1,0)<CR><C-w>pA
         endfunction
 
         nnoremap <leader>f :<C-u>Denite file -start-filter<cr>
