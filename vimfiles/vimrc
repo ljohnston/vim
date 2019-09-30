@@ -36,8 +36,18 @@
         set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
     endif
 
+    "
     " Create a '~/.vim/python' symlink to python home to turn this on...
     " python -> ~/.asdf/installs/python/3.7.3-framework-vim/Python.framework/Versions/3.7
+    "
+    
+    "
+    " This seems to be fraught with peril... things seem to work just fine, and
+    " then I'll start to get weird errors. I don't believe the answer
+    " necessarily lies here, but it may:
+    "
+    "    https://www.bountysource.com/issues/42900279-could-not-find-neovim
+    "
     if isdirectory($HOME . '/.vim/python') && !exists('s:python_initialized')
         set pythonthreehome=$HOME/.vim/python
         " Setting 'pythonthreehome' seems to be enough for the dll as well.
