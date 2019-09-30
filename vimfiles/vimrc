@@ -102,11 +102,15 @@
 " General {{{
     filetype plugin indent on
     syntax enable
+
     scriptencoding utf-8
+    set encoding=utf-8
 
     set fileformats=unix 
     set history=100
     set ttyfast                             
+
+    set nofileignorecase                    "case-sensitive file completion
 
     set ruler                               "show cursor position
 
