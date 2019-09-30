@@ -801,6 +801,10 @@
 "
 "   - Copy character from line above/below?.
 "
+"   - I have some diff mode stuff configured here (see the VimDiff and windo
+"   keymappings above). It would be nice if we did a 'diffoff' while in a Vim
+"   Fugitive diff, that we delete the git index buffer.
+"
 "   - Some interesting things I see in Nate Neff's vim github project:
 "
 "     <Space>    Show recent buffers at bottom of screen.
