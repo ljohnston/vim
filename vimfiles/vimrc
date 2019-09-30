@@ -551,8 +551,8 @@
         autocmd FileType defx setlocal bufhidden=wipe
 
         augroup defx_buffers
-         autocmd BufEnter,VimEnter,BufNew
-               \ * call s:explore(expand('<amatch>'))
+            autocmd BufEnter,VimEnter,BufNew
+                \ * call s:explore(expand('<amatch>'))
         augroup END
 
         autocmd BufLeave * 
@@ -562,25 +562,25 @@
 
         function s:explore(path)
 
-           augroup FileExplorer
-               autocmd!
-           augroup END
+            augroup FileExplorer
+                autocmd!
+            augroup END
 
-           " Not sure why, but sometimes we get a defx buffer whithout the 
-           " filetype being properly set.
-           if &filetype ==# 'defx' || bufname('%') =~ '\[defx\]'
-               return
-           endif
+            " Not sure why, but sometimes we get a defx buffer whithout the 
+            " filetype being properly set.
+            if &filetype ==# 'defx' || bufname('%') =~ '\[defx\]'
+                return
+            endif
 
-           if @# != ''
-               let s:alt_buf = expand('#')
-           else
-               let s:alt_buf = expand('%')
-           endif
+            if @# != ''
+                let s:alt_buf = expand('#')
+            else
+                let s:alt_buf = expand('%')
+            endif
 
-           if isdirectory(a:path) 
-               execute 'Defx' . expand("<amatch>") 
-           endif
+            if isdirectory(a:path) 
+                execute 'Defx' . expand("<amatch>") 
+            endif
         endfunction
     " }}}
     
