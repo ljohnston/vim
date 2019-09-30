@@ -612,6 +612,10 @@
         call denite#custom#option('_', 'prompt', '>')
         call denite#custom#option('_', 'direction', 'dynamictop')
         call denite#custom#option('_', 'filter_split_direction', 'belowright')
+        call denite#custom#option('_', 'vertical_preview', 'true')
+
+        " Not sure this is best for all colorschemes (is for quantum).
+        call denite#custom#option('_', 'highlight_matched_char', 'Special')
 
         call denite#custom#source('file/rec', 'matchers', ['matcher/regexp'])
         call denite#custom#source('grep', 'matchers', ['matcher/regexp'])
@@ -621,18 +625,21 @@
 
         function! s:denite_my_settings() abort
             nnoremap <silent><buffer><expr> <CR> denite#do_map('do_action')
-            nnoremap <silent><buffer><expr> d denite#do_map('do_action', 'delete')
-            nnoremap <silent><buffer><expr> i denite#do_map('open_filter_buffer')
-            nnoremap <silent><buffer><expr> p denite#do_map('do_action', 'preview')
-            nnoremap <silent><buffer><expr> q denite#do_map('quit')
+            nnoremap <silent><buffer><expr> d    denite#do_map('do_action', 'delete')
+            nnoremap <silent><buffer><expr> i    denite#do_map('open_filter_buffer')
+            nnoremap <silent><buffer><expr> p    denite#do_map('do_action', 'preview')
+
+            nnoremap <silent><buffer><expr> <esc> denite#do_map('quit')
+            nnoremap <silent><buffer><expr> q     denite#do_map('quit')
         endfunction
 
         autocmd FileType denite-filter call s:denite_filter_my_settings()
 
         function! s:denite_filter_my_settings() abort
+            " Quit filter window.
             imap <silent><buffer> <esc> <Plug>(denite_filter_quit)
 
-            " Fully quit denite.
+            " Quit filter window and denite.
 	        imap <silent><buffer> <C-o> <Plug>(denite_filter_quit)qq
 
             " Move cursor while in insert mode.
