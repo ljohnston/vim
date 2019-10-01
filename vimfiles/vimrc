@@ -178,8 +178,11 @@
     set viewdir=~/.vim/.view
 
     " Strip trailing whitespace from these files.
-    autocmd FileType groovy,java,python,puppet,ruby,terraform 
-        \ autocmd BufWritePre <buffer> %s/\s\+$//e
+    augroup whitespace
+        autocmd!
+        autocmd FileType groovy,java,python,puppet,ruby,terraform 
+            \ autocmd BufWritePre <buffer> %s/\s\+$//e
+    augroup END
 " }}}
 
 " UI {{{
@@ -437,8 +440,8 @@
     " }}}
     
     " shell scripts {{{
-       autocmd FileType sh setlocal shiftwidth=2
-       autocmd FileType sh setlocal softtabstop=2
+        autocmd FileType sh setlocal shiftwidth=2
+        autocmd FileType sh setlocal softtabstop=2
     " }}}
     
     " ruby {{{
@@ -516,7 +519,7 @@
     " }}}
    
     " Defx {{{
-        autocmd FileType defx call s:DefxSettings()
+        autocmd! FileType defx call s:DefxSettings()
 
         function! s:DefxSettings() abort
 
@@ -548,9 +551,10 @@
 
         " let s:alt_buf = ''
 
-        autocmd FileType defx setlocal bufhidden=wipe
+        autocmd! FileType defx setlocal bufhidden=wipe
 
         augroup defx_buffers
+            autocmd!
             autocmd BufEnter,VimEnter,BufNew
                 \ * call s:explore(expand('<amatch>'))
         augroup END
