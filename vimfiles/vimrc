@@ -77,24 +77,24 @@
         Plug 'tpope/vim-abolish'
         Plug 'tpope/vim-fugitive'
         Plug 'tpope/vim-surround'
-
+        
         Plug 'jeetsukumaran/vim-buffergator'
-
+        
         Plug 'rodjek/vim-puppet'
         Plug 'markcornick/vim-terraform'
         Plug 'lmeijvogel/vim-yaml-helper'
-
+        
         Plug 'luochen1990/rainbow'
         Plug 'mtth/scratch.vim'
         Plug 'ervandew/supertab'
         Plug 'scrooloose/syntastic'
         Plug 'godlygeek/tabular'
         Plug 'tomtom/tcomment_vim'
-
+        
         Plug 'jiangmiao/auto-pairs'
-
+        
         Plug 'vim-scripts/groovyindent-unix'
-
+        
         Plug 'vimwiki/vimwiki'
     call plug#end()
 " }}}
@@ -490,10 +490,16 @@
     "  }}}
 
     " Debugging {{{
-        " autocmd VimEnter * echom('========== VimEnter:' . expand('%'))
-        " autocmd BufEnter * echom('========== BufEnter:' . expand('%'))
-        " autocmd BufNew   * echom('========== BufNew:'   . expand('%'))
-        " autocmd BufLeave * echom('========== BufLeave:' . expand('%'))
+        " autocmd BufCreate   * echom('========== BufCreate:'   . expand('%'))
+        " autocmd BufEnter    * echom('========== BufEnter:'    . expand('%'))
+        " autocmd BufHidden   * echom('========== BufHidden:'   . expand('%'))
+        " autocmd BufLeave    * echom('========== BufLeave:'    . expand('%'))
+        " autocmd BufNew      * echom('========== BufNew:'      . expand('%'))
+        " autocmd BufRead     * echom('========== BufRead:'     . expand('%'))
+        " autocmd BufWinEnter * echom('========== BufWinEnter:' . expand('%'))
+        " autocmd BufWipeout  * echom('========== BufWipeout:'  . expand('%')) 
+        " autocmd FileType    * echom('========== FileType:'    . expand('%')) 
+        " autocmd VimEnter    * echom('========== VimEnter:'    . expand('%'))
     " }}}
 "}}}
 
@@ -519,25 +525,27 @@
     " }}}
    
     " Defx {{{
-        autocmd! FileType defx call s:DefxSettings()
+        autocmd FileType defx call s:DefxSettings()
+        
+        function! s:DefxSettings() 
 
-        function! s:DefxSettings() abort
+            " Define mappings
+            nnoremap <silent><buffer><expr> <CR>  defx#do_action('open')
+            nnoremap <silent><buffer><expr> ~     defx#do_action('cd')
+            nnoremap <silent><buffer><expr> -     defx#do_action('cd', ['..'])
+            nnoremap <silent><buffer><expr> u     defx#do_action('cd', ['..'])
+            nnoremap <silent><buffer><expr> t     defx#do_action('open_or_close_tree')
+            nnoremap <silent><buffer><expr> T     defx#do_action('open_tree_recursive')
+            nnoremap <silent><buffer><expr> .     defx#do_action('toggle_ignored_files')
+            nnoremap <silent><buffer><expr> yy    defx#do_action('yank_path')
+            nnoremap <silent><buffer><expr> q     defx#do_action('quit')
+            nnoremap <silent><buffer><expr> N     defx#do_action('new_file')
+            nnoremap <silent><buffer><expr> K     defx#do_action('new_directory')
+            nnoremap <silent><buffer><expr> D     defx#do_action('remove')
 
-          " Define mappings
-          nnoremap <silent><buffer><expr> <CR>  defx#do_action('open')
-          nnoremap <silent><buffer><expr> ~     defx#do_action('cd')
-          nnoremap <silent><buffer><expr> -     defx#do_action('cd', ['..'])
-          nnoremap <silent><buffer><expr> u     defx#do_action('cd', ['..'])
-          nnoremap <silent><buffer><expr> t     defx#do_action('open_or_close_tree')
-          nnoremap <silent><buffer><expr> T     defx#do_action('open_tree_recursive')
-          nnoremap <silent><buffer><expr> .     defx#do_action('toggle_ignored_files')
-          nnoremap <silent><buffer><expr> yy    defx#do_action('yank_path')
-          nnoremap <silent><buffer><expr> <esc> defx#do_action('quit')
-          nnoremap <silent><buffer><expr> q     defx#do_action('quit')
-          nnoremap <silent><buffer><expr> N     defx#do_action('new_file')
-          nnoremap <silent><buffer><expr> K     defx#do_action('new_directory')
-          nnoremap <silent><buffer><expr> D     defx#do_action('remove')
-
+            " For some reason, mapping this key can cause all kinds of grief.
+            " Unmap it and run '$ vim <dir>' in a terminal to see.
+            " nnoremap <silent><buffer><expr> <esc> defx#do_action('quit')
         endfunction
 
         "
@@ -551,11 +559,11 @@
 
         " let s:alt_buf = ''
 
-        autocmd! FileType defx setlocal bufhidden=wipe
+        autocmd FileType defx setlocal bufhidden=wipe 
 
         augroup defx_buffers
             autocmd!
-            autocmd BufEnter,VimEnter,BufNew
+            autocmd BufEnter,VimEnter,BufNew,BufWinEnter,BufRead,BufCreate
                 \ * call s:explore(expand('<amatch>'))
         augroup END
 
@@ -565,16 +573,19 @@
             \| endif
 
         function s:explore(path)
+            " echom('explore:a:path: '    . a:path)
+            " echom('explore:bufname: '   . bufname('%'))
+            " echom('explore:bufnr: '     . bufnr('%'))
+            " echom('explore:bufhidden: ' . &bufhidden)
+            " echom('explore:abuf: '      . expand('<abuf>'))
+            " echom('explore:filetype: '  . &filetype)
+            " echom('explore:lines: '     . line('$'))
 
-            augroup FileExplorer
-                autocmd!
-            augroup END
-
-            " Not sure why, but sometimes we get a defx buffer whithout the 
-            " filetype being properly set.
-            if &filetype ==# 'defx' || bufname('%') =~ '\[defx\]'
+            if a:path == '' || &filetype ==# 'defx' 
                 return
             endif
+
+            " echom('explore-1')
 
             if @# != ''
                 let s:alt_buf = expand('#')
@@ -583,8 +594,22 @@
             endif
 
             if isdirectory(a:path) 
-                execute 'Defx' . expand("<amatch>") 
+                " echom('explore-2')
+
+                " Disable netrw.
+                augroup FileExplorer
+                    autocmd!
+                augroup END
+
+                " The current buffer was opened with a directory path. We need
+                " to wipe it out and replace it with a defx buffer on that same
+                " path.
+                bwipeout!
+
+                " echom('explore-3')
+                call defx#util#call_defx('Defx', a:path)
             endif
+            " echom('explore-4')
         endfunction
     " }}}
     
@@ -644,7 +669,7 @@
             imap <silent><buffer> <esc> <Plug>(denite_filter_quit)
 
             " Quit filter window and denite.
-	        imap <silent><buffer> <C-o> <Plug>(denite_filter_quit)qq
+	        imap <silent><buffer> <C-o> <Plug>(denite_filter_quit)q
 
             " Move cursor while in insert mode.
             inoremap <silent><buffer> <C-j>
