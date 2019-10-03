@@ -383,13 +383,35 @@
     " Delete buffer.
     nnoremap <c-q> :bdelete<cr>
 
-    " Last buffer.
-    " TODO: Would like to have this in insert mode, but that presents issues.
-    " Specifically, we have to leave insert mode in this buffer to switch buffers.
-    " We could reset ourselves to insert mode _after_ we switch buffers, but then
-    " we'd be in insert mode in the buffer we switch to, which is probably not what
-    " we want. Rather, we probably want to move around in that buffer and then come
-    " back to the original buffer, picking up where we left off in insert mode.
+    "
+    " I've been trying for ages to get a simple keystroke that will allow me to
+    " bounce back and forth between two buffers. I've tried to leverage vim's
+    " "alternate file", but that can get hosed up when buffers are simply
+    " deleted rather than wiped out. And trying to ensure a buffer is wiped out
+    " can be a pain in the ass.
+    "
+    " My next attempt was to use BufferGator's MRU capabilities. The problem
+    " with that is that its MRU list is not actually in most recently _used_
+    " order, but rather most recently _opened_. IOW, it has the concept of
+    " opening the previous buffer, but after doing so, going to the previous
+    " buffer again doesn't return us back to where we started - we have to go
+    " to the next buffer to do that. Here's what I had for that: 
+    " nnoremap <leader><leader> :call <SID>BuffergatorAltFile(<SID>GetBuffergatorAltFileDirection())<cr>
+    " nnoremap <leader>, :call <SID>BuffergatorAltFile('prev')<cr> nnoremap
+    " <leader>. :call <SID>BuffergatorAltFile('next')<cr>
+    "
+    " But... I'm fed up enough with this that I'm going bite the bullet and
+    " write my own plugin to do this. It'll be a good learning experience and
+    " I'll get what I want. This may be a useful resource:
+    "
+    " https://github.com/vim-scripts/bufmru.vim/blob/821869d8b6139536c1122902493de00c654b5a2a/plugin/bufmru.vim
+    "
+    " And of course there's this:
+    "
+    " http://learnvimscriptthehardway.stevelosh.com/
+    "
+    
+    " Goto previous buffer.
     nnoremap <leader><leader> <C-^>
 
     " Ideally, used in split window with desired diff buffers open.
@@ -424,7 +446,7 @@
     nnoremap <leader>e :Defx<cr>
 
     " Search for my section headers.
-   nnoremap <leader>s /^.*-\{40,80}\n^.*\[.*\]\s*\_.\{-}-\{40,80}\s*$<cr>
+    nnoremap <leader>s /^.*-\{40,80}\n^.*\[.*\]\s*\_.\{-}-\{40,80}\s*$<cr>
 " }}}
 
 " Autocommands {{{
@@ -519,9 +541,30 @@
                                      
     " Buffergator {{{
         let g:buffergator_autoexpand_on_split = 0
+        let g:buffergator_mru_cycle_local_to_window = 1
+        let g:buffergator_mru_cycle_loop = 0
         let g:buffergator_sort_regime = "filepath"
-        let g:buffergator_viewport_split_policy = "T"
         let g:buffergator_split_size = 15
+        let g:buffergator_viewport_split_policy = "T"            
+
+        " Commenting this out for now because BufferGator's MRU is not really
+        " an MRU.
+        "
+        " let s:buffergator_alt_file_direction = 'prev'
+        "                                          
+        " function! s:GetBuffergatorAltFileDirection() 
+        "     return s:buffergator_alt_file_direction
+        " endfunction
+        "                                          
+        " function! s:BuffergatorAltFile(direction) 
+        "     if a:direction ==# 'prev'
+        "         execute 'BuffergatorMruCyclePrev'
+        "         let s:buffergator_alt_file_direction = 'next'
+        "     elseif a:direction ==# 'next'
+        "         execute 'BuffergatorMruCycleNext'
+        "         let s:buffergator_alt_file_direction = 'prev'
+        "     endif
+        " endfunction
     " }}}
    
     " Defx {{{
@@ -530,21 +573,25 @@
         function! s:DefxSettings() 
 
             " Define mappings
-            nnoremap <silent><buffer><expr> <CR>  defx#do_action('open')
-            nnoremap <silent><buffer><expr> ~     defx#do_action('cd')
-            nnoremap <silent><buffer><expr> -     defx#do_action('cd', ['..'])
-            nnoremap <silent><buffer><expr> u     defx#do_action('cd', ['..'])
-            nnoremap <silent><buffer><expr> t     defx#do_action('open_or_close_tree')
-            nnoremap <silent><buffer><expr> T     defx#do_action('open_tree_recursive')
-            nnoremap <silent><buffer><expr> .     defx#do_action('toggle_ignored_files')
-            nnoremap <silent><buffer><expr> yy    defx#do_action('yank_path')
-            nnoremap <silent><buffer><expr> q     defx#do_action('quit')
-            nnoremap <silent><buffer><expr> N     defx#do_action('new_file')
-            nnoremap <silent><buffer><expr> K     defx#do_action('new_directory')
-            nnoremap <silent><buffer><expr> D     defx#do_action('remove')
+            nnoremap <silent><buffer><expr> <CR> defx#do_action('open')
+            nnoremap <silent><buffer><expr> ~    defx#do_action('cd')
+            nnoremap <silent><buffer><expr> -    defx#do_action('cd', ['..'])
+            nnoremap <silent><buffer><expr> u    defx#do_action('cd', ['..'])
+            nnoremap <silent><buffer><expr> t    defx#do_action('open_or_close_tree')
+            nnoremap <silent><buffer><expr> T    defx#do_action('open_tree_recursive')
+            nnoremap <silent><buffer><expr> .    defx#do_action('toggle_ignored_files')
+            nnoremap <silent><buffer><expr> yy   defx#do_action('yank_path')
+            nnoremap <silent><buffer><expr> q    defx#do_action('quit')
+            nnoremap <silent><buffer><expr> K    defx#do_action('new_directory')
+            nnoremap <silent><buffer><expr> N    defx#do_action('new_file')
+            nnoremap <silent><buffer><expr> M    defx#do_action('new_multiple_files')
+            nnoremap <silent><buffer><expr> D    defx#do_action('remove')
+            nnoremap <silent><buffer><expr> s    defx#do_action('toggle_select')
+            vnoremap <silent><buffer><expr> s    defx#do_action('toggle_select_visual')
+            
 
             " For some reason, mapping this key can cause all kinds of grief.
-            " Unmap it and run '$ vim <dir>' in a terminal to see.
+            " Unmap it and run '$ vim <dir>' in a terminal to see it.
             " nnoremap <silent><buffer><expr> <esc> defx#do_action('quit')
         endfunction
 
@@ -557,8 +604,6 @@
         "   buffer _never_ becomes the alternate file).
         "
 
-        " let s:alt_buf = ''
-
         autocmd FileType defx setlocal bufhidden=wipe 
 
         augroup defx_buffers
@@ -567,9 +612,14 @@
                 \ * call s:explore(expand('<amatch>'))
         augroup END
 
+        let s:alt_buf = ''
+
         autocmd BufLeave * 
             \  if &filetype ==# 'defx' && s:alt_buf != '' 
             \|     let @# = bufnr(s:alt_buf) 
+            \|     let s:alt_buf = ''
+            \| elseif &filetype != 'defx'
+            \|     let s:alt_buf = expand('%')
             \| endif
 
         function s:explore(path)
@@ -585,16 +635,13 @@
                 return
             endif
 
-            " echom('explore-1')
-
-            if @# != ''
-                let s:alt_buf = expand('#')
-            else
-                let s:alt_buf = expand('%')
+            " Handle ':edit ~'.
+            let path = a:path
+            if fnamemodify(path, ':t') ==# '~'
+                let path = expand('~')
             endif
 
-            if isdirectory(a:path) 
-                " echom('explore-2')
+            if isdirectory(path) 
 
                 " Disable netrw.
                 augroup FileExplorer
@@ -606,10 +653,8 @@
                 " path.
                 bwipeout!
 
-                " echom('explore-3')
-                call defx#util#call_defx('Defx', a:path)
+                call defx#util#call_defx('Defx', path)
             endif
-            " echom('explore-4')
         endfunction
     " }}}
     
