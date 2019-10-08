@@ -2,6 +2,12 @@
 //
 // Browser-specific notes.
 //
+// * General
+//
+//   If changes are made to this file, in any associated browsers, go to the
+//   Surfingkeys settings, ensure "Load settings from:" specifies
+//   "file:///<this_file>", and press the "Save" button.
+//
 // * Vivaldi
 //   
 //   * By default, Vivaldi puts the focus in the address bar when opening a
@@ -30,22 +36,22 @@
 //
 // Set the following browser shortcuts:
 //
-//   Settings / Tabs / Keyboard
+//   Settings / Keyboard ...
 //
-//     - Page focus
+//     - ... Page (page focus)
 //
 //       Shift-Cmd-K: Focus Address Bar/Field
 //       Shift-Cmd-J: Focus Page
 //
-//     - To match Surfingkeys
+//     - ... Tab (to match Surfingkeys)
 //
-//       Ctrl-d: Close Tab
+//       Ctrl-o: Close Tab
 //       H (Shift-h): Backward history
 //       L (Shift-l): Forward history
 //
 
 // Close current tab (configure in browser).
-map('<Ctrl-d>', 'x');
+map('<Ctrl-o>', 'x');
 
 // Forward/backward history (configure in browser).
 map('H', 'S');
