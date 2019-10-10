@@ -444,10 +444,32 @@
     " Turn current highlight off.
     nnoremap <silent> <leader>/ :noh<cr>
 
-    nnoremap <leader>e :Defx<cr>
-
     " Search for my section headers.
     nnoremap <leader>s /^.*-\{40,80}\n^.*\[.*\]\s*\_.\{-}-\{40,80}\s*$<cr>
+
+    "
+    " Plugin-related global key mappings (buffer local plugin mappings in
+    " "Plugin Config" section below).
+    "
+    
+    nnoremap <leader>e :Defx<cr>
+
+    " vim-surround's default keys include 'ds'. I have lots of plugins with
+    " buffer-local key mappings use 'd' (e.g. buffergator's delete buffer),
+    " and I don't want the associated key delay.
+    let g:surround_no_mappings = 1
+    let g:surround_no_insert_mappings = 1
+
+    nmap sd  <Plug>Dsurround
+    nmap sc  <Plug>Csurround
+    nmap sC  <Plug>CSurround
+    nmap ss  <Plug>Ysurround
+    nmap sS  <Plug>YSurround
+    nmap sss <Plug>Yssurround
+    nmap ssS <Plug>YSsurround
+    xmap S   <Plug>VSurround
+    xmap sg  <Plug>VgSurround
+    
 " }}}
 
 " Autocommands {{{
