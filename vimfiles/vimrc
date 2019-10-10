@@ -381,7 +381,8 @@
     nnoremap <leader>W :wa!<cr>
 
     " Delete buffer.
-    nnoremap <c-q> :bdelete<cr>
+    " nnoremap <c-q> :bdelete<cr>
+    nnoremap <c-o> :bdelete<cr>
 
     "
     " I've been trying for ages to get a simple keystroke that will allow me to
@@ -438,7 +439,7 @@
 
     " Toggle line numbers.
     nnoremap <C-n> :call CycleNumber()<cr>
-    inoremap <C-n> <C-o><C-n>
+    imap <C-n> <C-o><C-n>
 
     " Turn current highlight off.
     nnoremap <silent> <leader>/ :noh<cr>
