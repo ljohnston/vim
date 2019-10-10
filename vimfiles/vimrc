@@ -40,6 +40,9 @@
     " Create a '~/.vim/python' symlink to python home to turn this on...
     " python -> ~/.asdf/installs/python/3.7.3-framework-vim/Python.framework/Versions/3.7
     "
+    " Install neovim in python env:
+    "   $ pip install neovim
+    "
     
     "
     " This seems to be fraught with peril... things seem to work just fine, and
@@ -97,6 +100,10 @@
         
         Plug 'vimwiki/vimwiki'
     call plug#end()
+
+    if exists("g:plugin_install") && g:plugin_install == 1 
+        finish
+    endif
 " }}}
 
 " General {{{

@@ -23,18 +23,9 @@ action_header() {
 }
 
 
-install_neobundle() {
-    [ -d $VIM_DIR/bundle ] || mkdir -p $VIM_DIR/bundle
-    
-    if [ -d $VIM_DIR/bundle/neobundle.vim ]; then
-        action_header "Updating neobundle..."
-        cd $VIM_DIR/bundle/neobundle.vim
-        git pull
-        cd - >/dev/null
-    else
-        action_header "Installing neobundle..."
-        git clone https://github.com/Shougo/neobundle.vim $VIM_DIR/bundle/neobundle.vim
-    fi
+install_vimplug() {
+    curl --silent -fLo $VIM_DIR/autoload/plug.vim --create-dirs \
+      https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 }
 
 
@@ -97,34 +88,9 @@ install_dotfiles() {
 
 
 install_plugins() {
-
-    #
-    # Installing simply by firing up Vim works without issue. Via the
-    # command-line, however, we may ses lots of the following warnings:
-    #
-    # not found in 'runtimepath': "autoload/vimproc.vim"
-    #
-    # The vimproc.vim warning seems to be most prevalent, but there are
-    # others (eclim, for example, if we're using that). I think it's
-    # somewhat dependent on what plugins we're installing. Regardless,
-    # they all seem to be benign when installing the plugins this way.
-    #
-    # We'll simply grep these out. In addtion, we can minimize the 
-    # vimproc.vim messages by specifically installing it first (which I 
-    # think may be a good idea anyway - I see this in the neobundle help).
-    #
-    # I've also seen the 'packpath' message from time to time.
-    #
-    
-    action_header "Installing plugins (vimproc)..."
-    $VIM_DIR/bundle/neobundle.vim/bin/neoinstall vimproc.vim 2>&1 \
-        |grep -v "not found in 'runtimepath'" \
-        |grep -v "not found in 'packpath'" 
-    
-    action_header "Installing plugins (all remaining)..."
-    $VIM_DIR/bundle/neobundle.vim/bin/neoinstall 2>&1 \
-        |grep -v "not found in 'runtimepath'" \
-        |grep -v "not found in 'packpath'" 
+    # g:plugin_install=1 will cause .vimrc to stop processing after
+    # the plugins are installed.
+    vim --cmd "let g:plugin_install=1" +PlugInstall +qall
 }
 
 link_vimwiki() {
@@ -133,7 +99,7 @@ link_vimwiki() {
 
 
 install() {
-   install_neobundle
+   install_vimplug
    install_fonts
    install_dotfiles
    install_plugins
@@ -143,6 +109,9 @@ install() {
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 VIM_DIR="$( cd $SCRIPT_DIR/.. && pwd )"
 
+# This must match what's in .vimrc's plug#begin().
+PLUGIN_DIR="${VIM_DIR}/plugged"
+
 FONTS="${VIM_DIR}/fonts/powerline-fonts-SourceCodePro/*.otf"
 
 case "$1" in 
@@ -150,7 +119,7 @@ case "$1" in
         install
         ;;
     clean-install)
-        [ -d $VIM_DIR/bundle ] && rm -rf $VIM_DIR/bundle 2>/dev/null
+        [ -d $PLUGIN_DIR ] && rm -rf $PLUGIN_DIR 2>/dev/null
         install
         ;;
     *)
