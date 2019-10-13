@@ -646,7 +646,9 @@
 
         autocmd BufLeave * 
             \  if &filetype ==# 'defx' && s:alt_buf != '' 
-            \|     let @# = bufnr(s:alt_buf) 
+            \|     if bufnr(s:alt_buf) != -1
+            \|         let @# = bufnr(s:alt_buf) 
+            \|     endif
             \|     let s:alt_buf = ''
             \| elseif &filetype != 'defx'
             \|     let s:alt_buf = expand('%')
