@@ -198,6 +198,12 @@
 
     " GUI {{{
 
+        " Note that gui commands that have any meaning with regard to
+        " 'gui_running' include only 'guicursor', 'guifont', 'guipty', and
+        " 'guioptions'. Note also that gui apps for neovim do not have
+        " 'gui_running', nor do they support any of those gui commands. For the
+        " OS X vimR at least, the font is set through normal OS X app
+        " preferences.
         if has("gui_running")
 
            " 
@@ -231,24 +237,21 @@
     " {{{ colorscheme 
         " set background=light
 
-        if has("gui_running")
-            " colorscheme onedark
-            " colorscheme professional
-            " colorscheme molokai
-            " colorscheme solarized
-            " colorscheme desert
-            " colorscheme neodark
-            colorscheme quantum
-        else
-            colorscheme molokai
-        endif
+        " colorscheme onedark
+        " colorscheme professional
+        " colorscheme molokai
+        " colorscheme solarized
+        " colorscheme desert
+        " colorscheme neodark
+        colorscheme quantum
         
         "
         " I'm not interested in creating my own versions of various color
         " schemes. I do, however, want to be able to tweak the ones I use if
         " necessary, so we'll do that here.
         "
-        " TODO: Is there a better way to achieve the tweaks we want?
+        " TODO: Is there a better way to achieve the tweaks we want? Answer:
+        " Yes, see https://github.com/vim-scripts/AfterColors.vim
         " 
 
         "
@@ -298,7 +301,8 @@
         elseif cname == 'professional'
             highlight ColorColumn guibg=BlanchedAlmond
         elseif cname == 'quantum'
-            highlight CursorLine guibg=gray27
+            highlight CursorLine guibg=gray27 ctermbg=242
+            highlight Folded guifg=#658494 ctermfg=9
         elseif cname == 'solarized' || cname == 'desert'
             highlight ColorColumn guibg=DarkSlateGray
         endif
