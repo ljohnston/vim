@@ -71,9 +71,10 @@
             Plug 'roxma/vim-hug-neovim-rpc'
         endif
 
-        Plug 'vim-airline/vim-airline'
-        Plug 'vim-airline/vim-airline-themes'
+        " Plug 'vim-airline/vim-airline'
+        " Plug 'vim-airline/vim-airline-themes'
         Plug 'flazz/vim-colorschemes'
+        Plug 'itchyny/lightline.vim'
 
         Plug 'Shougo/denite.nvim', { 'tag': '3.0' }
         Plug 'Shougo/defx.nvim', { 'tag': '1.0' }
@@ -83,7 +84,7 @@
         Plug 'tpope/vim-surround'
         
         Plug 'jeetsukumaran/vim-buffergator'
-        
+
         Plug 'rodjek/vim-puppet'
         Plug 'markcornick/vim-terraform'
         Plug 'lmeijvogel/vim-yaml-helper'
@@ -130,8 +131,13 @@
     set showmode                            "display mode at bottom of screen
     set showcmd                             "show commands at bottom of screen
 
-    set cursorline                          "hightlight current line
     set colorcolumn=81                      "make 80 columns obvious
+
+    augroup CursorLine
+        autocmd!
+        autocmd VimEnter,WinEnter,BufWinEnter * setlocal cursorline
+        autocmd WinLeave * setlocal nocursorline
+    augroup END
 
     set nostartofline                       "try to leave cursor in same column
     set virtualedit=all                     "allow cursor where no actual characters exist
@@ -572,17 +578,24 @@
 " Plugin Config {{{
 
     " Airline {{{
-        if !exists('g:airline_theme')
-            let g:airline_theme = 'molokai'
-        endif
-
-        let g:airline_powerline_fonts = 1
-        if !exists('g:airline_symbols')
-            let g:airline_symbols = {}
-        endif
-        let g:airline_symbols.space = "\ua0"
+        " if !exists('g:airline_theme')
+        "     let g:airline_theme = 'molokai'
+        " endif
+        "
+        " let g:airline_powerline_fonts = 1
+        " if !exists('g:airline_symbols')
+        "     let g:airline_symbols = {}
+        " endif
+        " let g:airline_symbols.space = "\ua0"
     " }}}
                                      
+    " Airline {{{
+        " Like these: PaperColor, OldHope
+        let g:lightline = {
+          \ 'colorscheme': 'PaperColor',
+          \ }
+    " }}}
+
     " Buffergator {{{
         let g:buffergator_autoexpand_on_split = 0
         let g:buffergator_mru_cycle_local_to_window = 1
