@@ -461,9 +461,17 @@
     
     nnoremap <leader>e :Defx<cr>
 
+    "
     " vim-surround's default keys include 'ds'. I have lots of plugins with
-    " buffer-local key mappings use 'd' (e.g. buffergator's delete buffer),
-    " and I don't want the associated key delay.
+    " buffer-local key mappings that use 'd' (e.g. buffergator's delete
+    " buffer), and I don't want the associated key delay, so changing all
+    " surround keys to begin with 's'. <nowait> on the plugin's mapping (e.g.
+    " buffergator) would solve the problem, but key mapping for plugins aren't
+    " always customizable (again, buffergator).  Possible solution here: 
+    "
+    " https://github.com/tpope/vim-surround/issues/98#issuecomment-21426681 
+    "
+
     let g:surround_no_mappings = 1
     let g:surround_no_insert_mappings = 1
 
@@ -616,9 +624,12 @@
             nnoremap <silent><buffer><expr> N    defx#do_action('new_file')
             nnoremap <silent><buffer><expr> M    defx#do_action('new_multiple_files')
             nnoremap <silent><buffer><expr> D    defx#do_action('remove')
-            nnoremap <silent><buffer><expr> s    defx#do_action('toggle_select')
-            vnoremap <silent><buffer><expr> s    defx#do_action('toggle_select_visual')
-            
+            nnoremap <silent><buffer><expr> R    defx#do_action('rename')
+
+            " The mnemonic here is 'mark' (not s=select, to avoid key delay on
+            " vim-surround's s key).
+            nnoremap <silent><buffer><expr> m    defx#do_action('toggle_select')
+            vnoremap <silent><buffer><expr> m    defx#do_action('toggle_select_visual')
 
             " For some reason, mapping this key can cause all kinds of grief.
             " Unmap it and run '$ vim <dir>' in a terminal to see it.
