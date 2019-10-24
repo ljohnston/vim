@@ -89,7 +89,8 @@
         
         Plug 'luochen1990/rainbow'
         Plug 'mtth/scratch.vim'
-        Plug 'ervandew/supertab'
+        " Plug 'ervandew/supertab'
+        Plug 'ajh17/VimCompletesMe'
         Plug 'scrooloose/syntastic'
         Plug 'godlygeek/tabular'
         Plug 'tomtom/tcomment_vim'
@@ -782,11 +783,11 @@
     " SuperTab {{{
         " <c-space> is gobally mapped to :buffer#, but there seems
         " to be no conflict here.
-        let g:SuperTabMappingForward = '<c-space>'
-        let g:SuperTabMappingBackward = '<s-c-space>'
-
-        let g:SuperTabDefaultCompletionType = "context"
-        let g:SuperTabContextDefaultCompletionType = "<c-n>"
+        " let g:SuperTabMappingForward = '<c-space>'
+        " let g:SuperTabMappingBackward = '<s-c-space>'
+        "
+        " let g:SuperTabDefaultCompletionType = "context"
+        " let g:SuperTabContextDefaultCompletionType = "<c-n>"
     " }}}
     
     " VimWiki {{{
