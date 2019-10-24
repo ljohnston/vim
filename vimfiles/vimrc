@@ -52,7 +52,8 @@
     "    https://www.bountysource.com/issues/42900279-could-not-find-neovim
     "
     if isdirectory($HOME . '/.vim/python') && !exists('s:python_initialized')
-        set pythonthreehome=$HOME/.vim/python
+        set pyxversion=3
+        " set pythonthreehome=$HOME/.vim/python
         " Setting 'pythonthreehome' seems to be enough for the dll as well.
         "set pythonthreedll=$HOME/.vim/python/lib/libpython3.7.dylib
         let $PATH = $HOME . '/.vim/python/bin:' . $PATH
