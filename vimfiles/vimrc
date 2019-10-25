@@ -550,7 +550,10 @@
 
     " .vimrc {{{
         " reread .vimrc on save
-        autocmd! BufWritePost .vimrc source % 
+        " For some reason I don't understand, sourceing .vimrc causes lightline
+        " to lose it's colors (it's just white on black), but only apparently
+        " in normal mode. We'll hack our way around this for now with this...
+        autocmd! BufWritePost .vimrc source % | :call lightline#enable()
 
         " prevent our .vimrc modeline from closing all our folds on save
         autocmd! BufWritePre .vimrc setlocal nomodeline
@@ -590,13 +593,6 @@
         "     let g:airline_symbols = {}
         " endif
         " let g:airline_symbols.space = "\ua0"
-    " }}}
-                                     
-    " Airline {{{
-        " Like these: PaperColor, OldHope
-        let g:lightline = {
-          \ 'colorscheme': 'PaperColor',
-          \ }
     " }}}
 
     " Buffergator {{{
@@ -794,6 +790,20 @@
 
         nnoremap <leader>p :<C-u>DeniteProjectDir file/rec -start-filter<cr>
         nnoremap <leader>P :<C-u>DeniteProjectDir grep -start-filter<cr>
+    " }}}
+                                     
+    " Lightline {{{
+        " Like these: PaperColor, OldHope
+        let g:lightline = {
+        \   'colorscheme': 'PaperColor',
+        \   'active': {
+        \     'left': [ [ 'mode', 'paste' ],
+        \               [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+        \   },
+        \   'component_function': {
+        \     'gitbranch': 'fugitive#head'
+        \   },
+        \ }
     " }}}
 
     " Miscellaneous {{{
