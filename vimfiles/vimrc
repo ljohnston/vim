@@ -136,7 +136,10 @@
     augroup CursorLine
         autocmd!
         autocmd VimEnter,WinEnter,BufWinEnter * setlocal cursorline
-        autocmd WinLeave * setlocal nocursorline
+        autocmd WinLeave * 
+            \  if &filetype !~ '^\(denite\|foo\)$' 
+            \|     setlocal nocursorline
+            \| endif
     augroup END
 
     set nostartofline                       "try to leave cursor in same column
