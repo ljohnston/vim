@@ -53,10 +53,12 @@
     "
     if isdirectory($HOME . '/.vim/python') && !exists('s:python_initialized')
         set pyxversion=3
-        " set pythonthreehome=$HOME/.vim/python
-        " Setting 'pythonthreehome' seems to be enough for the dll as well.
-        "set pythonthreedll=$HOME/.vim/python/lib/libpython3.7.dylib
         let $PATH = $HOME . '/.vim/python/bin:' . $PATH
+
+        if !has('nvim')
+            set pythonthreehome=$HOME/.vim/python
+        endif
+
         let s:python_initialized = 1
     endif
 " }}}
