@@ -76,6 +76,11 @@ install_dotfiles() {
     
     [ -L ~/.vimrc ] && rm ~/.vimrc
     ln -s $VIM_DIR/vimfiles/vimrc ~/.vimrc
+
+    # neovim
+    [ -d ~/.config/nvim ] || mkdir -p ~/.config/nvim
+    [ -L ~/.config/nvim/init.vim ] && rm ~/.config/nvim/init.vim
+    ln -s $VIM_DIR/vimfiles/init.vim ~/.config/nvim/init.vim
     
     # Surfingkeys is firefox/chrome vim plugin.
     [ -L ~/.surfingkeysrc ] && rm ~/.surfingkeysrc
