@@ -57,6 +57,7 @@
 
         if !has('nvim')
             set pythonthreehome=$HOME/.vim/python
+            set pythonthreedll=$HOME/.vim/python/lib/libpython3.7m.dylib
         endif
 
         let s:python_initialized = 1
@@ -242,6 +243,9 @@
            set guioptions-=L           " no scrollbars on the left
            set guioptions-=r           " no scrollbars on the right
            set guioptions-=R           " no scrollbars on the right
+
+           " turn off cursor blinking
+           set guicursor+=a:blinkon0
         endif
     " }}}
 
@@ -314,6 +318,11 @@
         elseif cname == 'quantum'
             highlight CursorLine guibg=gray27 ctermbg=242
             highlight Folded guifg=#658494 ctermfg=9
+
+            " A total hack for the time being for VimR.
+            if has('nvim')
+                highlight Search guibg=BlanchedAlmond guifg=NONE
+            endif
         elseif cname == 'solarized' || cname == 'desert'
             highlight ColorColumn guibg=DarkSlateGray
         endif
@@ -673,6 +682,12 @@
                 \ * call s:explore(expand('<amatch>'))
         augroup END
 
+        " TODO: There's something not right with this logic...
+        "   - open two buffers
+        "   - ensure alternate file is working as expected
+        "   - open and quit defx without choosing a file
+        "   - alternate file is gone, should be what it was before defx
+
         let s:alt_buf = ''
 
         autocmd BufLeave * 
@@ -765,6 +780,9 @@
             nnoremap <silent><buffer><expr> d    denite#do_map('do_action', 'delete')
             nnoremap <silent><buffer><expr> i    denite#do_map('open_filter_buffer')
             nnoremap <silent><buffer><expr> p    denite#do_map('do_action', 'preview')
+
+            nnoremap <silent><buffer><expr> m    denite#do_map('toggle_select')
+            nnoremap <silent><buffer><expr> M    denite#do_map('toggle_select_all')
 
             nnoremap <silent><buffer><expr> <esc> denite#do_map('quit')
             nnoremap <silent><buffer><expr> q     denite#do_map('quit')
