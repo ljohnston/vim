@@ -339,6 +339,10 @@
 
     :nnoremap <leader>ve :vsplit $MYVIMRC<cr>
 
+    noremap <leader>gs :Gstatus<cr>
+    noremap <leader>gb :Gblame<cr>
+    noremap <leader>gl :Glog<cr>
+
     " Wrapped lines goes down/up to next row, rather than next line in file.
     noremap j gj
     noremap k gk
@@ -454,8 +458,8 @@
     nnoremap <leader>du :diffupdate<CR>
 
     " Build with gradle.
-    nnoremap <leader>gb :compiler gradlew<CR> :make compile<CR>
-    nnoremap <leader>gt :compiler gradlew<CR> :make test<CR>
+    " nnoremap <leader>gb :compiler gradlew<CR> :make compile<CR>
+    " nnoremap <leader>gt :compiler gradlew<CR> :make test<CR>
 
     "
     " <C-o> instead of <esc> to reduce side-effects. More here:
