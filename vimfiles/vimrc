@@ -337,7 +337,8 @@
     let mapleader = "\<Space>"
     let g:mapleader = "\<Space>"
 
-    :nnoremap <leader>ve :vsplit $MYVIMRC<cr>
+    " :nnoremap <leader>ve :vsplit $MYVIMRC<cr>
+    :nnoremap <leader>ve :vsplit ~/.vimrc<cr>
 
     noremap <leader>gs :Gstatus<cr>
     noremap <leader>gb :Gblame<cr>
