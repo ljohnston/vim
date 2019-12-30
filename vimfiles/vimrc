@@ -835,6 +835,13 @@
         let g:rainbow_active = 1
         let g:vim_yaml_helper#auto_display_path = 1
     " }}}
+   
+    " Scratch {{{
+        let g:scratch_height = 0.4
+        let g:scratch_autohide = 0
+        let g:scratch_insert_autohide = 0
+        let g:scratch_persistence_file='~/.scratch.vim'
+    " }}}
 
     " SuperTab {{{
         " <c-space> is gobally mapped to :buffer#, but there seems
