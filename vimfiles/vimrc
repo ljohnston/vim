@@ -43,24 +43,17 @@
     " Install neovim in python env:
     "   $ pip install neovim
     "
-    
-    "
-    " This seems to be fraught with peril... things seem to work just fine, and
-    " then I'll start to get weird errors. I don't believe the answer
-    " necessarily lies here, but it may:
-    "
-    "    https://www.bountysource.com/issues/42900279-could-not-find-neovim
-    "
     if isdirectory($HOME . '/.vim/python') && !exists('s:python_initialized')
-        set pyxversion=3
-        let $PATH = $HOME . '/.vim/python/bin:' . $PATH
+       set pyxversion=3
 
-        if !has('nvim')
-            set pythonthreehome=$HOME/.vim/python
-            set pythonthreedll=$HOME/.vim/python/lib/libpython3.7m.dylib
-        endif
+       let $PATH = $HOME . '/.vim/python/bin:' . $PATH
 
-        let s:python_initialized = 1
+       if !has('nvim')
+           set pythonthreehome=/Users/lance.johnston/.vim/python
+           set pythonthreedll=/Users/lance.johnston/.vim/python/lib/libpython3.7.dylib
+       endif
+
+       let s:python_initialized = 1
     endif
 " }}}
 
@@ -79,8 +72,9 @@
         Plug 'flazz/vim-colorschemes'
         Plug 'itchyny/lightline.vim'
 
-        Plug 'Shougo/denite.nvim', { 'tag': '3.0' }
-        Plug 'Shougo/defx.nvim', { 'tag': '1.0' }
+        Plug 'Shougo/denite.nvim', { 'tag': '3.2', 'do': ':UpdateRemotePlugins' }
+        "Plug 'Shougo/defx.nvim', { 'tag': '1.0' }
+        Plug 'Shougo/defx.nvim', { 'do': ':UpdateRemotePlugins' }
 
         Plug 'tpope/vim-abolish'
         Plug 'tpope/vim-fugitive'
@@ -110,6 +104,223 @@
     if exists("g:plugin_install") && g:plugin_install == 1 
         finish
     endif
+" }}}
+
+" Altbuf Plugin {{{
+
+    " TODO (for a real plugin):
+    " - check compatible
+    " - global configuration options, defaults
+    
+    " TODO (issues):
+
+    " autocmd event notes
+    " - We get a bdelete on a bwipeout
+    " - Some plugins seem to do weird things with the events. For example, netrw
+    "   fires a BufEnter event before the buffer has name and then files two (yes,
+    "   two) BufDelete events. It isn't until the second BufDelete that the
+    "   buffer's filetype is correctly set to netrw. On the BufEnter, buflisted=1.
+    
+    command! -nargs=0 AltbufPrevious :call AltbufPrevious()
+
+    augroup altbuf
+        autocmd!
+        autocmd BufEnter * call s:AltbufDebug('BufEnter') | call s:AltbufEnter()
+        autocmd BufDelete * call s:AltbufDebug('BufDelete') | call s:AltbufDelete()
+    augroup END
+
+
+    function! s:AltbufDebugMsg(msg)
+        " unsilent echom(a:msg)
+    endfunction
+
+
+    function! s:AltbufDebug(event)
+        call s:AltbufDebugMsg('--------------------')
+        call s:AltbufDebugMsg(a:event . ':<abuf>=' . expand('<abuf>'))
+        call s:AltbufDebugMsg(a:event . ':filetype=' . &filetype)
+        call s:AltbufDebugMsg(a:event . ':buflisted=' . &buflisted)
+        call s:AltbufDebugMsg(a:event . ':bufname(%)=' . bufname('%'))
+        call s:AltbufDebugMsg(a:event . ':winnr())=' . winnr())
+        call s:AltbufDebugMsg('--------------------')
+    endfunction
+
+    " I _think_ we can use this to identify a window-specific bufList...
+    " getwininfo(win_getid())[0]['bufnr']
+    "
+    " We can use this to check if a window ID is still open
+    " range(1,winnr('$'))
+    " win_getid(<win number from above>)
+    "
+    " Here's what we want to do...
+    "
+    " - On bufenter get the window ID and buffer and manage a window-specific
+    "   buffer list just as we are now.
+    " - On bufenter get list of all existing window IDs and compare to the list
+    "   of window IDs we have bufferlists for. If any window are missing,
+    "   delete the dictionary entry for the window IDs that no longer exist.
+    " - On bufdelete, we need to remove the buffer from _all_ window buflists
+    "   where it exists.
+    
+    let s:winBufDict = {}
+    let s:bufWinDict = {}
+
+    " TODO: Make these configurable plugin options.
+    let s:includeFiletypes = ['help']
+    let s:excludeFiletypes = ['netrw']
+
+    " Ignore buffers with empty name (e.g. "[No Name]" buffers)
+    let s:excludeBufnames = ['\v^\s*$']
+
+    function! s:AltbufEnter()
+        call s:AltbufDebugMsg('altbufEnter:@%=' . @%)
+        call s:AltbufDebugMsg('altbufEnter:@#=' . @#)
+        call s:AltbufDebugMsg('altbufEnter:<abuf>=' . expand('<abuf>'))
+        call s:AltbufDebugMsg('altbufEnter:win_getid()=' . win_getid())
+        call s:AltbufDebugMsg("altbufEnter:getwininfo(win_getid())[0]['bufnr']=" . getwininfo(win_getid())[0]['bufnr'])
+
+        let l:winid = win_getid()
+        let l:bufnr = bufnr('%')
+
+        if !has_key(s:winBufDict, l:winid)
+            let s:winBufDict[l:winid] = []
+        endif
+
+        if !has_key(s:bufWinDict, l:bufnr)
+            let s:bufWinDict[l:bufnr] = []
+        endif
+
+        let l:winBufList = get(s:winBufDict, l:winid)
+        let l:bufWinList = get(s:bufWinDict, l:bufnr)
+
+        call s:EnsureListElement(l:bufWinList, l:winid)
+        
+        " Remove buffer from list if it exists, and put it on top.
+        call s:RemoveListElement(l:winBufList, l:bufnr)
+        call add(l:winBufList, l:bufnr)
+        
+        call s:AltbufDebugMsg('AltbufEnter:winBufList=' . join(l:winBufList))
+        call s:AltbufDebugMsg('AltbufEnter:bufWinList=' . join(l:bufWinList))
+    endfunction
+
+
+    function! s:AltbufDelete()
+        call s:AltbufDebugMsg('altbufDelete:@%=' . @%)
+        call s:AltbufDebugMsg('altbufDelete:@#=' . @#)
+        call s:AltbufDebugMsg('altbufDelete:<abuf>=' . expand('<abuf>'))
+        call s:AltbufDebugMsg('altbufDelete:win_getid()=' . win_getid())
+        call s:AltbufDebugMsg("altbufDelete:getwininfo(win_getid())[0]['bufnr']=" . getwininfo(win_getid())[0]['bufnr'])
+
+        let l:bufnr = bufnr('%')
+        let l:winList = s:bufWinDict[l:bufnr]
+        
+        for winid in l:winList
+            let l:bufList = s:winBufDict[winid]
+            call s:RemoveListElement(l:bufList, l:bufnr)
+        endfor
+        
+    endfunction
+
+
+    function! PruneWinDict()
+
+        let l:altbufWinList = keys(s:winBufDict)
+        let l:vimWinList = map(range(1, winnr('$')), 'win_getid(v:val)')
+
+        for winid in l:altbufWinList
+
+            " Could do this with a filter.
+            if index(l:vimWinList, winid) == -1
+                unlet s:winBufDict[winid]
+            endif
+
+        endfor
+ 
+    endfunction
+
+
+    function! s:EnsureListElement(list, element)
+
+        if index(a:list, a:element) == -1
+            call add(a:list, a:element)
+        endif
+
+    endfunction
+
+
+    function! s:RemoveListElement(list, element)
+        let l:idx = index(a:list, a:element)
+
+        if l:idx >= 0
+            call remove(a:list, l:idx)
+        endif
+
+    endfunction
+
+
+    function s:IsExcludedBufname(bufname)
+
+        for pattern in s:excludeBufnames
+            if a:bufname =~ pattern
+                return 1
+            endif
+        endfor
+
+        return 0
+    endfunction
+
+    function! s:IsExcludedBuf(bufnr)
+
+        let l:filetype = getbufvar(a:bufnr, '&filetype')
+
+        " Excludes take precedence.
+        if index(s:excludeFiletypes, l:filetype) >= 0
+            return 1
+        endif
+
+        if s:IsExcludedBufname(bufname(a:bufnr)) 
+            return 1
+        endif 
+
+        " Incude filetypes take precedence over unlisted bufs.
+        if index(s:includeFiletypes, l:filetype) >= 0
+            return 0
+        endif
+
+        if !buflisted(a:bufnr)
+            return 1
+        endif
+
+        return 0
+        
+    endfunction
+
+    function! AltbufList()
+        echo(s:winBufDict)
+    endfunction
+
+    function! AltbufPrevious()
+
+        let l:winBufList = get(s:winBufDict, win_getid())
+        let l:bufListLen = len(l:winBufList)
+
+        " Why are we doing this???
+        " if l:bufListLen > 0 && (bufnr('%') != l:winBufList[-1])
+        "     execute 'buffer' . l:winBufList[-1]
+        " endif
+
+        if l:bufListLen < 2
+            return
+        endif
+
+        while l:bufListLen >= 2 && s:IsExcludedBuf(l:winBufList[l:bufListLen - 2])
+            call remove(l:winBufList, l:bufListLen - 2)
+            let l:bufListLen -= 1
+        endwhile
+
+        execute 'buffer' . l:winBufList[l:bufListLen - 2]
+    endfunction
+
 " }}}
 
 " General {{{
@@ -225,9 +436,11 @@
            "
 
            if OSX()
-               set guifont=Sauce\ Code\ Powerline:h18
-               set columns=160
-               set lines=48
+               if !has('gui_vimr')
+                   set guifont=Sauce\ Code\ Powerline:h18
+                   set columns=160
+                   set lines=40
+               endif
            elseif LINUX()
                set guifont=Source\ Code\ Pro\ for\ Powerline\ Medium\ 10
                set columns=120
@@ -337,12 +550,14 @@
     let mapleader = "\<Space>"
     let g:mapleader = "\<Space>"
 
-    " :nnoremap <leader>ve :vsplit $MYVIMRC<cr>
     :nnoremap <leader>ve :vsplit ~/.vimrc<cr>
 
     noremap <leader>gs :Gstatus<cr>
     noremap <leader>gb :Gblame<cr>
     noremap <leader>gl :Glog<cr>
+
+    noremap gyy :YamlGetFullPath<cr>
+    noremap gyp :YamlGoToParent<cr>
 
     " Wrapped lines goes down/up to next row, rather than next line in file.
     noremap j gj
@@ -451,7 +666,8 @@
     "
     
     " Goto previous buffer.
-    nnoremap <leader><leader> <C-^>
+    " nnoremap <leader><leader> <C-^>
+    nnoremap <silent> <leader><leader> :AltbufPrevious<cr>
 
     " Ideally, used in split window with desired diff buffers open.
     nnoremap <leader>dt :windo diffthis<CR>
@@ -584,16 +800,24 @@
     "  }}}
 
     " Debugging {{{
-        " autocmd BufCreate   * echom('========== BufCreate:'   . expand('%'))
-        " autocmd BufEnter    * echom('========== BufEnter:'    . expand('%'))
-        " autocmd BufHidden   * echom('========== BufHidden:'   . expand('%'))
-        " autocmd BufLeave    * echom('========== BufLeave:'    . expand('%'))
-        " autocmd BufNew      * echom('========== BufNew:'      . expand('%'))
-        " autocmd BufRead     * echom('========== BufRead:'     . expand('%'))
-        " autocmd BufWinEnter * echom('========== BufWinEnter:' . expand('%'))
-        " autocmd BufWipeout  * echom('========== BufWipeout:'  . expand('%')) 
-        " autocmd FileType    * echom('========== FileType:'    . expand('%')) 
-        " autocmd VimEnter    * echom('========== VimEnter:'    . expand('%'))
+    augroup vimrc_debug
+        autocmd!
+        " autocmd BufCreate   * unsilent echom('========== BufCreate:'   . expand('%'))
+        " autocmd BufEnter    * unsilent echom('========== BufEnter:'    . expand('%'))
+        " autocmd BufHidden   * unsilent echom('========== BufHidden:'   . expand('%'))
+        " autocmd BufLeave    * unsilent echom('========== BufLeave:'    . expand('%'))
+        " autocmd BufNew      * unsilent echom('========== BufNew:'      . expand('%'))
+        " autocmd BufRead     * unsilent echom('========== BufRead:'     . expand('%'))
+        " autocmd BufWinEnter * unsilent echom('========== BufWinEnter:' . expand('%'))
+        " autocmd BufWinLeave * unsilent echom('========== BufWinLeave:' . expand('%'))
+        " autocmd BufWipeout  * unsilent echom('========== BufWipeout:'  . expand('%')) 
+        " autocmd FileType    * unsilent echom('========== FileType:'    . expand('%')) 
+        " autocmd VimEnter    * unsilent echom('========== VimEnter:'    . expand('%'))
+        " autocmd WinNew      * unsilent echom('========== WinNew:'      . expand('%'))
+        " autocmd WinEnter    * unsilent echom('========== WinEnter:'    . expand('%'))
+        " autocmd WinLeave    * unsilent echom('========== WinLeave:'    . expand('%'))
+        " autocmd OptionSet   * unsilent echom('========== OptionSet:'   . expand('<amatch>'))
+    augroup END
     " }}}
 "}}}
 
@@ -640,6 +864,7 @@
     " }}}
    
     " Defx {{{
+
         autocmd FileType defx call s:DefxSettings()
         
         function! s:DefxSettings() 
@@ -679,40 +904,22 @@
         "   buffer _never_ becomes the alternate file).
         "
 
-        autocmd FileType defx setlocal bufhidden=wipe 
+        " autocmd FileType defx setlocal bufhidden=wipe 
 
         augroup defx_buffers
             autocmd!
-            autocmd BufEnter,VimEnter,BufNew,BufWinEnter,BufRead,BufCreate
+            autocmd BufEnter,BufWinEnter
                 \ * call s:explore(expand('<amatch>'))
         augroup END
 
-        " TODO: There's something not right with this logic...
-        "   - open two buffers
-        "   - ensure alternate file is working as expected
-        "   - open and quit defx without choosing a file
-        "   - alternate file is gone, should be what it was before defx
-
-        let s:alt_buf = ''
-
-        autocmd BufLeave * 
-            \  if &filetype ==# 'defx' && s:alt_buf != '' 
-            \|     if bufnr(s:alt_buf) != -1
-            \|         let @# = bufnr(s:alt_buf) 
-            \|     endif
-            \|     let s:alt_buf = ''
-            \| elseif &filetype != 'defx'
-            \|     let s:alt_buf = expand('%')
-            \| endif
-
         function s:explore(path)
-            " echom('explore:a:path: '    . a:path)
-            " echom('explore:bufname: '   . bufname('%'))
-            " echom('explore:bufnr: '     . bufnr('%'))
-            " echom('explore:bufhidden: ' . &bufhidden)
-            " echom('explore:abuf: '      . expand('<abuf>'))
-            " echom('explore:filetype: '  . &filetype)
-            " echom('explore:lines: '     . line('$'))
+            " unsilent echom('explore:a:path: '    . a:path)
+            " unsilent echom('explore:bufname: '   . bufname('%'))
+            " unsilent echom('explore:bufnr: '     . bufnr('%'))
+            " unsilent echom('explore:bufhidden: ' . &bufhidden)
+            " unsilent echom('explore:abuf: '      . expand('<abuf>'))
+            " unsilent echom('explore:filetype: '  . &filetype)
+            " unsilent echom('explore:lines: '     . line('$'))
 
             if a:path == '' || &filetype ==# 'defx' 
                 return
@@ -833,14 +1040,13 @@
 
     " Miscellaneous {{{
         let g:rainbow_active = 1
-        let g:vim_yaml_helper#auto_display_path = 1
     " }}}
    
     " Scratch {{{
-        let g:scratch_height = 0.4
-        let g:scratch_autohide = 0
-        let g:scratch_insert_autohide = 0
-        let g:scratch_persistence_file='~/.scratch.vim'
+        " let g:scratch_height = 0.4
+        " let g:scratch_autohide = 0
+        " let g:scratch_insert_autohide = 0
+        let g:scratch_persistence_file=$HOME . '/.scratch.vim'
     " }}}
 
     " SuperTab {{{
@@ -861,6 +1067,8 @@
         silent! nunmap <leader>w<leader>t
         silent! nunmap <leader>w<leader>w
         silent! nunmap <leader>w<leader>i
+        silent! nunmap <leader>w<leader>m
+        silent! nunmap <leader>w<leader>y
 
         nmap <leader>vw <Plug>VimwikiIndex
         nmap <leader>vi <Plug>VimwikiTabIndex

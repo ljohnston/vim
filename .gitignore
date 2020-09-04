@@ -4,6 +4,8 @@ autoload/
 plugged/
 python
 
+**/*.with-local
+
 **/*.backup
 !.backup/README.md
 

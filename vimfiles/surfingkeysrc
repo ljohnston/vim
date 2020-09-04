@@ -1,3 +1,10 @@
+//
+// If the name of this file is surfingkeysrc.with-local DON'T EDIT IT!!!
+// Instead, edit either vimfiles/surfingkeysrc and/or ~/.surfingkeysrc.local
+// and then run:
+//
+//   bin/setup surfingkeys
+//
 
 //
 // Browser-specific notes.
@@ -7,6 +14,10 @@
 //   If changes are made to this file, in any associated browsers, go to the
 //   Surfingkeys settings, ensure "Load settings from:" specifies
 //   "file:///<this_file>", and press the "Save" button.
+//
+//   Firefox does not have a File API and cannot read local files from disk.
+//   If changes are made here, the contents of this file must be copy and
+//   pasted into the SurfingKeys settings.
 //
 // * Vivaldi
 //   
@@ -81,11 +92,11 @@ map('o', 'go');
 // No prefix will cause it to show up in the 'Misc' section.
 //
 
-mapkey('gh', "Open google in the current tab", function() {
+mapkey(',h', "Open google in the current tab", function() {
     window.location.href = 'https://google.com';
 });
 
-mapkey('gH', 'Open google in a new tab', function() {
+mapkey(',H', 'Open google in a new tab', function() {
     tabOpenLink('https://google.com');
 });
 
@@ -160,13 +171,15 @@ settings.theme = `
 .sk_theme .omnibar_visitcount {
     color: #98c379;
 }
-.sk_theme #sk_omnibarSearchResult>ul>li:nth-child(odd) {
+.sk_theme #sk_omnibarSearchResult ul li:nth-child(odd) {
     background: #303030;
 }
-.sk_theme #sk_omnibarSearchResult>ul>li.focused {
+.sk_theme #sk_omnibarSearchResult ul li.focused {
     background: #3e4452;
 }
 #sk_status, #sk_find {
     font-size: 20pt;
 }`;
-// click `Save` button to make above settings to take effect.
+
+// EOF: vimfiles/surfingkeysrc
+
