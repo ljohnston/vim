@@ -62,19 +62,21 @@
 
         Plug 'Shougo/deoplete.nvim'
 
-        if !has('nvim')
-            Plug 'roxma/nvim-yarp'
-            Plug 'roxma/vim-hug-neovim-rpc'
-        endif
+        " if !has('nvim')
+        "     Plug 'roxma/nvim-yarp'
+        "     Plug 'roxma/vim-hug-neovim-rpc'
+        " endif
 
         " Plug 'vim-airline/vim-airline'
         " Plug 'vim-airline/vim-airline-themes'
         Plug 'flazz/vim-colorschemes'
         Plug 'itchyny/lightline.vim'
 
-        Plug 'Shougo/denite.nvim', { 'tag': '3.2', 'do': ':UpdateRemotePlugins' }
+        " Plug 'Shougo/denite.nvim', { 'tag': '3.2', 'do': ':UpdateRemotePlugins' }
         "Plug 'Shougo/defx.nvim', { 'tag': '1.0' }
-        Plug 'Shougo/defx.nvim', { 'do': ':UpdateRemotePlugins' }
+        " Plug 'Shougo/defx.nvim', { 'do': ':UpdateRemotePlugins' }
+        
+        Plug 'preservim/nerdtree'
 
         Plug 'tpope/vim-abolish'
         Plug 'tpope/vim-fugitive'
@@ -121,205 +123,205 @@
     "   two) BufDelete events. It isn't until the second BufDelete that the
     "   buffer's filetype is correctly set to netrw. On the BufEnter, buflisted=1.
     
-    command! -nargs=0 AltbufPrevious :call AltbufPrevious()
-
-    augroup altbuf
-        autocmd!
-        autocmd BufEnter * call s:AltbufDebug('BufEnter') | call s:AltbufEnter()
-        autocmd BufDelete * call s:AltbufDebug('BufDelete') | call s:AltbufDelete()
-    augroup END
-
-
-    function! s:AltbufDebugMsg(msg)
-        " unsilent echom(a:msg)
-    endfunction
-
-
-    function! s:AltbufDebug(event)
-        call s:AltbufDebugMsg('--------------------')
-        call s:AltbufDebugMsg(a:event . ':<abuf>=' . expand('<abuf>'))
-        call s:AltbufDebugMsg(a:event . ':filetype=' . &filetype)
-        call s:AltbufDebugMsg(a:event . ':buflisted=' . &buflisted)
-        call s:AltbufDebugMsg(a:event . ':bufname(%)=' . bufname('%'))
-        call s:AltbufDebugMsg(a:event . ':winnr())=' . winnr())
-        call s:AltbufDebugMsg('--------------------')
-    endfunction
-
-    " I _think_ we can use this to identify a window-specific bufList...
-    " getwininfo(win_getid())[0]['bufnr']
+    " command! -nargs=0 AltbufPrevious :call AltbufPrevious()
     "
-    " We can use this to check if a window ID is still open
-    " range(1,winnr('$'))
-    " win_getid(<win number from above>)
+    " augroup altbuf
+    "     autocmd!
+    "     autocmd BufEnter * call s:AltbufDebug('BufEnter') | call s:AltbufEnter()
+    "     autocmd BufDelete * call s:AltbufDebug('BufDelete') | call s:AltbufDelete()
+    " augroup END
     "
-    " Here's what we want to do...
     "
-    " - On bufenter get the window ID and buffer and manage a window-specific
-    "   buffer list just as we are now.
-    " - On bufenter get list of all existing window IDs and compare to the list
-    "   of window IDs we have bufferlists for. If any window are missing,
-    "   delete the dictionary entry for the window IDs that no longer exist.
-    " - On bufdelete, we need to remove the buffer from _all_ window buflists
-    "   where it exists.
-    
-    let s:winBufDict = {}
-    let s:bufWinDict = {}
-
-    " TODO: Make these configurable plugin options.
-    let s:includeFiletypes = ['help']
-    let s:excludeFiletypes = ['netrw']
-
-    " Ignore buffers with empty name (e.g. "[No Name]" buffers)
-    let s:excludeBufnames = ['\v^\s*$']
-
-    function! s:AltbufEnter()
-        call s:AltbufDebugMsg('altbufEnter:@%=' . @%)
-        call s:AltbufDebugMsg('altbufEnter:@#=' . @#)
-        call s:AltbufDebugMsg('altbufEnter:<abuf>=' . expand('<abuf>'))
-        call s:AltbufDebugMsg('altbufEnter:win_getid()=' . win_getid())
-        call s:AltbufDebugMsg("altbufEnter:getwininfo(win_getid())[0]['bufnr']=" . getwininfo(win_getid())[0]['bufnr'])
-
-        let l:winid = win_getid()
-        let l:bufnr = bufnr('%')
-
-        if !has_key(s:winBufDict, l:winid)
-            let s:winBufDict[l:winid] = []
-        endif
-
-        if !has_key(s:bufWinDict, l:bufnr)
-            let s:bufWinDict[l:bufnr] = []
-        endif
-
-        let l:winBufList = get(s:winBufDict, l:winid)
-        let l:bufWinList = get(s:bufWinDict, l:bufnr)
-
-        call s:EnsureListElement(l:bufWinList, l:winid)
-        
-        " Remove buffer from list if it exists, and put it on top.
-        call s:RemoveListElement(l:winBufList, l:bufnr)
-        call add(l:winBufList, l:bufnr)
-        
-        call s:AltbufDebugMsg('AltbufEnter:winBufList=' . join(l:winBufList))
-        call s:AltbufDebugMsg('AltbufEnter:bufWinList=' . join(l:bufWinList))
-    endfunction
-
-
-    function! s:AltbufDelete()
-        call s:AltbufDebugMsg('altbufDelete:@%=' . @%)
-        call s:AltbufDebugMsg('altbufDelete:@#=' . @#)
-        call s:AltbufDebugMsg('altbufDelete:<abuf>=' . expand('<abuf>'))
-        call s:AltbufDebugMsg('altbufDelete:win_getid()=' . win_getid())
-        call s:AltbufDebugMsg("altbufDelete:getwininfo(win_getid())[0]['bufnr']=" . getwininfo(win_getid())[0]['bufnr'])
-
-        let l:bufnr = bufnr('%')
-        let l:winList = s:bufWinDict[l:bufnr]
-        
-        for winid in l:winList
-            let l:bufList = s:winBufDict[winid]
-            call s:RemoveListElement(l:bufList, l:bufnr)
-        endfor
-        
-    endfunction
-
-
-    function! PruneWinDict()
-
-        let l:altbufWinList = keys(s:winBufDict)
-        let l:vimWinList = map(range(1, winnr('$')), 'win_getid(v:val)')
-
-        for winid in l:altbufWinList
-
-            " Could do this with a filter.
-            if index(l:vimWinList, winid) == -1
-                unlet s:winBufDict[winid]
-            endif
-
-        endfor
- 
-    endfunction
-
-
-    function! s:EnsureListElement(list, element)
-
-        if index(a:list, a:element) == -1
-            call add(a:list, a:element)
-        endif
-
-    endfunction
-
-
-    function! s:RemoveListElement(list, element)
-        let l:idx = index(a:list, a:element)
-
-        if l:idx >= 0
-            call remove(a:list, l:idx)
-        endif
-
-    endfunction
-
-
-    function s:IsExcludedBufname(bufname)
-
-        for pattern in s:excludeBufnames
-            if a:bufname =~ pattern
-                return 1
-            endif
-        endfor
-
-        return 0
-    endfunction
-
-    function! s:IsExcludedBuf(bufnr)
-
-        let l:filetype = getbufvar(a:bufnr, '&filetype')
-
-        " Excludes take precedence.
-        if index(s:excludeFiletypes, l:filetype) >= 0
-            return 1
-        endif
-
-        if s:IsExcludedBufname(bufname(a:bufnr)) 
-            return 1
-        endif 
-
-        " Incude filetypes take precedence over unlisted bufs.
-        if index(s:includeFiletypes, l:filetype) >= 0
-            return 0
-        endif
-
-        if !buflisted(a:bufnr)
-            return 1
-        endif
-
-        return 0
-        
-    endfunction
-
-    function! AltbufList()
-        echo(s:winBufDict)
-    endfunction
-
-    function! AltbufPrevious()
-
-        let l:winBufList = get(s:winBufDict, win_getid())
-        let l:bufListLen = len(l:winBufList)
-
-        " Why are we doing this???
-        " if l:bufListLen > 0 && (bufnr('%') != l:winBufList[-1])
-        "     execute 'buffer' . l:winBufList[-1]
-        " endif
-
-        if l:bufListLen < 2
-            return
-        endif
-
-        while l:bufListLen >= 2 && s:IsExcludedBuf(l:winBufList[l:bufListLen - 2])
-            call remove(l:winBufList, l:bufListLen - 2)
-            let l:bufListLen -= 1
-        endwhile
-
-        execute 'buffer' . l:winBufList[l:bufListLen - 2]
-    endfunction
+    " function! s:AltbufDebugMsg(msg)
+    "     " unsilent echom(a:msg)
+    " endfunction
+    "
+    "
+    " function! s:AltbufDebug(event)
+    "     call s:AltbufDebugMsg('--------------------')
+    "     call s:AltbufDebugMsg(a:event . ':<abuf>=' . expand('<abuf>'))
+    "     call s:AltbufDebugMsg(a:event . ':filetype=' . &filetype)
+    "     call s:AltbufDebugMsg(a:event . ':buflisted=' . &buflisted)
+    "     call s:AltbufDebugMsg(a:event . ':bufname(%)=' . bufname('%'))
+    "     call s:AltbufDebugMsg(a:event . ':winnr())=' . winnr())
+    "     call s:AltbufDebugMsg('--------------------')
+    " endfunction
+    "
+    " " I _think_ we can use this to identify a window-specific bufList...
+    " " getwininfo(win_getid())[0]['bufnr']
+    " "
+    " " We can use this to check if a window ID is still open
+    " " range(1,winnr('$'))
+    " " win_getid(<win number from above>)
+    " "
+    " " Here's what we want to do...
+    " "
+    " " - On bufenter get the window ID and buffer and manage a window-specific
+    " "   buffer list just as we are now.
+    " " - On bufenter get list of all existing window IDs and compare to the list
+    " "   of window IDs we have bufferlists for. If any window are missing,
+    " "   delete the dictionary entry for the window IDs that no longer exist.
+    " " - On bufdelete, we need to remove the buffer from _all_ window buflists
+    " "   where it exists.
+    "
+    " let s:winBufDict = {}
+    " let s:bufWinDict = {}
+    "
+    " " TODO: Make these configurable plugin options.
+    " let s:includeFiletypes = ['help']
+    " let s:excludeFiletypes = ['netrw']
+    "
+    " " Ignore buffers with empty name (e.g. "[No Name]" buffers)
+    " let s:excludeBufnames = ['\v^\s*$']
+    "
+    " function! s:AltbufEnter()
+    "     call s:AltbufDebugMsg('altbufEnter:@%=' . @%)
+    "     call s:AltbufDebugMsg('altbufEnter:@#=' . @#)
+    "     call s:AltbufDebugMsg('altbufEnter:<abuf>=' . expand('<abuf>'))
+    "     call s:AltbufDebugMsg('altbufEnter:win_getid()=' . win_getid())
+    "     call s:AltbufDebugMsg("altbufEnter:getwininfo(win_getid())[0]['bufnr']=" . getwininfo(win_getid())[0]['bufnr'])
+    "
+    "     let l:winid = win_getid()
+    "     let l:bufnr = bufnr('%')
+    "
+    "     if !has_key(s:winBufDict, l:winid)
+    "         let s:winBufDict[l:winid] = []
+    "     endif
+    "
+    "     if !has_key(s:bufWinDict, l:bufnr)
+    "         let s:bufWinDict[l:bufnr] = []
+    "     endif
+    "
+    "     let l:winBufList = get(s:winBufDict, l:winid)
+    "     let l:bufWinList = get(s:bufWinDict, l:bufnr)
+    "
+    "     call s:EnsureListElement(l:bufWinList, l:winid)
+    "     
+    "     " Remove buffer from list if it exists, and put it on top.
+    "     call s:RemoveListElement(l:winBufList, l:bufnr)
+    "     call add(l:winBufList, l:bufnr)
+    "     
+    "     call s:AltbufDebugMsg('AltbufEnter:winBufList=' . join(l:winBufList))
+    "     call s:AltbufDebugMsg('AltbufEnter:bufWinList=' . join(l:bufWinList))
+    " endfunction
+    "
+    "
+    " function! s:AltbufDelete()
+    "     call s:AltbufDebugMsg('altbufDelete:@%=' . @%)
+    "     call s:AltbufDebugMsg('altbufDelete:@#=' . @#)
+    "     call s:AltbufDebugMsg('altbufDelete:<abuf>=' . expand('<abuf>'))
+    "     call s:AltbufDebugMsg('altbufDelete:win_getid()=' . win_getid())
+    "     call s:AltbufDebugMsg("altbufDelete:getwininfo(win_getid())[0]['bufnr']=" . getwininfo(win_getid())[0]['bufnr'])
+    "
+    "     let l:bufnr = bufnr('%')
+    "     let l:winList = s:bufWinDict[l:bufnr]
+    "     
+    "     for winid in l:winList
+    "         let l:bufList = s:winBufDict[winid]
+    "         call s:RemoveListElement(l:bufList, l:bufnr)
+    "     endfor
+    "     
+    " endfunction
+    "
+    "
+    " function! PruneWinDict()
+    "
+    "     let l:altbufWinList = keys(s:winBufDict)
+    "     let l:vimWinList = map(range(1, winnr('$')), 'win_getid(v:val)')
+    "
+    "     for winid in l:altbufWinList
+    "
+    "         " Could do this with a filter.
+    "         if index(l:vimWinList, winid) == -1
+    "             unlet s:winBufDict[winid]
+    "         endif
+    "
+    "     endfor
+    "
+    " endfunction
+    "
+    "
+    " function! s:EnsureListElement(list, element)
+    "
+    "     if index(a:list, a:element) == -1
+    "         call add(a:list, a:element)
+    "     endif
+    "
+    " endfunction
+    "
+    "
+    " function! s:RemoveListElement(list, element)
+    "     let l:idx = index(a:list, a:element)
+    "
+    "     if l:idx >= 0
+    "         call remove(a:list, l:idx)
+    "     endif
+    "
+    " endfunction
+    "
+    "
+    " function s:IsExcludedBufname(bufname)
+    "
+    "     for pattern in s:excludeBufnames
+    "         if a:bufname =~ pattern
+    "             return 1
+    "         endif
+    "     endfor
+    "
+    "     return 0
+    " endfunction
+    "
+    " function! s:IsExcludedBuf(bufnr)
+    "
+    "     let l:filetype = getbufvar(a:bufnr, '&filetype')
+    "
+    "     " Excludes take precedence.
+    "     if index(s:excludeFiletypes, l:filetype) >= 0
+    "         return 1
+    "     endif
+    "
+    "     if s:IsExcludedBufname(bufname(a:bufnr)) 
+    "         return 1
+    "     endif 
+    "
+    "     " Incude filetypes take precedence over unlisted bufs.
+    "     if index(s:includeFiletypes, l:filetype) >= 0
+    "         return 0
+    "     endif
+    "
+    "     if !buflisted(a:bufnr)
+    "         return 1
+    "     endif
+    "
+    "     return 0
+    "     
+    " endfunction
+    "
+    " function! AltbufList()
+    "     echo(s:winBufDict)
+    " endfunction
+    "
+    " function! AltbufPrevious()
+    "
+    "     let l:winBufList = get(s:winBufDict, win_getid())
+    "     let l:bufListLen = len(l:winBufList)
+    "
+    "     " Why are we doing this???
+    "     " if l:bufListLen > 0 && (bufnr('%') != l:winBufList[-1])
+    "     "     execute 'buffer' . l:winBufList[-1]
+    "     " endif
+    "
+    "     if l:bufListLen < 2
+    "         return
+    "     endif
+    "
+    "     while l:bufListLen >= 2 && s:IsExcludedBuf(l:winBufList[l:bufListLen - 2])
+    "         call remove(l:winBufList, l:bufListLen - 2)
+    "         let l:bufListLen -= 1
+    "     endwhile
+    "
+    "     execute 'buffer' . l:winBufList[l:bufListLen - 2]
+    " endfunction
 
 " }}}
 
@@ -350,7 +352,7 @@
     augroup CursorLine
         autocmd!
         autocmd VimEnter,WinEnter,BufWinEnter * setlocal cursorline
-        autocmd WinLeave * 
+        " autocmd WinLeave * 
             \  if &filetype !~ '^\(denite\|foo\)$' 
             \|     setlocal nocursorline
             \| endif
@@ -706,9 +708,18 @@
     " "Plugin Config" section below).
     "
     
-    nnoremap <leader>e :Defx<cr>
+    " nnoremap <leader>e :Defx<cr>
+    
+    nnoremap <leader>e :execute 'edit' . getcwd()<CR>
+    let NERDTreeHijackNetrw=1
+    let NERDTreeMinimalUI=1
+    let NERDTreeQuitOnOpen=1
+    let NERDTreeShowHidden=1
 
-    "
+    let g:NERDTreeMapOpenInTab=''
+
+    autocmd FileType nerdtree setlocal bufhidden=wipe
+
     " vim-surround's default keys include 'ds'. I have lots of plugins with
     " buffer-local key mappings that use 'd' (e.g. buffergator's delete
     " buffer), and I don't want the associated key delay, so changing all
@@ -865,163 +876,163 @@
    
     " Defx {{{
 
-        autocmd FileType defx call s:DefxSettings()
-        
-        function! s:DefxSettings() 
-
-            " Define mappings
-            nnoremap <silent><buffer><expr> <CR> defx#do_action('open')
-            nnoremap <silent><buffer><expr> ~    defx#do_action('cd')
-            nnoremap <silent><buffer><expr> -    defx#do_action('cd', ['..'])
-            nnoremap <silent><buffer><expr> u    defx#do_action('cd', ['..'])
-            nnoremap <silent><buffer><expr> t    defx#do_action('open_or_close_tree')
-            nnoremap <silent><buffer><expr> T    defx#do_action('open_tree_recursive')
-            nnoremap <silent><buffer><expr> .    defx#do_action('toggle_ignored_files')
-            nnoremap <silent><buffer><expr> yy   defx#do_action('yank_path')
-            nnoremap <silent><buffer><expr> q    defx#do_action('quit')
-            nnoremap <silent><buffer><expr> K    defx#do_action('new_directory')
-            nnoremap <silent><buffer><expr> N    defx#do_action('new_file')
-            nnoremap <silent><buffer><expr> M    defx#do_action('new_multiple_files')
-            nnoremap <silent><buffer><expr> D    defx#do_action('remove')
-            nnoremap <silent><buffer><expr> R    defx#do_action('rename')
-
-            " The mnemonic here is 'mark' (not s=select, to avoid key delay on
-            " vim-surround's s key).
-            nnoremap <silent><buffer><expr> m    defx#do_action('toggle_select')
-            vnoremap <silent><buffer><expr> m    defx#do_action('toggle_select_visual')
-
-            " For some reason, mapping this key can cause all kinds of grief.
-            " Unmap it and run '$ vim <dir>' in a terminal to see it.
-            " nnoremap <silent><buffer><expr> <esc> defx#do_action('quit')
-        endfunction
-
+        " autocmd FileType defx call s:DefxSettings()
         "
-        " The following is all about implementing some sort of sane buffer
-        " handling for for file browsing. That is:
+        " function! s:DefxSettings() 
         "
-        " - Fully replace netrw with defx.
-        " - Proper alternate buffer handling when using defx (i.e. the defx
-        "   buffer _never_ becomes the alternate file).
+        "     " Define mappings
+        "     nnoremap <silent><buffer><expr> <CR> defx#do_action('open')
+        "     nnoremap <silent><buffer><expr> ~    defx#do_action('cd')
+        "     nnoremap <silent><buffer><expr> -    defx#do_action('cd', ['..'])
+        "     nnoremap <silent><buffer><expr> u    defx#do_action('cd', ['..'])
+        "     nnoremap <silent><buffer><expr> t    defx#do_action('open_or_close_tree')
+        "     nnoremap <silent><buffer><expr> T    defx#do_action('open_tree_recursive')
+        "     nnoremap <silent><buffer><expr> .    defx#do_action('toggle_ignored_files')
+        "     nnoremap <silent><buffer><expr> yy   defx#do_action('yank_path')
+        "     nnoremap <silent><buffer><expr> q    defx#do_action('quit')
+        "     nnoremap <silent><buffer><expr> K    defx#do_action('new_directory')
+        "     nnoremap <silent><buffer><expr> N    defx#do_action('new_file')
+        "     nnoremap <silent><buffer><expr> M    defx#do_action('new_multiple_files')
+        "     nnoremap <silent><buffer><expr> D    defx#do_action('remove')
+        "     nnoremap <silent><buffer><expr> R    defx#do_action('rename')
         "
-
-        " autocmd FileType defx setlocal bufhidden=wipe 
-
-        augroup defx_buffers
-            autocmd!
-            autocmd BufEnter,BufWinEnter
-                \ * call s:explore(expand('<amatch>'))
-        augroup END
-
-        function s:explore(path)
-            " unsilent echom('explore:a:path: '    . a:path)
-            " unsilent echom('explore:bufname: '   . bufname('%'))
-            " unsilent echom('explore:bufnr: '     . bufnr('%'))
-            " unsilent echom('explore:bufhidden: ' . &bufhidden)
-            " unsilent echom('explore:abuf: '      . expand('<abuf>'))
-            " unsilent echom('explore:filetype: '  . &filetype)
-            " unsilent echom('explore:lines: '     . line('$'))
-
-            if a:path == '' || &filetype ==# 'defx' 
-                return
-            endif
-
-            " Handle ':edit ~'.
-            let path = a:path
-            if fnamemodify(path, ':t') ==# '~'
-                let path = expand('~')
-            endif
-
-            if isdirectory(path) 
-
-                " Disable netrw.
-                augroup FileExplorer
-                    autocmd!
-                augroup END
-
-                " The current buffer was opened with a directory path. We need
-                " to wipe it out and replace it with a defx buffer on that same
-                " path.
-                bwipeout!
-
-                call defx#util#call_defx('Defx', path)
-            endif
-        endfunction
+        "     " The mnemonic here is 'mark' (not s=select, to avoid key delay on
+        "     " vim-surround's s key).
+        "     nnoremap <silent><buffer><expr> m    defx#do_action('toggle_select')
+        "     vnoremap <silent><buffer><expr> m    defx#do_action('toggle_select_visual')
+        "
+        "     " For some reason, mapping this key can cause all kinds of grief.
+        "     " Unmap it and run '$ vim <dir>' in a terminal to see it.
+        "     " nnoremap <silent><buffer><expr> <esc> defx#do_action('quit')
+        " endfunction
+        "
+        " "
+        " " The following is all about implementing some sort of sane buffer
+        " " handling for for file browsing. That is:
+        " "
+        " " - Fully replace netrw with defx.
+        " " - Proper alternate buffer handling when using defx (i.e. the defx
+        " "   buffer _never_ becomes the alternate file).
+        " "
+        "
+        " " autocmd FileType defx setlocal bufhidden=wipe 
+        "
+        " augroup defx_buffers
+        "     autocmd!
+        "     autocmd BufEnter,BufWinEnter
+        "         \ * call s:explore(expand('<amatch>'))
+        " augroup END
+        "
+        " function s:explore(path)
+        "     " unsilent echom('explore:a:path: '    . a:path)
+        "     " unsilent echom('explore:bufname: '   . bufname('%'))
+        "     " unsilent echom('explore:bufnr: '     . bufnr('%'))
+        "     " unsilent echom('explore:bufhidden: ' . &bufhidden)
+        "     " unsilent echom('explore:abuf: '      . expand('<abuf>'))
+        "     " unsilent echom('explore:filetype: '  . &filetype)
+        "     " unsilent echom('explore:lines: '     . line('$'))
+        "
+        "     if a:path == '' || &filetype ==# 'defx' 
+        "         return
+        "     endif
+        "
+        "     " Handle ':edit ~'.
+        "     let path = a:path
+        "     if fnamemodify(path, ':t') ==# '~'
+        "         let path = expand('~')
+        "     endif
+        "
+        "     if isdirectory(path) 
+        "
+        "         " Disable netrw.
+        "         augroup FileExplorer
+        "             autocmd!
+        "         augroup END
+        "
+        "         " The current buffer was opened with a directory path. We need
+        "         " to wipe it out and replace it with a defx buffer on that same
+        "         " path.
+        "         bwipeout!
+        "
+        "         call defx#util#call_defx('Defx', path)
+        "     endif
+        " endfunction
     " }}}
     
     " Denite {{{
-        if executable('ag')
-            call denite#custom#var('file/rec', 'command', 
-                \ ['ag', '--follow', '--nocolor', '--nogroup', '-g', '']) 
-
-            call denite#custom#var('grep', 'command', ['ag'])
-            call denite#custom#var('grep', 'default_opts', ['-i', '--vimgrep'])
-            call denite#custom#var('grep', 'final_opts', [])
-            call denite#custom#var('grep', 'pattern_opt', [])
-            call denite#custom#var('grep', 'recursive_opts', [])
-            call denite#custom#var('grep', 'separator', ['--'])
-
-        elseif executable('rg')
-            call denite#custom#var('file/rec', 'command', 
-                \ ['rg', '--files', '--glob', '!.git'])
-
-            call denite#custom#var('grep', 'command', ['rg'])
-            call denite#custom#var('grep', 'command', ['rg', '--threads', '1'])
-            call denite#custom#var('grep', 'default_opts', ['--vimgrep', '--no-heading'])
-            call denite#custom#var('grep', 'final_opts', [])
-            call denite#custom#var('grep', 'pattern_opt', ['--regexp'])
-            call denite#custom#var('grep', 'recursive_opts', [])
-            call denite#custom#var('grep', 'separator', ['--'])
-        endif
-
-        call denite#custom#option('_', 'prompt', '>')
-        call denite#custom#option('_', 'direction', 'dynamictop')
-        call denite#custom#option('_', 'filter_split_direction', 'belowright')
-        call denite#custom#option('_', 'vertical_preview', 'true')
-
-        " Not sure this is best for all colorschemes (is for quantum).
-        call denite#custom#option('_', 'highlight_matched_char', 'Special')
-
-        call denite#custom#source('file/rec', 'matchers', ['matcher/regexp'])
-        call denite#custom#source('grep', 'matchers', ['matcher/regexp'])
-        call denite#custom#source('grep', 'converters', ['converter/abbr_word'])
-
-        autocmd FileType denite call s:denite_my_settings()
-
-        function! s:denite_my_settings() abort
-            nnoremap <silent><buffer><expr> <CR> denite#do_map('do_action')
-            nnoremap <silent><buffer><expr> d    denite#do_map('do_action', 'delete')
-            nnoremap <silent><buffer><expr> i    denite#do_map('open_filter_buffer')
-            nnoremap <silent><buffer><expr> p    denite#do_map('do_action', 'preview')
-
-            nnoremap <silent><buffer><expr> m    denite#do_map('toggle_select')
-            nnoremap <silent><buffer><expr> M    denite#do_map('toggle_select_all')
-
-            nnoremap <silent><buffer><expr> <esc> denite#do_map('quit')
-            nnoremap <silent><buffer><expr> q     denite#do_map('quit')
-        endfunction
-
-        autocmd FileType denite-filter call s:denite_filter_my_settings()
-
-        function! s:denite_filter_my_settings() abort
-            " Quit filter window.
-            imap <silent><buffer> <esc> <Plug>(denite_filter_quit)
-
-            " Quit filter window and denite.
-	        imap <silent><buffer> <C-o> <Plug>(denite_filter_quit)q
-
-            " Move cursor while in insert mode.
-            inoremap <silent><buffer> <C-j>
-                        \ <Esc><C-w>p:call cursor(line('.')+1,0)<CR><C-w>pA
-            inoremap <silent><buffer> <C-k>
-                        \ <Esc><C-w>p:call cursor(line('.')-1,0)<CR><C-w>pA
-        endfunction
-
-        nnoremap <leader>f :<C-u>Denite file -start-filter<cr>
-        nnoremap <leader>r :<C-u>Denite file/rec -start-filter<cr>
-        nnoremap <leader>R :<C-u>Denite grep -start-filter<cr>
-
-        nnoremap <leader>p :<C-u>DeniteProjectDir file/rec -start-filter<cr>
-        nnoremap <leader>P :<C-u>DeniteProjectDir grep -start-filter<cr>
+        " if executable('ag')
+        "     call denite#custom#var('file/rec', 'command', 
+        "         \ ['ag', '--follow', '--nocolor', '--nogroup', '-g', '']) 
+        "
+        "     call denite#custom#var('grep', 'command', ['ag'])
+        "     call denite#custom#var('grep', 'default_opts', ['-i', '--vimgrep'])
+        "     call denite#custom#var('grep', 'final_opts', [])
+        "     call denite#custom#var('grep', 'pattern_opt', [])
+        "     call denite#custom#var('grep', 'recursive_opts', [])
+        "     call denite#custom#var('grep', 'separator', ['--'])
+        "
+        " elseif executable('rg')
+        "     call denite#custom#var('file/rec', 'command', 
+        "         \ ['rg', '--files', '--glob', '!.git'])
+        "
+        "     call denite#custom#var('grep', 'command', ['rg'])
+        "     call denite#custom#var('grep', 'command', ['rg', '--threads', '1'])
+        "     call denite#custom#var('grep', 'default_opts', ['--vimgrep', '--no-heading'])
+        "     call denite#custom#var('grep', 'final_opts', [])
+        "     call denite#custom#var('grep', 'pattern_opt', ['--regexp'])
+        "     call denite#custom#var('grep', 'recursive_opts', [])
+        "     call denite#custom#var('grep', 'separator', ['--'])
+        " endif
+        "
+        " call denite#custom#option('_', 'prompt', '>')
+        " call denite#custom#option('_', 'direction', 'dynamictop')
+        " call denite#custom#option('_', 'filter_split_direction', 'belowright')
+        " call denite#custom#option('_', 'vertical_preview', 'true')
+        "
+        " " Not sure this is best for all colorschemes (is for quantum).
+        " call denite#custom#option('_', 'highlight_matched_char', 'Special')
+        "
+        " call denite#custom#source('file/rec', 'matchers', ['matcher/regexp'])
+        " call denite#custom#source('grep', 'matchers', ['matcher/regexp'])
+        " call denite#custom#source('grep', 'converters', ['converter/abbr_word'])
+        "
+        " autocmd FileType denite call s:denite_my_settings()
+        "
+        " function! s:denite_my_settings() abort
+        "     nnoremap <silent><buffer><expr> <CR> denite#do_map('do_action')
+        "     nnoremap <silent><buffer><expr> d    denite#do_map('do_action', 'delete')
+        "     nnoremap <silent><buffer><expr> i    denite#do_map('open_filter_buffer')
+        "     nnoremap <silent><buffer><expr> p    denite#do_map('do_action', 'preview')
+        "
+        "     nnoremap <silent><buffer><expr> m    denite#do_map('toggle_select')
+        "     nnoremap <silent><buffer><expr> M    denite#do_map('toggle_select_all')
+        "
+        "     nnoremap <silent><buffer><expr> <esc> denite#do_map('quit')
+        "     nnoremap <silent><buffer><expr> q     denite#do_map('quit')
+        " endfunction
+        "
+        " autocmd FileType denite-filter call s:denite_filter_my_settings()
+        "
+        " function! s:denite_filter_my_settings() abort
+        "     " Quit filter window.
+        "     imap <silent><buffer> <esc> <Plug>(denite_filter_quit)
+        "
+        "     " Quit filter window and denite.
+	    "     imap <silent><buffer> <C-o> <Plug>(denite_filter_quit)q
+        "
+        "     " Move cursor while in insert mode.
+        "     inoremap <silent><buffer> <C-j>
+        "                 \ <Esc><C-w>p:call cursor(line('.')+1,0)<CR><C-w>pA
+        "     inoremap <silent><buffer> <C-k>
+        "                 \ <Esc><C-w>p:call cursor(line('.')-1,0)<CR><C-w>pA
+        " endfunction
+        "
+        " nnoremap <leader>f :<C-u>Denite file -start-filter<cr>
+        " nnoremap <leader>r :<C-u>Denite file/rec -start-filter<cr>
+        " nnoremap <leader>R :<C-u>Denite grep -start-filter<cr>
+        "
+        " nnoremap <leader>p :<C-u>DeniteProjectDir file/rec -start-filter<cr>
+        " nnoremap <leader>P :<C-u>DeniteProjectDir grep -start-filter<cr>
     " }}}
                                      
     " Lightline {{{
