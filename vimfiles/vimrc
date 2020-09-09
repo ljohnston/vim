@@ -45,9 +45,10 @@
     "
     if isdirectory($HOME . '/.vim/python') && !exists('s:python_initialized')
        set pyxversion=3
+       let g:python3_host_prog=expand('~/.vim/python/bin/python3')
 
-       let $PATH = $HOME . '/.vim/python/bin:' . $PATH
-
+       " let $PATH = $HOME . '/.vim/python/bin:' . $PATH
+       "
        if !has('nvim')
            set pythonthreehome=/Users/lance.johnston/.vim/python
            set pythonthreedll=/Users/lance.johnston/.vim/python/lib/libpython3.7.dylib
@@ -62,7 +63,13 @@
 
         Plug 'Shougo/deoplete.nvim'
 
-        if !has('nvim')
+        if has('nvim')
+            Plug 'Shougo/defx.nvim', { 'do': ':UpdateRemotePlugins' }
+            Plug 'Shougo/denite.nvim', { 'do': ':UpdateRemotePlugins' }
+        else
+            " Plug 'Shougo/defx.nvim', { 'tag': '1.0' }
+            Plug 'Shougo/defx.nvim'
+            Plug 'Shougo/denite.nvim'
             Plug 'roxma/nvim-yarp'
             Plug 'roxma/vim-hug-neovim-rpc'
         endif
@@ -72,20 +79,16 @@
         Plug 'flazz/vim-colorschemes'
         Plug 'itchyny/lightline.vim'
 
-        Plug 'Shougo/denite.nvim', { 'tag': '3.2', 'do': ':UpdateRemotePlugins' }
-        "Plug 'Shougo/defx.nvim', { 'tag': '1.0' }
-        Plug 'Shougo/defx.nvim', { 'do': ':UpdateRemotePlugins' }
-
         Plug 'tpope/vim-abolish'
         Plug 'tpope/vim-fugitive'
         Plug 'tpope/vim-surround'
-        
+
         Plug 'jeetsukumaran/vim-buffergator'
 
         Plug 'rodjek/vim-puppet'
         Plug 'markcornick/vim-terraform'
         Plug 'lmeijvogel/vim-yaml-helper'
-        
+
         Plug 'luochen1990/rainbow'
         Plug 'mtth/scratch.vim'
         " Plug 'ervandew/supertab'
@@ -93,11 +96,11 @@
         Plug 'scrooloose/syntastic'
         Plug 'godlygeek/tabular'
         Plug 'tomtom/tcomment_vim'
-        
+
         Plug 'jiangmiao/auto-pairs'
-        
+
         Plug 'vim-scripts/groovyindent-unix'
-        
+
         Plug 'vimwiki/vimwiki'
     call plug#end()
 

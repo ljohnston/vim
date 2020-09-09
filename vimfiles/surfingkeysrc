@@ -92,11 +92,11 @@ map('o', 'go');
 // No prefix will cause it to show up in the 'Misc' section.
 //
 
-mapkey(',h', "Open google in the current tab", function() {
+mapkey('gh', "Open google in the current tab", function() {
     window.location.href = 'https://google.com';
 });
 
-mapkey(',H', 'Open google in a new tab', function() {
+mapkey('gH', 'Open google in a new tab', function() {
     tabOpenLink('https://google.com');
 });
 
