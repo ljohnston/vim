@@ -714,9 +714,22 @@
     let NERDTreeHijackNetrw=1
     let NERDTreeMinimalUI=1
     let NERDTreeQuitOnOpen=1
-    let NERDTreeShowHidden=1
 
+    let g:NERDTreeMapOpenRecursively='T'
+    let g:NERDTreeMapToggleHidden='.'
+
+    let g:NERDTreeMapChangeRoot=''
+    let g:NERDTreeMapChdir=''
+    let g:NERDTreeMapCWD=''
+    let g:NERDTreeMapDeleteBoomark=''
     let g:NERDTreeMapOpenInTab=''
+    let g:NERDTreeMapOpenInTabSilent=''
+    let g:NERDTreeMapPreview=''
+    let g:NERDTreeMapRefreshRoot=''
+    let g:NERDTreeMapToggleBookmarks=''
+    let g:NERDTreeMapToggleFiles=''
+    let g:NERDTreeMapToggleFilters=''
+    let g:NERDTreeMapToggleZoom=''
 
     autocmd FileType nerdtree setlocal bufhidden=wipe
 
