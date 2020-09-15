@@ -57,6 +57,30 @@
     endif
 " }}}
 
+" Debugging {{{
+    " augroup vimrc_debug
+    "     autocmd!
+    "     autocmd BufCreate   * unsilent echom('========== BufCreate:'   . expand('%') . ';winid:' . win_getid())
+    "     autocmd BufEnter    * unsilent echom('========== BufEnter:'    . expand('%') . ';winid:' . win_getid())
+    "     autocmd BufFilePre  * unsilent echom('========== BufFilePre:'  . expand('%') . ';winid:' . win_getid())
+    "     autocmd BufFilePost * unsilent echom('========== BufFilePost:' . expand('%') . ';winid:' . win_getid())
+    "     autocmd BufHidden   * unsilent echom('========== BufHidden:'   . expand('%') . ';winid:' . win_getid())
+    "     autocmd BufLeave    * unsilent echom('========== BufLeave:'    . expand('%') . ';winid:' . win_getid())
+    "     autocmd BufNew      * unsilent echom('========== BufNew:'      . expand('%') . ';winid:' . win_getid())
+    "     autocmd BufRead     * unsilent echom('========== BufRead:'     . expand('%') . ';winid:' . win_getid())
+    "     autocmd BufWinEnter * unsilent echom('========== BufWinEnter:' . expand('%') . ';winid:' . win_getid())
+    "     autocmd BufWinLeave * unsilent echom('========== BufWinLeave:' . expand('%') . ';winid:' . win_getid())
+    "     autocmd BufUnload   * unsilent echom('========== BufUnload:'   . expand('%') . ';winid:' . win_getid()) 
+    "     autocmd BufWipeout  * unsilent echom('========== BufWipeout:'  . expand('<abuf>') . ';winid:' . win_getid()) 
+    "     autocmd FileType    * unsilent echom('========== FileType:'    . expand('%')) 
+    "     autocmd VimEnter    * unsilent echom('========== VimEnter:'    . expand('%'))
+    "     autocmd WinNew      * unsilent echom('========== WinNew:'      . expand('%') . ';winid:' . win_getid())
+    "     autocmd WinEnter    * unsilent echom('========== WinEnter:'    . expand('%') . ';winid:' . win_getid())
+    "     autocmd WinLeave    * unsilent echom('========== WinLeave:'    . expand('%') . ';winid:' . win_getid())
+    "     autocmd OptionSet   * unsilent echom('========== OptionSet:'   . expand('<amatch>'))
+    " augroup END
+" }}}
+
 " Install Plugins {{{
     call plug#begin('~/.vim/plugged')
 
@@ -131,14 +155,15 @@
 
     augroup altbuf
         autocmd!
-        autocmd BufEnter  * call s:AltbufEnter()
-        autocmd BufDelete * call s:AltbufDelete()
-        autocmd WinEnter  * call s:AltbufWinEnter()
+        autocmd BufEnter,WinEnter * call s:AltbufEnter()
+        autocmd BufDelete         * call s:AltbufDelete()
+        autocmd WinLeave          * call s:AltbufWinLeave()
+        autocmd WinNew            * call s:AltbufWinNew()
     augroup END
 
 
     function! s:AltbufDebugMsg(msg)
-        unsilent echom(a:msg)
+        " unsilent echom(a:msg)
     endfunction
 
 
@@ -152,66 +177,17 @@
         call s:AltbufDebugMsg('--------------------')
     endfunction
 
-    " I _think_ we can use this to identify a window-specific bufList...
-    " getwininfo(win_getid())[0]['bufnr']
-    "
-    " We can use this to check if a window ID is still open
-    " range(1,winnr('$'))
-    " win_getid(<win number from above>)
-    "
-    " Here's what we want to do...
-    "
-    " - On bufenter get the window ID and buffer and manage a window-specific
-    "   buffer list just as we are now.
-    " - On bufenter get list of all existing window IDs and compare to the list
-    "   of window IDs we have bufferlists for. If any windows are missing,
-    "   delete the dictionary entry for the window IDs that no longer exist.
-    " - On bufdelete, we need to remove the buffer from _all_ window buflists
-    "   where it exists.
-
     let s:winBufDict = {}
-    let s:bufWinDict = {}
+    let s:bufList = []
 
     " TODO: Make these configurable plugin options.
     let s:includeFiletypes = ['help']
     let s:excludeFiletypes = ['netrw']
 
     " Ignore buffers with empty name (e.g. "[No Name]" buffers)
-    let s:excludeBufnames = ['\v^\s*$']
+    let s:excludeBufnames = ['^\s*$']
+    let s:excludeBufnames += ['\c.*buffergator.*']
 
-    function! s:AltbufWinEnter()
-        call s:AltbufDebugMsg('altbufWinEnter:@%=' . @%)
-        call s:AltbufDebugMsg('altbufWinEnter:@#=' . @#)
-        call s:AltbufDebugMsg('altbufWinEnter:<abuf>=' . expand('<abuf>'))
-        call s:AltbufDebugMsg("altbufWinEnter:filetype=" . &filetype)
-        call s:AltbufDebugMsg('altbufWinEnter:win_getid()=' . win_getid())
-        call s:AltbufDebugMsg("altbufWinEnter:getwininfo(win_getid())[0]['bufnr']=" . getwininfo(win_getid())[0]['bufnr'])
-        call s:AltbufDebugMsg("altbufWinEnter:bufWinDict=" . string(s:bufWinDict))
-        call s:AltbufDebugMsg("altbufWinEnter:winBufDict=" . string(s:winBufDict))
-
-        let l:winid = win_getid()
-        let l:bufnr = str2nr(expand('<abuf>'))
-
-        if !has_key(s:winBufDict, l:winid)
-            let s:winBufDict[l:winid] = []
-        endif
-
-        if !has_key(s:bufWinDict, l:bufnr)
-            let s:bufWinDict[l:bufnr] = []
-        endif
-
-        let l:winBufList = get(s:winBufDict, l:winid)
-        let l:bufWinList = get(s:bufWinDict, l:bufnr)
-
-        call s:EnsureListElement(l:bufWinList, l:winid)
-
-        " Remove buffer from list if it exists, and put it on top.
-        call s:RemoveListElement(l:winBufList, l:bufnr)
-        call add(l:winBufList, l:bufnr)
-
-        call s:PruneBufDict()
-        call s:PruneWinDict()
-    endfunction
 
     function! s:AltbufEnter()
         call s:AltbufDebugMsg('altbufEnter:@%=' . @%)
@@ -219,35 +195,33 @@
         call s:AltbufDebugMsg('altbufEnter:<abuf>=' . expand('<abuf>'))
         call s:AltbufDebugMsg("altbufEnter:filetype=" . &filetype)
         call s:AltbufDebugMsg('altbufEnter:win_getid()=' . win_getid())
-        call s:AltbufDebugMsg("altbufEnter:getwininfo(win_getid())[0]['bufnr']=" . getwininfo(win_getid())[0]['bufnr'])
-        call s:AltbufDebugMsg("altbufEnter:bufWinDict=" . string(s:bufWinDict))
         call s:AltbufDebugMsg("altbufEnter:winBufDict=" . string(s:winBufDict))
+
+        " We'll take this as another opportunity to prune inactive windows. See
+        " the AltbufWinLeave function header for more info.
+        call s:PruneWinDict()
 
         let l:winid = win_getid()
         let l:bufnr = str2nr(expand('<abuf>'))
+
+        if s:IsExcludedBufname(bufname(l:bufnr)) 
+            return
+        endif 
 
         if !has_key(s:winBufDict, l:winid)
             let s:winBufDict[l:winid] = []
         endif
 
-        if !has_key(s:bufWinDict, l:bufnr)
-            let s:bufWinDict[l:bufnr] = []
-        endif
-
+        " Remove buffer from window-specific list if it exists, and put it on top.
         let l:winBufList = get(s:winBufDict, l:winid)
-        let l:bufWinList = get(s:bufWinDict, l:bufnr)
-
-        call s:EnsureListElement(l:bufWinList, l:winid)
-
-        " Remove buffer from list if it exists, and put it on top.
         call s:RemoveListElement(l:winBufList, l:bufnr)
-        call add(l:winBufList, l:bufnr)
+        call insert(l:winBufList, l:bufnr, 0)
 
-        call s:PruneBufDict()
-        call s:PruneWinDict()
+        " Same for the global buffer list.
+        call s:RemoveListElement(s:bufList, l:bufnr)
+        call insert(s:bufList, l:bufnr, 0)
 
-        call s:AltbufDebugMsg('AltbufEnter:winBufList=' . join(l:winBufList))
-        call s:AltbufDebugMsg('AltbufEnter:bufWinList=' . join(l:bufWinList))
+        call s:AltbufDebugMsg("altbufEnter(end):winBufDict=" . string(s:winBufDict))
     endfunction
 
 
@@ -257,87 +231,106 @@
         call s:AltbufDebugMsg('altbufDelete:<abuf>=' . expand('<abuf>'))
         call s:AltbufDebugMsg("altbufDelete:filetype=" . &filetype)
         call s:AltbufDebugMsg('altbufDelete:win_getid()=' . win_getid())
-        call s:AltbufDebugMsg("altbufDelete:getwininfo(win_getid())[0]['bufnr']=" . getwininfo(win_getid())[0]['bufnr'])
-        call s:AltbufDebugMsg("altbufDelete:bufWinDict=" . string(s:bufWinDict))
         call s:AltbufDebugMsg("altbufDelete:winBufDict=" . string(s:winBufDict))
-        call s:AltbufDebugMsg("altbufDelete:filetype=" . &filetype)
 
-        let l:bufnr = bufnr()
-        let l:winid = win_getid()
-
-        let l:bufList = s:winBufDict[l:winid]
-        call s:RemoveListElement(l:bufList, l:bufnr)
-
-        " Remove buffer from any window-specific lists.
-        call s:PruneWinBufLists()
-
-        " Remove buffer from buffer dictionary.
-        if has_key(s:bufWinDict, l:bufnr)
-            call remove(s:bufWinDict, l:bufnr)
-        endif
-
-        call s:PruneBufDict()
+        " Prune the windows first for efficiency.
         call s:PruneWinDict()
 
-        "
-        " Somehow, it's possible to get a BufDelete event for buffers we never
-        " got a BufEnter event for, so we need to check bufWinDict to see if it
-        " has this buffer. I've seen this happen with NERDtree buffers.
-        "
+        " We can't just rely on PruneBuffers() here because the buffer that's
+        " being deleted still exists when this event fires.
+        let l:bufnr = str2nr(expand('<abuf>'))
+        call s:PruneWinBufLists(l:bufnr)
+        call s:PruneBuffers()
 
-        " if has_key(s:bufWinDict, l:bufnr)
-        "     let l:winList = s:bufWinDict[l:bufnr]
-        "
-        "     for winid in l:winList
-        "         let l:bufList = s:winBufDict[winid]
-        "         call s:RemoveListElement(l:bufList, l:bufnr)
-        "         let s:winBufDict[winid] = l:bufList
-        "     endfor
-        "
-        "     call remove(s:bufWinDict, l:bufnr)
-        " endif
-        
-        " let l:win_ids = win_findbuf(l:bufnr)
+        " Remove from global buffer list.
+        call s:RemoveListElement(s:bufList, l:bufnr)
 
-
-        call s:AltbufDebugMsg("altbufDelete(end):bufWinDict=" . string(s:bufWinDict))
         call s:AltbufDebugMsg("altbufDelete(end):winBufDict=" . string(s:winBufDict))
     endfunction
 
 
-    function! s:PruneWinBufLists()
-        let l:altbufWinList = keys(s:winBufDict)
+    " Initialize any new windows with the global buffer list.
+    function! s:AltbufWinNew() 
+        call s:AltbufDebugMsg('altbufWinNew:@%=' . @%)
+        call s:AltbufDebugMsg('altbufWinNew:@#=' . @#)
+        call s:AltbufDebugMsg('altbufWinNew:<abuf>=' . expand('<abuf>'))
+        call s:AltbufDebugMsg("altbufWinNew:filetype=" . &filetype)
+        call s:AltbufDebugMsg('altbufWinNew:win_getid()=' . win_getid())
+        call s:AltbufDebugMsg("altbufWinNew:winBufDict=" . string(s:winBufDict))
 
-        for winid in l:altbufWinList
-            let l:bufList = get(s:winBufDict, winid)
-            for bufnr in l:bufList
-                if bufwinnr(bufnr == -1)
-                    call s:RemoveListElement(l:bufList, bufnr)
-                endif
-            endfor
-        endfor
+        let l:winid = win_getid()
 
-    endfunction
-
-    function! s:PruneBufDict()
-        let l:bufnrs = keys(s:bufWinDict)
-
-        for bufnr in l:bufnrs
-            if bufwinnr(bufnr) == -1
-                call remove(s:bufWinDict, bufnr)
-            endif
-        endfor
+        if !has_key(s:winBufDict, l:winid)
+            let s:winBufDict[l:winid] = copy(s:bufList)
+        endif
 
     endfunction
 
 
+    " There is no such thing as a WinDelete event, so the active window still
+    " exists when we get the leave event, so the window that triggered this
+    " event won't be removed from the Altbuf state. Any other windows that are
+    " no longer active, however, will. This is just taking advantage of an
+    " opportunity to keep our state as accurate as possible.
+    function! s:AltbufWinLeave()
+        call s:AltbufDebugMsg('altbufWinLeave:@%=' . @%)
+        call s:AltbufDebugMsg('altbufWinLeave:@#=' . @#)
+        call s:AltbufDebugMsg('altbufWinLeave:<abuf>=' . expand('<abuf>'))
+        call s:AltbufDebugMsg("altbufWinLeave:filetype=" . &filetype)
+        call s:AltbufDebugMsg('altbufWinLeave:win_getid()=' . win_getid())
+        call s:AltbufDebugMsg("altbufWinLeave:winBufDict=" . string(s:winBufDict))
+
+        call s:PruneWinDict()
+        call s:PruneBuffers()
+        
+        call s:AltbufDebugMsg("altbufDelete(end):winBufDict=" . string(s:winBufDict))
+    endfunction
+
+
+    " Remove any windows from Altbuf state that no longer exist.
     function! s:PruneWinDict()
+        call s:AltbufDebugMsg("pruneWinDict:winBufDict=" . string(s:winBufDict))
+
         let l:winids = keys(s:winBufDict)
 
         for winid in l:winids
             if win_id2win(winid) == 0
                 call remove(s:winBufDict, winid)
             endif
+        endfor
+
+        call s:AltbufDebugMsg("pruneWinDict(end):winBufDict=" . string(s:winBufDict))
+    endfunction
+
+
+    " Remove any buffers from Altbuf state that no longer exist.
+    function! s:PruneBuffers()
+        call s:AltbufDebugMsg("pruneBuffers:winBufDict=" . string(s:winBufDict))
+        let l:bufnrs = []
+
+        for winid in keys(s:winBufDict)
+            let l:bufnrs += get(s:winBufDict, winid)
+        endfor
+        
+        call s:AltbufDebugMsg("PruneBuffers:" . string(l:bufnrs))
+
+        for bufnr in uniq(sort(l:bufnrs))
+            if ! bufexists(bufnr)
+                call s:PruneWinBufLists(bufnr)
+            endif
+        endfor
+
+        call s:AltbufDebugMsg("pruneBuffers(end):winBufDict=" . string(s:winBufDict))
+    endfunction
+
+
+    " Remove a buffer from all Altbuf window state.
+    function! s:PruneWinBufLists(bufnr)
+        call s:AltbufDebugMsg("PruneWinBufLists:bufnr=" . string(a:bufnr))
+
+        for winid in keys(s:winBufDict)
+            let l:bufList = get(s:winBufDict, winid)
+            call s:RemoveListElement(l:bufList, a:bufnr)
         endfor
 
     endfunction
@@ -353,8 +346,6 @@
 
 
     function! s:RemoveListElement(list, element)
-        call s:AltbufDebugMsg('RemoveListElement:list=' . string(a:list))
-        call s:AltbufDebugMsg('RemoveListElement:element=' . a:element)
 
         let l:idx = index(a:list, a:element)
 
@@ -362,20 +353,22 @@
             call remove(a:list, l:idx)
         endif
 
-        call s:AltbufDebugMsg('RemoveListElement(end):list=' . string(a:list))
     endfunction
 
 
     function s:IsExcludedBufname(bufname)
+        call s:AltbufDebugMsg('IsExcludedBufname:bufname=' . a:bufname)
 
         for pattern in s:excludeBufnames
             if a:bufname =~ pattern
+                call s:AltbufDebugMsg('IsExcludedBufname:excluding:' . a:bufname)
                 return 1
             endif
         endfor
 
         return 0
     endfunction
+
 
     function! s:IsExcludedBuf(bufnr)
 
@@ -390,7 +383,7 @@
             return 1
         endif 
 
-        " Incude filetypes take precedence over unlisted bufs.
+        " Include filetypes take precedence over unlisted bufs.
         if index(s:includeFiletypes, l:filetype) >= 0
             return 0
         endif
@@ -403,30 +396,30 @@
 
     endfunction
 
+
     function! AltbufList()
-        echom('winBufDict=' . string(s:winBufDict) . ', bufWinDict:' . string(s:bufWinDict))
+        echom('winBufDict=' . string(s:winBufDict))
     endfunction
+
 
     function! AltbufPrevious()
 
         let l:winBufList = get(s:winBufDict, win_getid())
         let l:bufListLen = len(l:winBufList)
 
-        " Why are we doing this???
-        " if l:bufListLen > 0 && (bufnr('%') != l:winBufList[-1])
-        "     execute 'buffer' . l:winBufList[-1]
-        " endif
-
         if l:bufListLen < 2
             return
         endif
 
-        while l:bufListLen >= 2 && s:IsExcludedBuf(l:winBufList[l:bufListLen - 2])
-            call remove(l:winBufList, l:bufListLen - 2)
+        while l:bufListLen > 1 && s:IsExcludedBuf(l:winBufList[1])
+            call remove(l:winBufList, 1)
             let l:bufListLen -= 1
         endwhile
 
-        execute 'buffer' . l:winBufList[l:bufListLen - 2]
+        if l:bufListLen > 1
+            execute 'buffer' . l:winBufList[1]
+        endif
+
     endfunction
 
 " }}}
@@ -883,30 +876,6 @@
 
         " Turn off handling of '-' as a bullet (sort of).
         autocmd BufRead,BufNewFile *.txt setlocal comments-=fb:-
-    "  }}}
-
-    " Debugging {{{
-    augroup vimrc_debug
-        autocmd!
-        autocmd BufCreate   * unsilent echom('========== BufCreate:'   . expand('%'))
-        autocmd BufEnter    * unsilent echom('========== BufEnter:'    . expand('%'))
-        autocmd BufFilePre  * unsilent echom('========== BufFilePre:'  . expand('%'))
-        autocmd BufFilePost * unsilent echom('========== BufFilePost:' . expand('%'))
-        autocmd BufHidden   * unsilent echom('========== BufHidden:'   . expand('%'))
-        autocmd BufLeave    * unsilent echom('========== BufLeave:'    . expand('%'))
-        autocmd BufNew      * unsilent echom('========== BufNew:'      . expand('%'))
-        autocmd BufRead     * unsilent echom('========== BufRead:'     . expand('%'))
-        autocmd BufWinEnter * unsilent echom('========== BufWinEnter:' . expand('%'))
-        autocmd BufWinLeave * unsilent echom('========== BufWinLeave:' . expand('%'))
-        autocmd BufUnload   * unsilent echom('========== BufUnload:'   . expand('%')) 
-        autocmd BufWipeout  * unsilent echom('========== BufWipeout:'  . expand('<abuf>')) 
-        " autocmd FileType    * unsilent echom('========== FileType:'    . expand('%')) 
-        " autocmd VimEnter    * unsilent echom('========== VimEnter:'    . expand('%'))
-        autocmd WinNew      * unsilent echom('========== WinNew:'      . expand('%'))
-        autocmd WinEnter    * unsilent echom('========== WinEnter:'    . expand('%'))
-        autocmd WinLeave    * unsilent echom('========== WinLeave:'    . expand('%'))
-        " autocmd OptionSet   * unsilent echom('========== OptionSet:'   . expand('<amatch>'))
-    augroup END
     " }}}
 "}}}
 
@@ -1087,17 +1056,17 @@
         " directories get opened in a new buffer (as opposed to just being
         " expanded in the current tree).
         "
-        
+
         autocmd VimEnter * call NERDTreeAddKeyMap({
                \ 'key': '<CR>',
                \ 'callback': 'NERDTreeOpenNode',
                \ 'quickhelpText': 'Better directory open',
-               \ 'scope': 'Node',
+               \ 'scope': 'DirNode',
                \ 'override' : 1})
 
         function! NERDTreeOpenNode(node)
             execute 'bwipeout' 
-            execute 'edit' . a:dirnode.path.str()
+            execute 'edit' . a:node.path.str()
         endfunction
 
         autocmd VimEnter * call NERDTreeAddKeyMap({
@@ -1120,7 +1089,7 @@
 
         augroup explore
             autocmd!
-            " autocmd BufEnter,BufWinEnter * call s:explore(expand('<amatch>'))
+            autocmd BufEnter,BufWinEnter * call s:explore(expand('<amatch>'))
         augroup END
 
         function s:explore(path)
@@ -1131,7 +1100,6 @@
             endif
 
             if isdirectory(path) 
-                execute 'bwipeout' 
                 call nerdtree#checkForBrowse(path)
             endif
         endfunction
