@@ -35,49 +35,44 @@
     if WINDOWS()
         set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
     endif
+" }}}
 
-    "
-    " Create a '~/.vim/python' symlink to python home to turn this on...
-    " python -> ~/.asdf/installs/python/3.7.3-framework-vim/Python.framework/Versions/3.7
-    "
-    " Install neovim in python env:
-    "   $ pip install neovim
-    "
-    if isdirectory($HOME . '/.vim/python') && !exists('s:python_initialized')
-       set pyxversion=3
-       let g:python3_host_prog=expand('~/.vim/python/bin/python3')
-
-       " let $PATH = $HOME . '/.vim/python/bin:' . $PATH
-       "
-       if !has('nvim')
-           set pythonthreehome=/Users/lance.johnston/.vim/python
-           set pythonthreedll=/Users/lance.johnston/.vim/python/lib/libpython3.7.dylib
-       endif
-
-       let s:python_initialized = 1
-    endif
+" Debugging {{{
+    " augroup vimrc_debug
+    "     autocmd!
+    "     autocmd BufCreate   * unsilent echom('========== BufCreate:'   . expand('%') . ';winid:' . win_getid())
+    "     autocmd BufEnter    * unsilent echom('========== BufEnter:'    . expand('%') . ';winid:' . win_getid())
+    "     autocmd BufFilePre  * unsilent echom('========== BufFilePre:'  . expand('%') . ';winid:' . win_getid())
+    "     autocmd BufFilePost * unsilent echom('========== BufFilePost:' . expand('%') . ';winid:' . win_getid())
+    "     autocmd BufHidden   * unsilent echom('========== BufHidden:'   . expand('%') . ';winid:' . win_getid())
+    "     autocmd BufLeave    * unsilent echom('========== BufLeave:'    . expand('%') . ';winid:' . win_getid())
+    "     autocmd BufNew      * unsilent echom('========== BufNew:'      . expand('%') . ';winid:' . win_getid())
+    "     autocmd BufRead     * unsilent echom('========== BufRead:'     . expand('%') . ';winid:' . win_getid())
+    "     autocmd BufWinEnter * unsilent echom('========== BufWinEnter:' . expand('%') . ';winid:' . win_getid())
+    "     autocmd BufWinLeave * unsilent echom('========== BufWinLeave:' . expand('%') . ';winid:' . win_getid())
+    "     autocmd BufUnload   * unsilent echom('========== BufUnload:'   . expand('%') . ';winid:' . win_getid()) 
+    "     autocmd BufWipeout  * unsilent echom('========== BufWipeout:'  . expand('<abuf>') . ';winid:' . win_getid()) 
+    "     autocmd FileType    * unsilent echom('========== FileType:'    . expand('%')) 
+    "     autocmd VimEnter    * unsilent echom('========== VimEnter:'    . expand('%'))
+    "     autocmd WinNew      * unsilent echom('========== WinNew:'      . expand('%') . ';winid:' . win_getid())
+    "     autocmd WinEnter    * unsilent echom('========== WinEnter:'    . expand('%') . ';winid:' . win_getid())
+    "     autocmd WinLeave    * unsilent echom('========== WinLeave:'    . expand('%') . ';winid:' . win_getid())
+    "     autocmd OptionSet   * unsilent echom('========== OptionSet:'   . expand('<amatch>'))
+    " augroup END
 " }}}
 
 " Install Plugins {{{
     call plug#begin('~/.vim/plugged')
 
-        Plug 'Shougo/deoplete.nvim'
-
-        if has('nvim')
-            Plug 'Shougo/defx.nvim', { 'do': ':UpdateRemotePlugins' }
-            Plug 'Shougo/denite.nvim', { 'do': ':UpdateRemotePlugins' }
-        else
-            " Plug 'Shougo/defx.nvim', { 'tag': '1.0' }
-            Plug 'Shougo/defx.nvim'
-            Plug 'Shougo/denite.nvim'
-            Plug 'roxma/nvim-yarp'
-            Plug 'roxma/vim-hug-neovim-rpc'
-        endif
-
         " Plug 'vim-airline/vim-airline'
         " Plug 'vim-airline/vim-airline-themes'
         Plug 'flazz/vim-colorschemes'
         Plug 'itchyny/lightline.vim'
+        
+        Plug 'preservim/nerdtree', { 'tag': '6.9.9' }
+
+        Plug '/usr/local/opt/fzf'
+        Plug 'junegunn/fzf.vim'
 
         Plug 'tpope/vim-abolish'
         Plug 'tpope/vim-fugitive'
@@ -100,8 +95,8 @@
         Plug 'jiangmiao/auto-pairs'
 
         Plug 'vim-scripts/groovyindent-unix'
-
-        Plug 'vimwiki/vimwiki'
+        
+        Plug 'vimwiki/vimwiki', { 'tag': '2.5' }
     call plug#end()
 
     if exists("g:plugin_install") && g:plugin_install == 1 
@@ -119,17 +114,20 @@
 
     " autocmd event notes
     " - We get a bdelete on a bwipeout
-    " - Some plugins seem to do weird things with the events. For example, netrw
-    "   fires a BufEnter event before the buffer has name and then files two (yes,
-    "   two) BufDelete events. It isn't until the second BufDelete that the
-    "   buffer's filetype is correctly set to netrw. On the BufEnter, buflisted=1.
+    " - Some plugins seem to do weird things with the events. For example,
+    "   netrw fires a BufEnter event before the buffer has a name and then
+    "   files two (yes, two) BufDelete events. It isn't until the second
+    "   BufDelete that the buffer's filetype is correctly set to netrw. On the
+    "   BufEnter, buflisted=1.
     
     command! -nargs=0 AltbufPrevious :call AltbufPrevious()
 
     augroup altbuf
         autocmd!
-        autocmd BufEnter * call s:AltbufDebug('BufEnter') | call s:AltbufEnter()
-        autocmd BufDelete * call s:AltbufDebug('BufDelete') | call s:AltbufDelete()
+        autocmd BufEnter,WinEnter * call s:AltbufEnter()
+        autocmd BufDelete         * call s:AltbufDelete()
+        autocmd WinLeave          * call s:AltbufWinLeave()
+        autocmd WinNew            * call s:AltbufWinNew()
     augroup END
 
 
@@ -144,66 +142,55 @@
         call s:AltbufDebugMsg(a:event . ':filetype=' . &filetype)
         call s:AltbufDebugMsg(a:event . ':buflisted=' . &buflisted)
         call s:AltbufDebugMsg(a:event . ':bufname(%)=' . bufname('%'))
-        call s:AltbufDebugMsg(a:event . ':winnr())=' . winnr())
+        call s:AltbufDebugMsg(a:event . ':winnr()=' . winnr())
         call s:AltbufDebugMsg('--------------------')
     endfunction
 
-    " I _think_ we can use this to identify a window-specific bufList...
-    " getwininfo(win_getid())[0]['bufnr']
-    "
-    " We can use this to check if a window ID is still open
-    " range(1,winnr('$'))
-    " win_getid(<win number from above>)
-    "
-    " Here's what we want to do...
-    "
-    " - On bufenter get the window ID and buffer and manage a window-specific
-    "   buffer list just as we are now.
-    " - On bufenter get list of all existing window IDs and compare to the list
-    "   of window IDs we have bufferlists for. If any window are missing,
-    "   delete the dictionary entry for the window IDs that no longer exist.
-    " - On bufdelete, we need to remove the buffer from _all_ window buflists
-    "   where it exists.
-    
     let s:winBufDict = {}
-    let s:bufWinDict = {}
+    let s:globalBufList = []
 
     " TODO: Make these configurable plugin options.
     let s:includeFiletypes = ['help']
     let s:excludeFiletypes = ['netrw']
 
     " Ignore buffers with empty name (e.g. "[No Name]" buffers)
-    let s:excludeBufnames = ['\v^\s*$']
+    let s:excludeBufnames = ['^\s*$']
+    let s:excludeBufnames += ['\c.*buffergator.*']
+
 
     function! s:AltbufEnter()
         call s:AltbufDebugMsg('altbufEnter:@%=' . @%)
         call s:AltbufDebugMsg('altbufEnter:@#=' . @#)
         call s:AltbufDebugMsg('altbufEnter:<abuf>=' . expand('<abuf>'))
+        call s:AltbufDebugMsg("altbufEnter:filetype=" . &filetype)
         call s:AltbufDebugMsg('altbufEnter:win_getid()=' . win_getid())
-        call s:AltbufDebugMsg("altbufEnter:getwininfo(win_getid())[0]['bufnr']=" . getwininfo(win_getid())[0]['bufnr'])
+        call s:AltbufDebugMsg("altbufEnter:winBufDict=" . string(s:winBufDict))
+
+        " We'll take this as another opportunity to prune inactive windows. See
+        " the AltbufWinLeave function header for more info.
+        call s:PruneWinDict()
 
         let l:winid = win_getid()
-        let l:bufnr = bufnr('%')
+        let l:bufnr = str2nr(expand('<abuf>'))
+
+        if s:IsExcludedBufname(bufname(l:bufnr)) 
+            return
+        endif 
 
         if !has_key(s:winBufDict, l:winid)
             let s:winBufDict[l:winid] = []
         endif
 
-        if !has_key(s:bufWinDict, l:bufnr)
-            let s:bufWinDict[l:bufnr] = []
-        endif
-
+        " Remove buffer from window-specific list if it exists, and put it on top.
         let l:winBufList = get(s:winBufDict, l:winid)
-        let l:bufWinList = get(s:bufWinDict, l:bufnr)
-
-        call s:EnsureListElement(l:bufWinList, l:winid)
-        
-        " Remove buffer from list if it exists, and put it on top.
         call s:RemoveListElement(l:winBufList, l:bufnr)
-        call add(l:winBufList, l:bufnr)
-        
-        call s:AltbufDebugMsg('AltbufEnter:winBufList=' . join(l:winBufList))
-        call s:AltbufDebugMsg('AltbufEnter:bufWinList=' . join(l:bufWinList))
+        call insert(l:winBufList, l:bufnr, 0)
+
+        " Same for the global buffer list.
+        call s:RemoveListElement(s:globalBufList, l:bufnr)
+        call insert(s:globalBufList, l:bufnr, 0)
+
+        call s:AltbufDebugMsg("altbufEnter(end):winBufDict=" . string(s:winBufDict))
     endfunction
 
 
@@ -211,34 +198,113 @@
         call s:AltbufDebugMsg('altbufDelete:@%=' . @%)
         call s:AltbufDebugMsg('altbufDelete:@#=' . @#)
         call s:AltbufDebugMsg('altbufDelete:<abuf>=' . expand('<abuf>'))
+        call s:AltbufDebugMsg("altbufDelete:filetype=" . &filetype)
         call s:AltbufDebugMsg('altbufDelete:win_getid()=' . win_getid())
-        call s:AltbufDebugMsg("altbufDelete:getwininfo(win_getid())[0]['bufnr']=" . getwininfo(win_getid())[0]['bufnr'])
+        call s:AltbufDebugMsg("altbufDelete:winBufDict=" . string(s:winBufDict))
 
-        let l:bufnr = bufnr('%')
-        let l:winList = s:bufWinDict[l:bufnr]
-        
-        for winid in l:winList
-            let l:bufList = s:winBufDict[winid]
-            call s:RemoveListElement(l:bufList, l:bufnr)
-        endfor
-        
+        " Prune the windows first for efficiency.
+        call s:PruneWinDict()
+
+        " We can't just rely on PruneBuffers() here because the buffer that's
+        " being deleted still exists when this event fires.
+        let l:bufnr = str2nr(expand('<abuf>'))
+        call s:PruneWinBufLists(l:bufnr)
+        call s:RemoveListElement(s:globalBufList, l:bufnr)
+
+        call s:PruneBuffers()
+
+        call s:AltbufDebugMsg("altbufDelete(end):winBufDict=" . string(s:winBufDict))
     endfunction
 
 
-    function! PruneWinDict()
+    " Initialize any new windows with the global buffer list.
+    " Why we need to... from a user experience standpoint, multiple windows can
+    " get strange with regard to our Altbuf intentions. For example, if a user
+    " has a window open with a number of buffers open and creates a new split
+    " (e.g. a simple ':vsplit'), then they're looking at two windows with the
+    " same buffer. If they close one of those windows, which one did they
+    " close... the one with a bunch of buffer history or the new one? From the
+    " user perspective, it's kind of hard to say, so it makes sense to push
+    " the current buffer history to each new window.
+    function! s:AltbufWinNew() 
+        call s:AltbufDebugMsg('altbufWinNew:@%=' . @%)
+        call s:AltbufDebugMsg('altbufWinNew:@#=' . @#)
+        call s:AltbufDebugMsg('altbufWinNew:<abuf>=' . expand('<abuf>'))
+        call s:AltbufDebugMsg("altbufWinNew:filetype=" . &filetype)
+        call s:AltbufDebugMsg('altbufWinNew:win_getid()=' . win_getid())
+        call s:AltbufDebugMsg("altbufWinNew:winBufDict=" . string(s:winBufDict))
 
-        let l:altbufWinList = keys(s:winBufDict)
-        let l:vimWinList = map(range(1, winnr('$')), 'win_getid(v:val)')
+        let s:winBufDict[win_getid()] = copy(s:globalBufList)
 
-        for winid in l:altbufWinList
+    endfunction
 
-            " Could do this with a filter.
-            if index(l:vimWinList, winid) == -1
-                unlet s:winBufDict[winid]
+
+    " There is no such thing as a WinDelete event, so the active window still
+    " exists when we get the leave event, so the window that triggered this
+    " event won't be removed from the Altbuf state. Any other windows that are
+    " no longer active, however, will. This is just taking advantage of an
+    " opportunity to keep our state as accurate as possible.
+    function! s:AltbufWinLeave()
+        call s:AltbufDebugMsg('altbufWinLeave:@%=' . @%)
+        call s:AltbufDebugMsg('altbufWinLeave:@#=' . @#)
+        call s:AltbufDebugMsg('altbufWinLeave:<abuf>=' . expand('<abuf>'))
+        call s:AltbufDebugMsg("altbufWinLeave:filetype=" . &filetype)
+        call s:AltbufDebugMsg('altbufWinLeave:win_getid()=' . win_getid())
+        call s:AltbufDebugMsg("altbufWinLeave:winBufDict=" . string(s:winBufDict))
+
+        call s:PruneWinDict()
+        call s:PruneBuffers()
+        
+        call s:AltbufDebugMsg("altbufDelete(end):winBufDict=" . string(s:winBufDict))
+    endfunction
+
+
+    " Remove any windows from Altbuf state that no longer exist.
+    function! s:PruneWinDict()
+        call s:AltbufDebugMsg("pruneWinDict:winBufDict=" . string(s:winBufDict))
+
+        let l:winids = keys(s:winBufDict)
+
+        for winid in l:winids
+            if win_id2win(winid) == 0
+                call remove(s:winBufDict, winid)
             endif
-
         endfor
- 
+
+        call s:AltbufDebugMsg("pruneWinDict(end):winBufDict=" . string(s:winBufDict))
+    endfunction
+
+
+    " Remove any buffers from Altbuf state that no longer exist.
+    function! s:PruneBuffers()
+        call s:AltbufDebugMsg("pruneBuffers:winBufDict=" . string(s:winBufDict))
+        let l:bufnrs = []
+
+        for winid in keys(s:winBufDict)
+            let l:bufnrs += get(s:winBufDict, winid)
+        endfor
+        
+        call s:AltbufDebugMsg("PruneBuffers:" . string(l:bufnrs))
+
+        for bufnr in uniq(sort(l:bufnrs))
+            if ! bufexists(bufnr)
+                call s:PruneWinBufLists(bufnr)
+            endif
+        endfor
+
+        call s:AltbufDebugMsg("pruneBuffers(end):winBufDict=" . string(s:winBufDict))
+    endfunction
+
+
+    " Remove a buffer from all Altbuf window state.
+    function! s:PruneWinBufLists(bufnr)
+        call s:AltbufDebugMsg("PruneWinBufLists:bufnr=" . string(a:bufnr))
+
+        for winid in keys(s:winBufDict)
+            let l:bufList = get(s:winBufDict, winid)
+            call s:RemoveListElement(l:bufList, a:bufnr)
+        endfor
+
     endfunction
 
 
@@ -252,6 +318,7 @@
 
 
     function! s:RemoveListElement(list, element)
+
         let l:idx = index(a:list, a:element)
 
         if l:idx >= 0
@@ -262,15 +329,18 @@
 
 
     function s:IsExcludedBufname(bufname)
+        call s:AltbufDebugMsg('IsExcludedBufname:bufname=' . a:bufname)
 
         for pattern in s:excludeBufnames
             if a:bufname =~ pattern
+                call s:AltbufDebugMsg('IsExcludedBufname:excluding:' . a:bufname)
                 return 1
             endif
         endfor
 
         return 0
     endfunction
+
 
     function! s:IsExcludedBuf(bufnr)
 
@@ -285,7 +355,7 @@
             return 1
         endif 
 
-        " Incude filetypes take precedence over unlisted bufs.
+        " Include filetypes take precedence over unlisted bufs.
         if index(s:includeFiletypes, l:filetype) >= 0
             return 0
         endif
@@ -295,33 +365,34 @@
         endif
 
         return 0
-        
+
     endfunction
 
+
     function! AltbufList()
-        echo(s:winBufDict)
+        echom('winBufDict=' . string(s:winBufDict))
+        echom('globalBufList=' . string(s:globalBufList))
     endfunction
+
 
     function! AltbufPrevious()
 
         let l:winBufList = get(s:winBufDict, win_getid())
         let l:bufListLen = len(l:winBufList)
 
-        " Why are we doing this???
-        " if l:bufListLen > 0 && (bufnr('%') != l:winBufList[-1])
-        "     execute 'buffer' . l:winBufList[-1]
-        " endif
-
         if l:bufListLen < 2
             return
         endif
 
-        while l:bufListLen >= 2 && s:IsExcludedBuf(l:winBufList[l:bufListLen - 2])
-            call remove(l:winBufList, l:bufListLen - 2)
+        while l:bufListLen > 1 && s:IsExcludedBuf(l:winBufList[1])
+            call remove(l:winBufList, 1)
             let l:bufListLen -= 1
         endwhile
 
-        execute 'buffer' . l:winBufList[l:bufListLen - 2]
+        if l:bufListLen > 1
+            execute 'buffer' . l:winBufList[1]
+        endif
+
     endfunction
 
 " }}}
@@ -353,7 +424,7 @@
     augroup CursorLine
         autocmd!
         autocmd VimEnter,WinEnter,BufWinEnter * setlocal cursorline
-        autocmd WinLeave * 
+        " autocmd WinLeave * 
             \  if &filetype !~ '^\(denite\|foo\)$' 
             \|     setlocal nocursorline
             \| endif
@@ -639,37 +710,8 @@
     " Delete buffer.
     " nnoremap <c-q> :bdelete<cr>
     nnoremap <c-o> :bdelete<cr>
-
-    "
-    " I've been trying for ages to get a simple keystroke that will allow me to
-    " bounce back and forth between two buffers. I've tried to leverage vim's
-    " "alternate file", but that can get hosed up when buffers are simply
-    " deleted rather than wiped out. And trying to ensure a buffer is wiped out
-    " can be a pain in the ass.
-    "
-    " My next attempt was to use BufferGator's MRU capabilities. The problem
-    " with that is that its MRU list is not actually in most recently _used_
-    " order, but rather most recently _opened_. IOW, it has the concept of
-    " opening the previous buffer, but after doing so, going to the previous
-    " buffer again doesn't return us back to where we started - we have to go
-    " to the next buffer to do that. Here's what I had for that: 
-    " nnoremap <leader><leader> :call <SID>BuffergatorAltFile(<SID>GetBuffergatorAltFileDirection())<cr>
-    " nnoremap <leader>, :call <SID>BuffergatorAltFile('prev')<cr> nnoremap
-    " <leader>. :call <SID>BuffergatorAltFile('next')<cr>
-    "
-    " But... I'm fed up enough with this that I'm going bite the bullet and
-    " write my own plugin to do this. It'll be a good learning experience and
-    " I'll get what I want. This may be a useful resource:
-    "
-    " https://github.com/vim-scripts/bufmru.vim/blob/821869d8b6139536c1122902493de00c654b5a2a/plugin/bufmru.vim
-    "
-    " And of course there's this:
-    "
-    " http://learnvimscriptthehardway.stevelosh.com/
-    "
     
     " Goto previous buffer.
-    " nnoremap <leader><leader> <C-^>
     nnoremap <silent> <leader><leader> :AltbufPrevious<cr>
 
     " Ideally, used in split window with desired diff buffers open.
@@ -709,9 +751,23 @@
     " "Plugin Config" section below).
     "
     
-    nnoremap <leader>e :Defx<cr>
+    nnoremap <leader>e :execute 'edit' . getcwd()<cr>
 
-    "
+    " fzf
+    command! -bang ProjectFiles call fzf#vim#files(ProjectRoot(), <bang>0)
+
+    command! -bang -nargs=* RgProjectFiles
+        \ call fzf#vim#grep(
+        \     'rg --column --line-number --no-heading --color=always --smart-case -- ' 
+        \        .shellescape(<q-args>).' '.ProjectRoot(), 
+        \     1, fzf#vim#with_preview(), <bang>0)
+
+    nnoremap <leader>r :Files<cr>
+    nnoremap <leader>R :Rg<space>
+
+    nnoremap <leader>p :ProjectFiles<cr>
+    nnoremap <leader>P :RgProjectFiles<space>
+
     " vim-surround's default keys include 'ds'. I have lots of plugins with
     " buffer-local key mappings that use 'd' (e.g. buffergator's delete
     " buffer), and I don't want the associated key delay, so changing all
@@ -800,27 +856,6 @@
 
         " Turn off handling of '-' as a bullet (sort of).
         autocmd BufRead,BufNewFile *.txt setlocal comments-=fb:-
-    "  }}}
-
-    " Debugging {{{
-    augroup vimrc_debug
-        autocmd!
-        " autocmd BufCreate   * unsilent echom('========== BufCreate:'   . expand('%'))
-        " autocmd BufEnter    * unsilent echom('========== BufEnter:'    . expand('%'))
-        " autocmd BufHidden   * unsilent echom('========== BufHidden:'   . expand('%'))
-        " autocmd BufLeave    * unsilent echom('========== BufLeave:'    . expand('%'))
-        " autocmd BufNew      * unsilent echom('========== BufNew:'      . expand('%'))
-        " autocmd BufRead     * unsilent echom('========== BufRead:'     . expand('%'))
-        " autocmd BufWinEnter * unsilent echom('========== BufWinEnter:' . expand('%'))
-        " autocmd BufWinLeave * unsilent echom('========== BufWinLeave:' . expand('%'))
-        " autocmd BufWipeout  * unsilent echom('========== BufWipeout:'  . expand('%')) 
-        " autocmd FileType    * unsilent echom('========== FileType:'    . expand('%')) 
-        " autocmd VimEnter    * unsilent echom('========== VimEnter:'    . expand('%'))
-        " autocmd WinNew      * unsilent echom('========== WinNew:'      . expand('%'))
-        " autocmd WinEnter    * unsilent echom('========== WinEnter:'    . expand('%'))
-        " autocmd WinLeave    * unsilent echom('========== WinLeave:'    . expand('%'))
-        " autocmd OptionSet   * unsilent echom('========== OptionSet:'   . expand('<amatch>'))
-    augroup END
     " }}}
 "}}}
 
@@ -845,188 +880,8 @@
         let g:buffergator_sort_regime = "filepath"
         let g:buffergator_split_size = 15
         let g:buffergator_viewport_split_policy = "T"            
-
-        " Commenting this out for now because BufferGator's MRU is not really
-        " an MRU.
-        "
-        " let s:buffergator_alt_file_direction = 'prev'
-        "                                          
-        " function! s:GetBuffergatorAltFileDirection() 
-        "     return s:buffergator_alt_file_direction
-        " endfunction
-        "                                          
-        " function! s:BuffergatorAltFile(direction) 
-        "     if a:direction ==# 'prev'
-        "         execute 'BuffergatorMruCyclePrev'
-        "         let s:buffergator_alt_file_direction = 'next'
-        "     elseif a:direction ==# 'next'
-        "         execute 'BuffergatorMruCycleNext'
-        "         let s:buffergator_alt_file_direction = 'prev'
-        "     endif
-        " endfunction
     " }}}
    
-    " Defx {{{
-
-        autocmd FileType defx call s:DefxSettings()
-        
-        function! s:DefxSettings() 
-
-            " Define mappings
-            nnoremap <silent><buffer><expr> <CR> defx#do_action('open')
-            nnoremap <silent><buffer><expr> ~    defx#do_action('cd')
-            nnoremap <silent><buffer><expr> -    defx#do_action('cd', ['..'])
-            nnoremap <silent><buffer><expr> u    defx#do_action('cd', ['..'])
-            nnoremap <silent><buffer><expr> t    defx#do_action('open_or_close_tree')
-            nnoremap <silent><buffer><expr> T    defx#do_action('open_tree_recursive')
-            nnoremap <silent><buffer><expr> .    defx#do_action('toggle_ignored_files')
-            nnoremap <silent><buffer><expr> yy   defx#do_action('yank_path')
-            nnoremap <silent><buffer><expr> q    defx#do_action('quit')
-            nnoremap <silent><buffer><expr> K    defx#do_action('new_directory')
-            nnoremap <silent><buffer><expr> N    defx#do_action('new_file')
-            nnoremap <silent><buffer><expr> M    defx#do_action('new_multiple_files')
-            nnoremap <silent><buffer><expr> D    defx#do_action('remove')
-            nnoremap <silent><buffer><expr> R    defx#do_action('rename')
-
-            " The mnemonic here is 'mark' (not s=select, to avoid key delay on
-            " vim-surround's s key).
-            nnoremap <silent><buffer><expr> m    defx#do_action('toggle_select')
-            vnoremap <silent><buffer><expr> m    defx#do_action('toggle_select_visual')
-
-            " For some reason, mapping this key can cause all kinds of grief.
-            " Unmap it and run '$ vim <dir>' in a terminal to see it.
-            " nnoremap <silent><buffer><expr> <esc> defx#do_action('quit')
-        endfunction
-
-        "
-        " The following is all about implementing some sort of sane buffer
-        " handling for for file browsing. That is:
-        "
-        " - Fully replace netrw with defx.
-        " - Proper alternate buffer handling when using defx (i.e. the defx
-        "   buffer _never_ becomes the alternate file).
-        "
-
-        " autocmd FileType defx setlocal bufhidden=wipe 
-
-        augroup defx_buffers
-            autocmd!
-            autocmd BufEnter,BufWinEnter
-                \ * call s:explore(expand('<amatch>'))
-        augroup END
-
-        function s:explore(path)
-            " unsilent echom('explore:a:path: '    . a:path)
-            " unsilent echom('explore:bufname: '   . bufname('%'))
-            " unsilent echom('explore:bufnr: '     . bufnr('%'))
-            " unsilent echom('explore:bufhidden: ' . &bufhidden)
-            " unsilent echom('explore:abuf: '      . expand('<abuf>'))
-            " unsilent echom('explore:filetype: '  . &filetype)
-            " unsilent echom('explore:lines: '     . line('$'))
-
-            if a:path == '' || &filetype ==# 'defx' 
-                return
-            endif
-
-            " Handle ':edit ~'.
-            let path = a:path
-            if fnamemodify(path, ':t') ==# '~'
-                let path = expand('~')
-            endif
-
-            if isdirectory(path) 
-
-                " Disable netrw.
-                augroup FileExplorer
-                    autocmd!
-                augroup END
-
-                " The current buffer was opened with a directory path. We need
-                " to wipe it out and replace it with a defx buffer on that same
-                " path.
-                bwipeout!
-
-                call defx#util#call_defx('Defx', path)
-            endif
-        endfunction
-    " }}}
-    
-    " Denite {{{
-        if executable('ag')
-            call denite#custom#var('file/rec', 'command', 
-                \ ['ag', '--follow', '--nocolor', '--nogroup', '-g', '']) 
-
-            call denite#custom#var('grep', 'command', ['ag'])
-            call denite#custom#var('grep', 'default_opts', ['-i', '--vimgrep'])
-            call denite#custom#var('grep', 'final_opts', [])
-            call denite#custom#var('grep', 'pattern_opt', [])
-            call denite#custom#var('grep', 'recursive_opts', [])
-            call denite#custom#var('grep', 'separator', ['--'])
-
-        elseif executable('rg')
-            call denite#custom#var('file/rec', 'command', 
-                \ ['rg', '--files', '--glob', '!.git'])
-
-            call denite#custom#var('grep', 'command', ['rg'])
-            call denite#custom#var('grep', 'command', ['rg', '--threads', '1'])
-            call denite#custom#var('grep', 'default_opts', ['--vimgrep', '--no-heading'])
-            call denite#custom#var('grep', 'final_opts', [])
-            call denite#custom#var('grep', 'pattern_opt', ['--regexp'])
-            call denite#custom#var('grep', 'recursive_opts', [])
-            call denite#custom#var('grep', 'separator', ['--'])
-        endif
-
-        call denite#custom#option('_', 'prompt', '>')
-        call denite#custom#option('_', 'direction', 'dynamictop')
-        call denite#custom#option('_', 'filter_split_direction', 'belowright')
-        call denite#custom#option('_', 'vertical_preview', 'true')
-
-        " Not sure this is best for all colorschemes (is for quantum).
-        call denite#custom#option('_', 'highlight_matched_char', 'Special')
-
-        call denite#custom#source('file/rec', 'matchers', ['matcher/regexp'])
-        call denite#custom#source('grep', 'matchers', ['matcher/regexp'])
-        call denite#custom#source('grep', 'converters', ['converter/abbr_word'])
-
-        autocmd FileType denite call s:denite_my_settings()
-
-        function! s:denite_my_settings() abort
-            nnoremap <silent><buffer><expr> <CR> denite#do_map('do_action')
-            nnoremap <silent><buffer><expr> d    denite#do_map('do_action', 'delete')
-            nnoremap <silent><buffer><expr> i    denite#do_map('open_filter_buffer')
-            nnoremap <silent><buffer><expr> p    denite#do_map('do_action', 'preview')
-
-            nnoremap <silent><buffer><expr> m    denite#do_map('toggle_select')
-            nnoremap <silent><buffer><expr> M    denite#do_map('toggle_select_all')
-
-            nnoremap <silent><buffer><expr> <esc> denite#do_map('quit')
-            nnoremap <silent><buffer><expr> q     denite#do_map('quit')
-        endfunction
-
-        autocmd FileType denite-filter call s:denite_filter_my_settings()
-
-        function! s:denite_filter_my_settings() abort
-            " Quit filter window.
-            imap <silent><buffer> <esc> <Plug>(denite_filter_quit)
-
-            " Quit filter window and denite.
-	        imap <silent><buffer> <C-o> <Plug>(denite_filter_quit)q
-
-            " Move cursor while in insert mode.
-            inoremap <silent><buffer> <C-j>
-                        \ <Esc><C-w>p:call cursor(line('.')+1,0)<CR><C-w>pA
-            inoremap <silent><buffer> <C-k>
-                        \ <Esc><C-w>p:call cursor(line('.')-1,0)<CR><C-w>pA
-        endfunction
-
-        nnoremap <leader>f :<C-u>Denite file -start-filter<cr>
-        nnoremap <leader>r :<C-u>Denite file/rec -start-filter<cr>
-        nnoremap <leader>R :<C-u>Denite grep -start-filter<cr>
-
-        nnoremap <leader>p :<C-u>DeniteProjectDir file/rec -start-filter<cr>
-        nnoremap <leader>P :<C-u>DeniteProjectDir grep -start-filter<cr>
-    " }}}
-                                     
     " Lightline {{{
         " Like these: PaperColor, OldHope
         let g:lightline = {
@@ -1038,6 +893,9 @@
         \   'component_function': {
         \     'gitbranch': 'fugitive#head'
         \   },
+		\   'component': {
+		\     'lineinfo': '%3l:%-2v',
+        \   },
         \ }
     " }}}
 
@@ -1045,6 +903,82 @@
         let g:rainbow_active = 1
     " }}}
    
+    " NERDTree {{{
+        let NERDTreeHijackNetrw=1
+        let NERDTreeMinimalUI=1
+        let NERDTreeQuitOnOpen=1
+
+        let g:NERDTreeMapOpenRecursively='T'
+        let g:NERDTreeMapToggleHidden='.'
+
+        let g:NERDTreeMapChangeRoot=v:null
+        let g:NERDTreeMapChdir=v:null
+        let g:NERDTreeMapCWD=v:null
+        let g:NERDTreeMapDeleteBoomark=v:null
+        let g:NERDTreeMapOpenInTab=v:null
+        let g:NERDTreeMapOpenInTabSilent=v:null
+        let g:NERDTreeMapPreview=v:null
+        let g:NERDTreeMapRefreshRoot=v:null
+        let g:NERDTreeMapToggleBookmarks=v:null
+        let g:NERDTreeMapToggleFiles=v:null
+        let g:NERDTreeMapToggleFilters=v:null
+        let g:NERDTreeMapToggleZoom=v:null
+
+        "
+        " Need to hook into both open and close to make sure the NERDTree
+        " buffers are getting wiped out. The OpenNode mapping also ensures that
+        " directories get opened in a new buffer (as opposed to just being
+        " expanded in the current tree).
+        "
+
+        autocmd VimEnter * call NERDTreeAddKeyMap({
+               \ 'key': '<CR>',
+               \ 'callback': 'NERDTreeOpenNode',
+               \ 'quickhelpText': 'Better directory open',
+               \ 'scope': 'DirNode',
+               \ 'override' : 1})
+
+        function! NERDTreeOpenNode(node)
+            execute 'bwipeout' 
+            execute 'edit' . a:node.path.str()
+        endfunction
+
+        autocmd VimEnter * call NERDTreeAddKeyMap({
+               \ 'key': 'q',
+               \ 'callback': 'NERDTreeClose',
+               \ 'quickhelpText': 'Close NERDTree buffer',
+               \ 'scope': 'all',
+               \ 'override' : 1})
+
+        function! NERDTreeClose()
+            execute 'bwipeout' 
+        endfunction
+
+        " Not sure why, but also need this.
+        autocmd FileType nerdtree setlocal bufhidden=wipe
+
+        "
+        " The following is all to handle ':edit ~'
+        "
+
+        augroup explore
+            autocmd!
+            autocmd BufEnter,BufWinEnter * call s:explore(expand('<amatch>'))
+        augroup END
+
+        function s:explore(path)
+
+            let path = a:path
+            if fnamemodify(path, ':t') ==# '~'
+                let path = expand('~')
+            endif
+
+            if isdirectory(path) 
+                call nerdtree#checkForBrowse(path)
+            endif
+        endfunction
+    " }}}
+
     " Scratch {{{
         " let g:scratch_height = 0.4
         " let g:scratch_autohide = 0
@@ -1063,17 +997,31 @@
     " }}}
     
     " VimWiki {{{
-        silent! nunmap <leader>ww
-        silent! nunmap <leader>wi
-        silent! nunmap <leader>ws
-        silent! nunmap <leader>wt
-        silent! nunmap <leader>w<leader>t
-        silent! nunmap <leader>w<leader>w
-        silent! nunmap <leader>w<leader>i
-        silent! nunmap <leader>w<leader>m
-        silent! nunmap <leader>w<leader>y
+        
+        " Don't want <leader>w[key] as I user <leader>w for write.
+        
+        " Unmap keys in VimEnter to make sure the plugin doesn't come back and
+        " remap them _after_ we've unmapped them.
+        " https://vim.fandom.com/wiki/Mapping_keys_in_Vim_-_Tutorial_(Part_1)
+        autocmd VimEnter * 
+            \  silent! nunmap <leader>ww
+            \| silent! nunmap <leader>w<leader>m
+            \| silent! nunmap <leader>w<leader>y
+            \| silent! nunmap <leader>wi
+            \| silent! nunmap <leader>ws
+            \| silent! nunmap <leader>wt
+            \| silent! nunmap <leader>w<leader>t
+            \| silent! nunmap <leader>w<leader>w
+            \| silent! nunmap <leader>w<leader>i
+            \| silent! nunmap <leader>w<leader>m
+            \| silent! nunmap <leader>w<leader>y
 
-        nmap <leader>vw <Plug>VimwikiIndex
+        " TODO: 'VimwikiIndex' should work here, but recently it's started
+        " randomly creating new 'index.wiki' files in the curren working
+        " directory.
+        nmap <leader>vw :execute 'edit ~/vimwiki/index.wiki'<CR>
+        " nmap <leader>vw <Plug>VimwikiIndex
+
         nmap <leader>vi <Plug>VimwikiTabIndex
         nmap <leader>vs <Plug>VimwikiUISelect
         nmap <leader>vr <Plug>VimwikiRenameLink
@@ -1087,6 +1035,36 @@
 " }}}
 
 " Functions {{{
+
+    " Find 'project' root dir, identified by list of file or dir markers.
+    " Mostly exists for use with fzf.
+    "
+    function! ProjectRoot()
+        " Dirs should end with a slash. Order is important... first find wins.
+        let l:root_markers = ['.git/', '.svn/', 'build.gradle', 'pom.xml']
+
+        for root_marker in l:root_markers
+            if root_marker[-1:] == '/'
+                let root_marker = root_marker[:-2]
+                let l:project_root = finddir(root_marker, expand('%:p:h').';') 
+            else
+                let l:project_root = findfile(root_marker, expand('%:p:h').';') 
+            endif
+
+            if l:project_root != ''
+                let l:project_root = fnamemodify(l:project_root, ':h')
+
+                if l:project_root == '.'
+                    let l:project_root = fnamemodify(l:project_root, ':p:h')
+                endif
+
+                return l:project_root
+            endif
+        endfor
+
+        return ''
+
+    endfunction
 
     " Dump output of an ex command to a new buffer in a new tab. Primarily
     " useful for searching ex command output.  
@@ -1105,7 +1083,9 @@
         silent put=message
       endif
     endfunction
+
     command! -nargs=+ -complete=command TabMessage call TabMessage(<q-args>)
+
 
     " Wanted to have <c-n> run invnumber and <c-r> run invrelativenumber so I
     " could toggle these independently, but <c-r> is redo and I didn't want to
