@@ -704,8 +704,8 @@
     " default word: <c-w>
 
     " Write buffers.
-    nnoremap <leader>w :w!<cr>
-    nnoremap <leader>W :wa!<cr>
+    nnoremap <leader>w :write<cr>
+    nnoremap <leader>W :wall<cr>
 
     " Delete buffer.
     " nnoremap <c-q> :bdelete<cr>
@@ -997,13 +997,14 @@
     " }}}
     
     " VimWiki {{{
-        
-        " Don't want <leader>w[key] as I user <leader>w for write.
-        
+    
+        " By default, vimwiki uses <leader>w... for a number of key mappings.
+        " I user <leader>w for write and don't want to deal with the key delay.    
+
         " Unmap keys in VimEnter to make sure the plugin doesn't come back and
         " remap them _after_ we've unmapped them.
         " https://vim.fandom.com/wiki/Mapping_keys_in_Vim_-_Tutorial_(Part_1)
-        autocmd VimEnter * 
+        autocmd VimEnter *
             \  silent! nunmap <leader>ww
             \| silent! nunmap <leader>w<leader>m
             \| silent! nunmap <leader>w<leader>y
@@ -1017,10 +1018,10 @@
             \| silent! nunmap <leader>w<leader>y
 
         " TODO: 'VimwikiIndex' should work here, but recently it's started
-        " randomly creating new 'index.wiki' files in the curren working
+        " randomly creating new 'index.wiki' files in the current working
         " directory.
-        nmap <leader>vw :execute 'edit ~/vimwiki/index.wiki'<CR>
         " nmap <leader>vw <Plug>VimwikiIndex
+        nmap <leader>vw :execute 'edit ~/vimwiki/index.wiki'<CR>
 
         nmap <leader>vi <Plug>VimwikiTabIndex
         nmap <leader>vs <Plug>VimwikiUISelect
