@@ -35,26 +35,6 @@
     if WINDOWS()
         set runtimepath=$HOME/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$HOME/.vim/after
     endif
-
-    "
-    " Create a '~/.vim/python' symlink to python home to turn this on...
-    " python -> ~/.asdf/installs/python/3.7.3-framework-vim/Python.framework/Versions/3.7
-    "
-    " Install neovim in python env:
-    "   $ pip install neovim
-    "
-    if isdirectory($HOME . '/.vim/python') && !exists('s:python_initialized')
-       set pyxversion=3
-
-       let $PATH = $HOME . '/.vim/python/bin:' . $PATH
-
-       if !has('nvim')
-           set pythonthreehome=/Users/lance.johnston/.vim/python
-           set pythonthreedll=/Users/lance.johnston/.vim/python/lib/libpython3.7.dylib
-       endif
-
-       let s:python_initialized = 1
-    endif
 " }}}
 
 " Debugging {{{
@@ -84,21 +64,10 @@
 " Install Plugins {{{
     call plug#begin('~/.vim/plugged')
 
-        Plug 'Shougo/deoplete.nvim'
-
-        " if !has('nvim')
-        "     Plug 'roxma/nvim-yarp'
-        "     Plug 'roxma/vim-hug-neovim-rpc'
-        " endif
-
         " Plug 'vim-airline/vim-airline'
         " Plug 'vim-airline/vim-airline-themes'
         Plug 'flazz/vim-colorschemes'
         Plug 'itchyny/lightline.vim'
-
-        " Plug 'Shougo/denite.nvim', { 'tag': '3.2', 'do': ':UpdateRemotePlugins' }
-        "Plug 'Shougo/defx.nvim', { 'tag': '1.0' }
-        " Plug 'Shougo/defx.nvim', { 'do': ':UpdateRemotePlugins' }
         
         Plug 'preservim/nerdtree', { 'tag': '6.9.9' }
 
@@ -178,7 +147,7 @@
     endfunction
 
     let s:winBufDict = {}
-    let s:bufList = []
+    let s:globalBufList = []
 
     " TODO: Make these configurable plugin options.
     let s:includeFiletypes = ['help']
@@ -218,8 +187,8 @@
         call insert(l:winBufList, l:bufnr, 0)
 
         " Same for the global buffer list.
-        call s:RemoveListElement(s:bufList, l:bufnr)
-        call insert(s:bufList, l:bufnr, 0)
+        call s:RemoveListElement(s:globalBufList, l:bufnr)
+        call insert(s:globalBufList, l:bufnr, 0)
 
         call s:AltbufDebugMsg("altbufEnter(end):winBufDict=" . string(s:winBufDict))
     endfunction
@@ -240,16 +209,23 @@
         " being deleted still exists when this event fires.
         let l:bufnr = str2nr(expand('<abuf>'))
         call s:PruneWinBufLists(l:bufnr)
-        call s:PruneBuffers()
+        call s:RemoveListElement(s:globalBufList, l:bufnr)
 
-        " Remove from global buffer list.
-        call s:RemoveListElement(s:bufList, l:bufnr)
+        call s:PruneBuffers()
 
         call s:AltbufDebugMsg("altbufDelete(end):winBufDict=" . string(s:winBufDict))
     endfunction
 
 
     " Initialize any new windows with the global buffer list.
+    " Why we need to... from a user experience standpoint, multiple windows can
+    " get strange with regard to our Altbuf intentions. For example, if a user
+    " has a window open with a number of buffers open and creates a new split
+    " (e.g. a simple ':vsplit'), then they're looking at two windows with the
+    " same buffer. If they close one of those windows, which one did they
+    " close... the one with a bunch of buffer history or the new one? From the
+    " user perspective, it's kind of hard to say, so it makes sense to push
+    " the current buffer history to each new window.
     function! s:AltbufWinNew() 
         call s:AltbufDebugMsg('altbufWinNew:@%=' . @%)
         call s:AltbufDebugMsg('altbufWinNew:@#=' . @#)
@@ -258,11 +234,7 @@
         call s:AltbufDebugMsg('altbufWinNew:win_getid()=' . win_getid())
         call s:AltbufDebugMsg("altbufWinNew:winBufDict=" . string(s:winBufDict))
 
-        let l:winid = win_getid()
-
-        if !has_key(s:winBufDict, l:winid)
-            let s:winBufDict[l:winid] = copy(s:bufList)
-        endif
+        let s:winBufDict[win_getid()] = copy(s:globalBufList)
 
     endfunction
 
@@ -399,6 +371,7 @@
 
     function! AltbufList()
         echom('winBufDict=' . string(s:winBufDict))
+        echom('globalBufList=' . string(s:globalBufList))
     endfunction
 
 
@@ -778,15 +751,22 @@
     " "Plugin Config" section below).
     "
     
-    " nnoremap <leader>e :Defx<cr>
-    nnoremap <leader>e :execute 'edit' . getcwd()<CR>
+    nnoremap <leader>e :execute 'edit' . getcwd()<cr>
 
     " fzf
+    command! -bang ProjectFiles call fzf#vim#files(ProjectRoot(), <bang>0)
+
+    command! -bang -nargs=* RgProjectFiles
+        \ call fzf#vim#grep(
+        \     'rg --column --line-number --no-heading --color=always --smart-case -- ' 
+        \        .shellescape(<q-args>).' '.ProjectRoot(), 
+        \     1, fzf#vim#with_preview(), <bang>0)
+
     nnoremap <leader>r :Files<cr>
     nnoremap <leader>R :Rg<space>
 
-    " TODO: Need a "project" level recursive grep.
-    nnoremap <leader>p :GFiles<cr>
+    nnoremap <leader>p :ProjectFiles<cr>
+    nnoremap <leader>P :RgProjectFiles<space>
 
     " vim-surround's default keys include 'ds'. I have lots of plugins with
     " buffer-local key mappings that use 'd' (e.g. buffergator's delete
@@ -902,115 +882,6 @@
         let g:buffergator_viewport_split_policy = "T"            
     " }}}
    
-    " Defx {{{
-
-        " autocmd FileType defx call s:DefxSettings()
-        "
-        " function! s:DefxSettings() 
-        "
-        "     " Define mappings
-        "     nnoremap <silent><buffer><expr> <CR> defx#do_action('open')
-        "     nnoremap <silent><buffer><expr> ~    defx#do_action('cd')
-        "     nnoremap <silent><buffer><expr> -    defx#do_action('cd', ['..'])
-        "     nnoremap <silent><buffer><expr> u    defx#do_action('cd', ['..'])
-        "     nnoremap <silent><buffer><expr> t    defx#do_action('open_or_close_tree')
-        "     nnoremap <silent><buffer><expr> T    defx#do_action('open_tree_recursive')
-        "     nnoremap <silent><buffer><expr> .    defx#do_action('toggle_ignored_files')
-        "     nnoremap <silent><buffer><expr> yy   defx#do_action('yank_path')
-        "     nnoremap <silent><buffer><expr> q    defx#do_action('quit')
-        "     nnoremap <silent><buffer><expr> K    defx#do_action('new_directory')
-        "     nnoremap <silent><buffer><expr> N    defx#do_action('new_file')
-        "     nnoremap <silent><buffer><expr> M    defx#do_action('new_multiple_files')
-        "     nnoremap <silent><buffer><expr> D    defx#do_action('remove')
-        "     nnoremap <silent><buffer><expr> R    defx#do_action('rename')
-        "
-        "     " The mnemonic here is 'mark' (not s=select, to avoid key delay on
-        "     " vim-surround's s key).
-        "     nnoremap <silent><buffer><expr> m    defx#do_action('toggle_select')
-        "     vnoremap <silent><buffer><expr> m    defx#do_action('toggle_select_visual')
-        "
-        "     " For some reason, mapping this key can cause all kinds of grief.
-        "     " Unmap it and run '$ vim <dir>' in a terminal to see it.
-        "     " nnoremap <silent><buffer><expr> <esc> defx#do_action('quit')
-        " endfunction
-    " }}}
-    
-    " Denite {{{
-        " if executable('ag')
-        "     call denite#custom#var('file/rec', 'command', 
-        "         \ ['ag', '--follow', '--nocolor', '--nogroup', '-g', '']) 
-        "
-        "     call denite#custom#var('grep', 'command', ['ag'])
-        "     call denite#custom#var('grep', 'default_opts', ['-i', '--vimgrep'])
-        "     call denite#custom#var('grep', 'final_opts', [])
-        "     call denite#custom#var('grep', 'pattern_opt', [])
-        "     call denite#custom#var('grep', 'recursive_opts', [])
-        "     call denite#custom#var('grep', 'separator', ['--'])
-        "
-        " elseif executable('rg')
-        "     call denite#custom#var('file/rec', 'command', 
-        "         \ ['rg', '--files', '--glob', '!.git'])
-        "
-        "     call denite#custom#var('grep', 'command', ['rg'])
-        "     call denite#custom#var('grep', 'command', ['rg', '--threads', '1'])
-        "     call denite#custom#var('grep', 'default_opts', ['--vimgrep', '--no-heading'])
-        "     call denite#custom#var('grep', 'final_opts', [])
-        "     call denite#custom#var('grep', 'pattern_opt', ['--regexp'])
-        "     call denite#custom#var('grep', 'recursive_opts', [])
-        "     call denite#custom#var('grep', 'separator', ['--'])
-        " endif
-        "
-        " call denite#custom#option('_', 'prompt', '>')
-        " call denite#custom#option('_', 'direction', 'dynamictop')
-        " call denite#custom#option('_', 'filter_split_direction', 'belowright')
-        " call denite#custom#option('_', 'vertical_preview', 'true')
-        "
-        " " Not sure this is best for all colorschemes (is for quantum).
-        " call denite#custom#option('_', 'highlight_matched_char', 'Special')
-        "
-        " call denite#custom#source('file/rec', 'matchers', ['matcher/regexp'])
-        " call denite#custom#source('grep', 'matchers', ['matcher/regexp'])
-        " call denite#custom#source('grep', 'converters', ['converter/abbr_word'])
-        "
-        " autocmd FileType denite call s:denite_my_settings()
-        "
-        " function! s:denite_my_settings() abort
-        "     nnoremap <silent><buffer><expr> <CR> denite#do_map('do_action')
-        "     nnoremap <silent><buffer><expr> d    denite#do_map('do_action', 'delete')
-        "     nnoremap <silent><buffer><expr> i    denite#do_map('open_filter_buffer')
-        "     nnoremap <silent><buffer><expr> p    denite#do_map('do_action', 'preview')
-        "
-        "     nnoremap <silent><buffer><expr> m    denite#do_map('toggle_select')
-        "     nnoremap <silent><buffer><expr> M    denite#do_map('toggle_select_all')
-        "
-        "     nnoremap <silent><buffer><expr> <esc> denite#do_map('quit')
-        "     nnoremap <silent><buffer><expr> q     denite#do_map('quit')
-        " endfunction
-        "
-        " autocmd FileType denite-filter call s:denite_filter_my_settings()
-        "
-        " function! s:denite_filter_my_settings() abort
-        "     " Quit filter window.
-        "     imap <silent><buffer> <esc> <Plug>(denite_filter_quit)
-        "
-        "     " Quit filter window and denite.
-	    "     imap <silent><buffer> <C-o> <Plug>(denite_filter_quit)q
-        "
-        "     " Move cursor while in insert mode.
-        "     inoremap <silent><buffer> <C-j>
-        "                 \ <Esc><C-w>p:call cursor(line('.')+1,0)<CR><C-w>pA
-        "     inoremap <silent><buffer> <C-k>
-        "                 \ <Esc><C-w>p:call cursor(line('.')-1,0)<CR><C-w>pA
-        " endfunction
-        "
-        " nnoremap <leader>f :<C-u>Denite file -start-filter<cr>
-        " nnoremap <leader>r :<C-u>Denite file/rec -start-filter<cr>
-        " nnoremap <leader>R :<C-u>Denite grep -start-filter<cr>
-        "
-        " nnoremap <leader>p :<C-u>DeniteProjectDir file/rec -start-filter<cr>
-        " nnoremap <leader>P :<C-u>DeniteProjectDir grep -start-filter<cr>
-    " }}}
-                                     
     " Lightline {{{
         " Like these: PaperColor, OldHope
         let g:lightline = {
@@ -1021,6 +892,9 @@
         \   },
         \   'component_function': {
         \     'gitbranch': 'fugitive#head'
+        \   },
+		\   'component': {
+		\     'lineinfo': '%3l:%-2v',
         \   },
         \ }
     " }}}
@@ -1123,15 +997,24 @@
     " }}}
     
     " VimWiki {{{
-        silent! nunmap <leader>ww
-        silent! nunmap <leader>wi
-        silent! nunmap <leader>ws
-        silent! nunmap <leader>wt
-        silent! nunmap <leader>w<leader>t
-        silent! nunmap <leader>w<leader>w
-        silent! nunmap <leader>w<leader>i
-        silent! nunmap <leader>w<leader>m
-        silent! nunmap <leader>w<leader>y
+        
+        " Don't want <leader>w[key] as I user <leader>w for write.
+        
+        " Unmap keys in VimEnter to make sure the plugin doesn't come back and
+        " remap them _after_ we've unmapped them.
+        " https://vim.fandom.com/wiki/Mapping_keys_in_Vim_-_Tutorial_(Part_1)
+        autocmd VimEnter * 
+            \  silent! nunmap <leader>ww
+            \| silent! nunmap <leader>w<leader>m
+            \| silent! nunmap <leader>w<leader>y
+            \| silent! nunmap <leader>wi
+            \| silent! nunmap <leader>ws
+            \| silent! nunmap <leader>wt
+            \| silent! nunmap <leader>w<leader>t
+            \| silent! nunmap <leader>w<leader>w
+            \| silent! nunmap <leader>w<leader>i
+            \| silent! nunmap <leader>w<leader>m
+            \| silent! nunmap <leader>w<leader>y
 
         " TODO: 'VimwikiIndex' should work here, but recently it's started
         " randomly creating new 'index.wiki' files in the curren working
@@ -1153,6 +1036,36 @@
 
 " Functions {{{
 
+    " Find 'project' root dir, identified by list of file or dir markers.
+    " Mostly exists for use with fzf.
+    "
+    function! ProjectRoot()
+        " Dirs should end with a slash. Order is important... first find wins.
+        let l:root_markers = ['.git/', '.svn/', 'build.gradle', 'pom.xml']
+
+        for root_marker in l:root_markers
+            if root_marker[-1:] == '/'
+                let root_marker = root_marker[:-2]
+                let l:project_root = finddir(root_marker, expand('%:p:h').';') 
+            else
+                let l:project_root = findfile(root_marker, expand('%:p:h').';') 
+            endif
+
+            if l:project_root != ''
+                let l:project_root = fnamemodify(l:project_root, ':h')
+
+                if l:project_root == '.'
+                    let l:project_root = fnamemodify(l:project_root, ':p:h')
+                endif
+
+                return l:project_root
+            endif
+        endfor
+
+        return ''
+
+    endfunction
+
     " Dump output of an ex command to a new buffer in a new tab. Primarily
     " useful for searching ex command output.  
     " Example: :TabMessage map
@@ -1170,7 +1083,9 @@
         silent put=message
       endif
     endfunction
+
     command! -nargs=+ -complete=command TabMessage call TabMessage(<q-args>)
+
 
     " Wanted to have <c-n> run invnumber and <c-r> run invrelativenumber so I
     " could toggle these independently, but <c-r> is redo and I didn't want to
