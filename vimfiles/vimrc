@@ -997,39 +997,22 @@
     " }}}
     
     " VimWiki {{{
-    
-        " By default, vimwiki uses <leader>w... for a number of key mappings.
-        " I user <leader>w for write and don't want to deal with the key delay.    
-
-        " Unmap keys in VimEnter to make sure the plugin doesn't come back and
-        " remap them _after_ we've unmapped them.
-        " https://vim.fandom.com/wiki/Mapping_keys_in_Vim_-_Tutorial_(Part_1)
-        autocmd VimEnter *
-            \  silent! nunmap <leader>ww
-            \| silent! nunmap <leader>w<leader>m
-            \| silent! nunmap <leader>w<leader>y
-            \| silent! nunmap <leader>wi
-            \| silent! nunmap <leader>ws
-            \| silent! nunmap <leader>wt
-            \| silent! nunmap <leader>w<leader>t
-            \| silent! nunmap <leader>w<leader>w
-            \| silent! nunmap <leader>w<leader>i
-            \| silent! nunmap <leader>w<leader>m
-            \| silent! nunmap <leader>w<leader>y
-
+        
         " TODO: 'VimwikiIndex' should work here, but recently it's started
         " randomly creating new 'index.wiki' files in the current working
         " directory.
         " nmap <leader>vw <Plug>VimwikiIndex
         nmap <leader>vw :execute 'edit ~/vimwiki/index.wiki'<CR>
+    
+        " By default, vimwiki uses <leader>w... for a number of key mappings.
+        " I user <leader>w for write and want to avoid the key delay. So...
 
-        nmap <leader>vi <Plug>VimwikiTabIndex
-        nmap <leader>vs <Plug>VimwikiUISelect
-        nmap <leader>vr <Plug>VimwikiRenameLink
-        nmap <leader>vdw <Plug>VimwikiDiaryIndex
-        nmap <leader>vdt <Plug>VimwikiTabMakeDiaryNote
-        nmap <leader>vdn <Plug>VimwikiMakeDiaryNote
-        nmap <leader>vdg <Plug>VimwikiDiaryGenerateLinks
+        " Disable all key mappings.
+        let g:vimwiki_key_mappings = { 'all_maps': 0, }
+
+        " Add the keys I want. I'm sure there will be others.
+        nmap <CR>        <Plug>VimwikiFollowLink
+        nmap <Backspace> <Plug>VimwikiGoBackLink
 
         autocmd FileType vimwiki setlocal textwidth=78
     " }}}
