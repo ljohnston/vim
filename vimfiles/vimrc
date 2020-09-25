@@ -130,11 +130,9 @@
         autocmd WinNew            * call s:AltbufWinNew()
     augroup END
 
-
     function! s:AltbufDebugMsg(msg)
         " unsilent echom(a:msg)
     endfunction
-
 
     function! s:AltbufDebug(event)
         call s:AltbufDebugMsg('--------------------')
@@ -193,7 +191,6 @@
         call s:AltbufDebugMsg("altbufEnter(end):winBufDict=" . string(s:winBufDict))
     endfunction
 
-
     function! s:AltbufDelete()
         call s:AltbufDebugMsg('altbufDelete:@%=' . @%)
         call s:AltbufDebugMsg('altbufDelete:@#=' . @#)
@@ -216,7 +213,7 @@
         call s:AltbufDebugMsg("altbufDelete(end):winBufDict=" . string(s:winBufDict))
     endfunction
 
-
+    "
     " Initialize any new windows with the global buffer list.
     " Why we need to... from a user experience standpoint, multiple windows can
     " get strange with regard to our Altbuf intentions. For example, if a user
@@ -226,6 +223,7 @@
     " close... the one with a bunch of buffer history or the new one? From the
     " user perspective, it's kind of hard to say, so it makes sense to push
     " the current buffer history to each new window.
+    "
     function! s:AltbufWinNew() 
         call s:AltbufDebugMsg('altbufWinNew:@%=' . @%)
         call s:AltbufDebugMsg('altbufWinNew:@#=' . @#)
@@ -235,15 +233,15 @@
         call s:AltbufDebugMsg("altbufWinNew:winBufDict=" . string(s:winBufDict))
 
         let s:winBufDict[win_getid()] = copy(s:globalBufList)
-
     endfunction
 
-
+    "
     " There is no such thing as a WinDelete event, so the active window still
     " exists when we get the leave event, so the window that triggered this
     " event won't be removed from the Altbuf state. Any other windows that are
     " no longer active, however, will. This is just taking advantage of an
     " opportunity to keep our state as accurate as possible.
+    "
     function! s:AltbufWinLeave()
         call s:AltbufDebugMsg('altbufWinLeave:@%=' . @%)
         call s:AltbufDebugMsg('altbufWinLeave:@#=' . @#)
@@ -258,8 +256,9 @@
         call s:AltbufDebugMsg("altbufDelete(end):winBufDict=" . string(s:winBufDict))
     endfunction
 
-
-    " Remove any windows from Altbuf state that no longer exist.
+    "
+    " Remove any windows that no longer exist from Altbuf state.
+    "
     function! s:PruneWinDict()
         call s:AltbufDebugMsg("pruneWinDict:winBufDict=" . string(s:winBufDict))
 
@@ -274,8 +273,9 @@
         call s:AltbufDebugMsg("pruneWinDict(end):winBufDict=" . string(s:winBufDict))
     endfunction
 
-
-    " Remove any buffers from Altbuf state that no longer exist.
+    "
+    " Remove any buffers that no longer exist from Altbuf state.
+    "
     function! s:PruneBuffers()
         call s:AltbufDebugMsg("pruneBuffers:winBufDict=" . string(s:winBufDict))
         let l:bufnrs = []
@@ -295,8 +295,9 @@
         call s:AltbufDebugMsg("pruneBuffers(end):winBufDict=" . string(s:winBufDict))
     endfunction
 
-
+    "
     " Remove a buffer from all Altbuf window state.
+    "
     function! s:PruneWinBufLists(bufnr)
         call s:AltbufDebugMsg("PruneWinBufLists:bufnr=" . string(a:bufnr))
 
@@ -304,29 +305,21 @@
             let l:bufList = get(s:winBufDict, winid)
             call s:RemoveListElement(l:bufList, a:bufnr)
         endfor
-
     endfunction
 
-
     function! s:EnsureListElement(list, element)
-
         if index(a:list, a:element) == -1
             call add(a:list, a:element)
         endif
-
     endfunction
 
-
     function! s:RemoveListElement(list, element)
-
         let l:idx = index(a:list, a:element)
 
         if l:idx >= 0
             call remove(a:list, l:idx)
         endif
-
     endfunction
-
 
     function s:IsExcludedBufname(bufname)
         call s:AltbufDebugMsg('IsExcludedBufname:bufname=' . a:bufname)
@@ -340,7 +333,6 @@
 
         return 0
     endfunction
-
 
     function! s:IsExcludedBuf(bufnr)
 
@@ -365,18 +357,14 @@
         endif
 
         return 0
-
     endfunction
-
 
     function! AltbufList()
         echom('winBufDict=' . string(s:winBufDict))
         echom('globalBufList=' . string(s:globalBufList))
     endfunction
 
-
     function! AltbufPrevious()
-
         let l:winBufList = get(s:winBufDict, win_getid())
         let l:bufListLen = len(l:winBufList)
 
@@ -392,9 +380,7 @@
         if l:bufListLen > 1
             execute 'buffer' . l:winBufList[1]
         endif
-
     endfunction
-
 " }}}
 
 " General {{{
@@ -754,20 +740,13 @@
     nnoremap <leader>e :execute 'edit' . getcwd()<cr>
 
     " fzf
-    command! -bang ProjectFiles call fzf#vim#files(ProjectRoot(), <bang>0)
-
-    command! -bang -nargs=* RgProjectFiles
-        \ call fzf#vim#grep(
-        \     'rg --column --line-number --no-heading --color=always --smart-case -- ' 
-        \        .shellescape(<q-args>).' '.ProjectRoot(), 
-        \     1, fzf#vim#with_preview(), <bang>0)
 
     nnoremap <leader>r :Files<cr>
     nnoremap <leader>R :Rg<space>
 
-    nnoremap <leader>p :ProjectFiles<cr>
-    nnoremap <leader>P :RgProjectFiles<space>
-
+    nnoremap <leader>p :FzfProjectFiles<cr>
+    nnoremap <expr> <leader>P IsInProject() ? ':FzfProjectRg<space>' : ''
+    
     " vim-surround's default keys include 'ds'. I have lots of plugins with
     " buffer-local key mappings that use 'd' (e.g. buffergator's delete
     " buffer), and I don't want the associated key delay, so changing all
@@ -842,8 +821,8 @@
     " .vimrc {{{
         " reread .vimrc on save
         " For some reason I don't understand, sourceing .vimrc causes lightline
-        " to lose it's colors (it's just white on black), but only apparently
-        " in normal mode. We'll hack our way around this for now with this...
+        " to lose it's colors (it's just white on black), We'll hack our way
+        " around this for now with this...
         autocmd! BufWritePost .vimrc source % | :call lightline#enable()
 
         " prevent our .vimrc modeline from closing all our folds on save
@@ -881,7 +860,52 @@
         let g:buffergator_split_size = 15
         let g:buffergator_viewport_split_policy = "T"            
     " }}}
-   
+    
+    " Fzf {{{
+        function s:FzfProjectFiles(path, bang)
+            let root = empty(a:path) ? s:ProjectRoot() : a:path
+
+            if empty(root)
+                return s:warn('Not in a project')
+            endif
+
+            let options = '-m --prompt "' . fnamemodify(root, ':t') . '> "'
+            return fzf#vim#files(root, { 'options': options }, a:bang)
+        endfunction
+
+        function s:FzfProjectRg(query, bang)
+            let root = s:ProjectRoot()
+
+            if empty(root)
+                return s:warn('Not in a project')
+            endif
+
+            " Chagne to project root instead of passing on rg command line so that
+            " all file results are relative to project root.
+            execute 'cd ' . root
+            call fzf#vim#grep(
+                \ 'rg --column --line-number --no-heading --color=always --smart-case -- '
+                \     .shellescape(a:query), a:bang)
+        endfunction
+
+        function IsInProject()
+            if empty(s:ProjectRoot())
+                return s:warn('Not in a project')
+            endif
+            return 1
+        endfunction
+
+        "
+        " FzfProjectFiles doesn't really need to be a command, but FzfProjectRg
+        " does so that we can allow the user to enter the string to grep for.
+        " This, along with the above functions and the key mappings are kinda
+        " hackey, but it is what it is, at least for the time being.
+        " 
+        
+        command! -bang -nargs=* -complete=dir FzfProjectFiles call s:FzfProjectFiles(<q-args>, <bang>0)
+        command! -bang -nargs=* FzfProjectRg call s:FzfProjectRg(<q-args>, <bang>0)
+    " }}}
+
     " Lightline {{{
         " Like these: PaperColor, OldHope
         let g:lightline = {
@@ -1020,10 +1044,16 @@
 
 " Functions {{{
 
+    function! s:warn(message)
+        echohl WarningMsg | echom a:message | echohl None
+        return 0
+    endfunction
+
+    "
     " Find 'project' root dir, identified by list of file or dir markers.
     " Mostly exists for use with fzf.
     "
-    function! ProjectRoot()
+    function! s:ProjectRoot()
         " Dirs should end with a slash. Order is important... first find wins.
         let l:root_markers = ['.git/', '.svn/', 'build.gradle', 'pom.xml']
 
@@ -1047,9 +1077,9 @@
         endfor
 
         return ''
-
     endfunction
 
+    " 
     " Dump output of an ex command to a new buffer in a new tab. Primarily
     " useful for searching ex command output.  
     " Example: :TabMessage map
@@ -1058,6 +1088,7 @@
       redir => message
       silent execute a:cmd
       redir END
+
       if empty(message)
         echoerr "no output"
       else
@@ -1070,7 +1101,7 @@
 
     command! -nargs=+ -complete=command TabMessage call TabMessage(<q-args>)
 
-
+    " 
     " Wanted to have <c-n> run invnumber and <c-r> run invrelativenumber so I
     " could toggle these independently, but <c-r> is redo and I didn't want to
     " mess with that. With this function I can just cycle through using a
@@ -1086,67 +1117,6 @@
             set norelativenumber
         endif
     endfunction
-
-
-    function! FormatCss()
-
-        " TODO: Make sure we're in css buffer?
-
-        "
-        " Decontstruct the file to a consistent format from which
-        " we can reliably reconstruct it.
-        "
-
-        silent %s///g                       " Just in case, delete any control-M's.
-        silent %s/\s*$//g                     " Remove trailing whitespace on all lines.
-        silent %s/\s\+/ /g                    " Replace multiple whitespace with single space.
-        silent g/^\s*$/d                      " Delete all blank lines.
-        silent %s/\n//g                       " Remove all carriage returns.
-
-        "
-        " Reformat the deconstructed file.
-        "
-        
-        silent %s/\*\//*\/\r\r/g              " Two newlines after comment lines.
-        silent %s/}/}\r\r/g                   " Two newlines after }.
-        silent %s/{/{\r/g                     " Newline after {.
-        silent %s/;/;\r/g                     " Newline after ;.
-        silent %s/^\(\s*\S\+.*\)}$/\1\r}/g    " Newline before ).
-
-        " TODO: There's a potential issue with sorting attributes in
-        " that the original css could have multiple attributes, with
-        " the last one not being terminated with a ';'. In this case,
-        " sorting could move that attribute to the middle of the list,
-        " which, without the ';', would be invalid html. Therefore,
-        " we'll simply return here until we account for this.
-
-        return
-
-        "
-        " Sort attributes.
-        "
-
-        " Start at top of file.
-        normal gg
-
-        while search("{$", "W")
-            +1
-            let first = line(".")
-
-            /}
-            -1
-            let last = line(".")
-
-            execute first . "," . last . "sort"
-        endwhile
-
-        " Indent file.
-        normal gg=G
-
-    endfunction
-
-    nmap <silent> _c :call FormatCss()<CR>
-
 " }}}
 
 " TODO / etc {{{
