@@ -96,7 +96,7 @@
 
         Plug 'vim-scripts/groovyindent-unix'
         
-        Plug 'vimwiki/vimwiki', { 'tag': '2.5' }
+        Plug 'vimwiki/vimwiki', { 'tag': 'v2.5' }
     call plug#end()
 
     if exists("g:plugin_install") && g:plugin_install == 1 
