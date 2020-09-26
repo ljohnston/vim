@@ -111,7 +111,7 @@ install_surfingkeysrc() {
 install_plugins() {
     # g:plugin_install=1 will cause .vimrc to stop processing after
     # the plugins are installed.
-    vim --cmd "let g:plugin_install=1" +PlugInstall +qall
+    vim --not-a-term --cmd "let g:plugin_install=1" +PlugInstall +qall
 }
 
 
