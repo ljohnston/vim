@@ -109,15 +109,16 @@ install_surfingkeysrc() {
 
 
 install_plugins() {
-    # g:plugin_install=1 will cause .vimrc to stop processing after the plugins
-    # are installed. When we're called via ansible, this finishes with an exit
-    # code of 1.
-    vim --not-a-term --cmd "let g:plugin_install=1" +PlugInstall +qall || true
+    # g:plugin_install=1 will cause .vimrc to stop processing 
+    # after the plugins are installed.
+    vim --not-a-term --cmd "let g:plugin_install=1" +PlugInstall +qall 
 }
 
 
 link_vimwiki() {
-    [ -d ~/Google\ Drive/vimwiki ] && [ ! -L ~/vimwiki ] && ln -s ~/Google\ Drive/vimwiki/ ~/vimwiki
+    if [ -d ~/Google\ Drive/vimwiki ] && [ ! -L ~/vimwiki ]; then
+      ln -s ~/Google\ Drive/vimwiki/ ~/vimwiki
+    fi
 }
 
 
