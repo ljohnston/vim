@@ -80,10 +80,6 @@
 
         Plug 'jeetsukumaran/vim-buffergator'
 
-        Plug 'rodjek/vim-puppet'
-        Plug 'markcornick/vim-terraform'
-        Plug 'lmeijvogel/vim-yaml-helper'
-
         Plug 'luochen1990/rainbow'
         Plug 'mtth/scratch.vim'
         " Plug 'ervandew/supertab'
@@ -91,10 +87,14 @@
         Plug 'scrooloose/syntastic'
         Plug 'godlygeek/tabular'
         Plug 'tomtom/tcomment_vim'
+        Plug 'tyru/open-browser.vim'
 
         Plug 'jiangmiao/auto-pairs'
 
         Plug 'vim-scripts/groovyindent-unix'
+        Plug 'rodjek/vim-puppet'
+        Plug 'markcornick/vim-terraform'
+        Plug 'lmeijvogel/vim-yaml-helper'
         
         Plug 'vimwiki/vimwiki', { 'tag': 'v2.5' }
     call plug#end()
@@ -109,6 +109,7 @@
     " TODO (for a real plugin):
     " - check compatible
     " - global configuration options, defaults
+    " - min vim version check?
     
     " TODO (issues):
 
@@ -1001,6 +1002,12 @@
                 call nerdtree#checkForBrowse(path)
             endif
         endfunction
+    " }}}
+
+    " Open-browser {{{
+        let g:netrw_nogx = 1 " disable netrw's gx mapping.
+        nmap gx <Plug>(openbrowser-smart-search)
+        vmap gx <Plug>(openbrowser-smart-search)
     " }}}
 
     " Scratch {{{
