@@ -881,7 +881,7 @@
                 return s:warn('Not in a project')
             endif
 
-            " Chagne to project root instead of passing on rg command line so that
+            " Change to project root instead of passing on rg command line so that
             " all file results are relative to project root.
             execute 'cd ' . root
             call fzf#vim#grep(
@@ -1042,10 +1042,9 @@
         let g:vimwiki_key_mappings = { 'all_maps': 0, }
 
         " Add the keys I want. I'm sure there will be others.
-        nmap <CR>        <Plug>VimwikiFollowLink
-        nmap <Backspace> <Plug>VimwikiGoBackLink
-
         autocmd FileType vimwiki setlocal textwidth=78
+            \| nmap <buffer> <CR>        <Plug>VimwikiFollowLink
+            \| nmap <buffer> <Backspace> <Plug>VimwikiGoBackLink
     " }}}
 " }}}
 
