@@ -29,41 +29,6 @@ install_vimplug() {
 }
 
 
-install_fonts_mac() {
-    rsync --times $FONTS ~/Library/Fonts >/dev/null
-}
-
-
-install_fonts_linux() {
-    rsynced_files=$(rsync --times --itemize-changes $FONTS ~/.fonts)
-
-    [ $? -eq 0 ] || exit 1
-
-    if [ -n "${rsynced_files}" ]; then
-        fc-cache -fv ~/.fonts >/dev/null
-    fi
-}
-
-
-install_fonts() {
-
-    os=$(uname -s)
-
-    case $os in 
-        Darwin)
-            install_fonts_mac
-            ;;
-        Linux)
-            install_fonts_linux
-            target='~/.fonts'
-            ;;
-        *)
-            echo -e "Unsupported OS '${os}'. Aborting..."
-            ;;
-    esac
-}
-
-
 install_dotfiles() {
     
     #
@@ -124,7 +89,6 @@ link_vimwiki() {
 
 install() {
    install_vimplug
-   install_fonts
    install_dotfiles
    install_surfingkeysrc
    install_plugins
@@ -136,8 +100,6 @@ VIM_DIR="$( cd $SCRIPT_DIR/.. && pwd )"
 
 # This must match what's in .vimrc's plug#begin().
 PLUGIN_DIR="${VIM_DIR}/plugged"
-
-FONTS="${VIM_DIR}/fonts/powerline-fonts-SourceCodePro/*.otf"
 
 case "$1" in 
     install)

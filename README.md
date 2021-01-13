@@ -2,6 +2,8 @@
 
 My vim config/setup project.
 
+TODO: Move contents of this project into mac-provision?
+
 ## PREREQUISITES
 
 On linux, may need additional build tools installed:
@@ -51,15 +53,15 @@ file. Getting this to work, however, is not entirely straighforward.
 #### Firefox
 
     At this time, Firefox does not have a File API, so it cannot load
-    Surfingkeys configuration from .surfingkeysrc.
+    Surfingkeys configuration from .surfingkeysrc. After installing the
+    Surfingkeys extension, install the configuration via the following:
 
-    - Install Surfingkeys.
     - Click on the Surfingkeys icon (browser toolbar) > Settings
     - Copy and paste the content of .surfingkeysrc into the textfield.
     - Click "Save".
 
-    IMPORTANT!!! Note that the settings in Firefox must be copy and pasted from
-    .surfingkeysrc on every change to that file to keep them in sync.
+    IMPORTANT!!! The above steps must be done after every change to the
+    .surfingkeysrc file to keep things in sync.
 
 #### Browser Key Mappings
 
@@ -74,10 +76,9 @@ the current tab, or navigate history).
 
 Unfortunately, on OS X, neither Chrome or Firefox offer extensive key mapping
 capabilities. As a result, I tend to prefer alternative browsers that _do_
-support custome key mappings (and Surfingkeys). For a while, this was Opera, but
-recent releases have really hosed up Surfingkeys behavior. Vivaldi to the
-rescue... it supports all kinds of custom key mappings. Refer to comments in
-.surfingkeysrc for key mapping details.
+support custom key mappings (and Surfingkeys). Vivaldi to the rescue... it
+supports all kinds of custom key mappings. Refer to comments in
+vimfiles/surfingkeysrc in this repo for key mapping details.
 
 ### eclim
 
