@@ -498,12 +498,12 @@
 
            if OSX()
                if !has('gui_vimr')
-                   set guifont=Sauce\ Code\ Powerline:h18
+                   set guifont=SourceCodeProForPowerline-Regular:h18
                    set columns=160
                    set lines=40
                endif
            elseif LINUX()
-               set guifont=Source\ Code\ Pro\ for\ Powerline\ Medium\ 10
+               set guifont=SourceCodeProForPowerline-Regular:h18
                set columns=120
                set lines=52
            else
