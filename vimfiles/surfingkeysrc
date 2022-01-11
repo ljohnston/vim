@@ -3,7 +3,7 @@
 // Instead, edit either vimfiles/surfingkeysrc and/or ~/.surfingkeysrc.local
 // and then run:
 //
-//   bin/setup surfingkeys
+//   bin/setup surfingkeysrc
 //
 
 //
@@ -62,55 +62,55 @@
 //
 
 // Close current tab (configure in browser).
-map('<Ctrl-o>', 'x');
+api.map('<Ctrl-o>', 'x');
 
 // Forward/backward history (configure in browser).
-map('H', 'S');
-map('L', 'D');
+api.map('H', 'S');
+api.map('L', 'D');
 
-map('<Ctrl-[>', '<Esc>');
-cmap('<Ctrl-[>', '<Esc>');
-imap('<Ctrl-[>', '<Esc>');
-vmap('<Ctrl-[>', '<Esc>');
+api.map('<Ctrl-[>', '<Esc>');
+api.cmap('<Ctrl-[>', '<Esc>');
+api.imap('<Ctrl-[>', '<Esc>');
+api.vmap('<Ctrl-[>', '<Esc>');
 
 // Page scrolling.
-map('<Ctrl-b>', 'e');
-map('<Ctrl-f>', 'd');
+api.map('<Ctrl-b>', 'e');
+api.map('<Ctrl-f>', 'd');
 
 // Omnibar open in current tab.
-map('o', 'go');
+api.map('o', 'go');
 
 // Seems this is the way, but not working.
-// aceVimMap('<Ctrl-[>', '<Esc>', 'normal');
+// api.aceVimMap('<Ctrl-[>', '<Esc>', 'normal');
 
 //
 // NOTE: Can prefix the description with the section of the help screen 
 // where you want the key to show up (i.e. '?'). For example:
 //
-//   mapkey('gH', '#1Open google in a new tab', function() { ... }
+//   api.mapkey('gH', '#1Open google in a new tab', function() { ... }
 //
 // No prefix will cause it to show up in the 'Misc' section.
 //
 
-mapkey('gh', "Open google in the current tab", function() {
+api.mapkey('gh', "Open google in the current tab", function() {
     window.location.href = 'https://google.com';
 });
 
-mapkey('gH', 'Open google in a new tab', function() {
+api.mapkey('gH', 'Open google in a new tab', function() {
     tabOpenLink('https://google.com');
 });
 
 // Flip flop the 'su' and 'sU' mappings. {{
-unmap('su');
-unmap('sU');
+api.unmap('su');
+api.unmap('sU');
 
-mapkey('su', '#4Edit current URL with vim editor, and reload', function() {
+api.mapkey('su', '#4Edit current URL with vim editor, and reload', function() {
     Front.showEditor(window.location.href, function(data) {
         window.location.href = data;
     }, 'url');
 });
 
-mapkey('sU', '#4Edit current URL with vim editor, and open in new tab', function() {
+api.mapkey('sU', '#4Edit current URL with vim editor, and open in new tab', function() {
     Front.showEditor(window.location.href, function(data) {
         tabOpenLink(data);
     }, 'url');
@@ -131,16 +131,16 @@ settings.newTabPosition = 'right';
 
 // Surfingkeys internally maintains a tab order and maps the following keys to
 // navigate based on that order (search default mappings for 'historyTab').
-unmap('F');
-unmap('B');
-unmap('gt');
-unmap('gT');
+api.unmap('F');
+api.unmap('B');
+api.unmap('gt');
+api.unmap('gT');
 
 // Show links, open in new tab.
-map('F', 'af');
+api.map('F', 'af');
 
 // Go back to last active tab.
-map(',,', '<Ctrl-6>');
+api.map('<Space><Space>', '<Ctrl-6>');
 
 // set theme
 settings.theme = `
