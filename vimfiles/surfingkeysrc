@@ -97,7 +97,7 @@ api.mapkey('gh', "Open google in the current tab", function() {
 });
 
 api.mapkey('gH', 'Open google in a new tab', function() {
-    tabOpenLink('https://google.com');
+    api.tabOpenLink('https://google.com');
 });
 
 // Flip flop the 'su' and 'sU' mappings. {{
@@ -112,7 +112,7 @@ api.mapkey('su', '#4Edit current URL with vim editor, and reload', function() {
 
 api.mapkey('sU', '#4Edit current URL with vim editor, and open in new tab', function() {
     Front.showEditor(window.location.href, function(data) {
-        tabOpenLink(data);
+        api.tabOpenLink(data);
     }, 'url');
 });
 // }}
