@@ -41,6 +41,9 @@ install_dotfiles() {
     
     [ -L ~/.vimrc ] && rm ~/.vimrc
     ln -s $VIM_DIR/vimfiles/vimrc ~/.vimrc
+    
+    [ -L ~/.ideavimrc ] && rm ~/.ideavimrc
+    ln -s $VIM_DIR/vimfiles/ideavimrc ~/.ideavimrc
 
     # neovim
     [ -d ~/.config/nvim ] || mkdir -p ~/.config/nvim

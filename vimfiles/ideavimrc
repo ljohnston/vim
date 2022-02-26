@@ -1,0 +1,157 @@
+source ~/.vimrc
+
+" TODO:
+"
+
+" (emulated) plugins:
+" set NERDTree (enabled via .vimrc)
+" set surround (enabled via .vimrc)
+" set commentary (enabled via .vimrc)
+
+let mapleader=<Space>
+
+set clipboard+=unnamed
+set clipboard+=ideaput
+
+set ideajoin
+set idearefactormode=keep
+
+" Force no bells (similar in ~/.vimrc doesn't work here).
+set noerrorbells
+set visualbell
+
+" Unmap these (Fzf recursive files/search, which we don't need
+" in IntelliJ anyway) from .vimrc so <Leader>r works here.
+unmap <Leader>rf
+unmap <Leader>rs
+
+"
+" Action descriptions can be found here:  https://bit.ly/3mzJpDA
+"
+
+" SelectInProjectView is a much better experience than
+" NERDTreeFocus or some other fake "NERDTree" behavior
+" as it focuses the tree on the file currently open in
+" the editor.
+nmap <Leader>e <Action>(SelectInProjectView)
+
+nmap <Leader>gb <Action>(Annotate)
+nmap <Leader>gm <Action>(Git.Menu)
+nmap <Leader>gs <Action>(ActivateCommitToolWindow)
+
+nmap <Leader>pc <Action>(GotoClass) 
+nmap <Leader>pf <Action>(GotoFile) 
+nmap <Leader>ps <Action>(FindInPath) 
+
+" Switcher shows open buffers.
+nmap <Leader>b <Action>(Switcher)
+nmap <Leader>r <Action>(RecentFiles)
+
+" mnemonic here is "switch projects"
+nmap <Leader>s <Action>(OpenProjectWindows)
+
+" mnemonic here is "open projects"
+nmap <Leader>o <Action>(ManageRecentProjects)
+
+" It's not AltBuf, but in IntelliJ, I think it'll do.
+nmap <Leader><Leader> :b#<CR>
+
+" For some reason, using <Action>(...) ends up moving the 
+" cursor one character forward after the action is complete. 
+" While annoying, this is usually benign. In the case of
+" CollapseRegion, however, this causes the region to be
+" re-expanded immediately after being collapsed. Using
+" :action ... works around this.
+nmap zc :action CollapseRegion<CR>
+nmap zo :action ExpandRegion<CR>
+
+nmap <Leader>c <Action>(ChooseRunConfiguration)
+
+nmap <s-h> <Action>(Back)
+nmap <s-l> <Action>(Forward)
+
+" In vim, <c-j> and <c-k> are mapped to scroll the screen,
+" leaving the cursor line in place. In IntelliJ, I use
+" Karabiner to map <c-h>, <c-j>, <c-k>, <c-l> to the
+" corresponding arrow keys. So to get the desired <c-j>
+" and <c-k> behavior here we need to map the arrow keys.
+nmap <Up> 1<c-u>
+nmap <Down> 1<c-d>
+
+nmap <c-s>; mxA;<Esc>`x
+nmap <c-s><c-;> mxA;<Esc>`x
+imap <c-s>; <Esc>lmxA;<Esc>`xi
+imap <c-s><c-;> <Esc>lmxA;<Esc>`xi
+
+nmap <c-s><ctrl-,> <l
+nmap <c-s><ctrl-.> >l
+imap <c-s><ctrl-,> <c-o><l
+imap <c-s><ctrl-.> <c-o>>l
+
+" This actually toggles hiding all tool windows (i.e. maximizing the editor)
+nmap ,e <Action>(HideAllWindows)
+
+nmap ,b <Action>(BuildMenu)
+nmap ,f <Action>(ShowIntentionActions)
+nmap ,o <Action>(OpenFile)
+
+" This actually toggles the pin
+nmap ,p <Action>(PinActiveEditorTab)
+
+" ,qX here because I want ,cX for code actions
+nmap ,qa <Action>(CloseAllEditors)
+nmap ,qo <Action>(CloseAllEditorsButActive)
+nmap ,qp <Action>(CloseProject)
+nmap ,qr <Action>(CloseAllToTheRight)
+nmap ,qu <Action>(CloseAllUnpinnedEditors)
+
+" This will close a git diff tab (and ???)
+nmap ,qc <Action>(CloseContent)
+
+nmap ,ci <Action>(OptimizeImports)
+nmap ,cm <Action>(ImplementMethods)
+nmap ,co <Action>(OverrideMethods)
+nmap ,cr <Action>(RefactoringMenu)
+
+" Note: ctrl-enter works for this as well.
+nmap ,cg <Action>(Generate)
+
+nmap ,gd <Action>(GotoDeclarationOnly)
+nmap ,gf <Action>(FileStructurePopup)
+nmap ,gi <Action>(GotoImplementation)
+nmap ,gs <Action>(GotoSuperMethod)
+nmap ,gu <Action>(FindUsages)
+
+nmap ,rc <Action>(RunClass)
+nmap ,rm <Action>(RunMenu)
+nmap ,rr <Action>(Run)
+nmap ,rd <Action>(Debug)
+nmap ,rs <Action>(Stop)<Action>(Stop)
+
+nmap ,rt <Action>(RerunTests)
+nmap ,rf <Action>(RerunFailedTests)
+
+nmap ,db <Action>(ToggleLineBreakpoint)
+nmap ,dc <Action>(DebugClass)
+nmap ,dd <Action>(Debug)
+nmap ,de <Action>(ToggleBreakpointEnabled)
+nmap ,dm <Action>(DebugMainMenu)
+nmap ,dr <Action>(Resume)
+nmap ,ds <Action>(Stop)<Action>(Stop)
+nmap ,dx <Action>(EvaluateExpression)
+
+nmap ,si <Action>(StepInto)
+nmap ,so <Action>(StepOver)
+nmap ,su <Action>(StepOut)
+nmap ,sc <Action>(RunToCursor)
+
+nmap ,tb <Action>(ActivateBuildToolWindow)
+nmap ,tc <Action>(ActivateCommitToolWindow)
+nmap ,td <Action>(ActivateDebugToolWindow)
+nmap ,tf <Action>(ActivateFindToolWindow)
+nmap ,tg <Action>(ActivateGradleToolWindow)
+nmap ,tl <Action>(JumpToLastWindow)
+nmap ,tp <Action>(ActivateProblemsViewToolWindow)
+nmap ,tr <Action>(ActivateRunToolWindow)
+nmap ,tt <Action>(ActivateTerminalToolWindow)
+nmap ,tv <Action>(ActivateVersionControlToolWindow)
