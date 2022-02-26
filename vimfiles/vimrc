@@ -76,7 +76,7 @@
         Plug 'tpope/vim-fugitive'
         Plug 'tpope/vim-surround'
 
-        Plug 'jeetsukumaran/vim-buffergator'
+        Plug 'jlanzarotta/bufexplorer'
 
         Plug 'luochen1990/rainbow'
         Plug 'mtth/scratch.vim'
@@ -865,15 +865,43 @@
         " endif
         " let g:airline_symbols.space = "\ua0"
     " }}}
+    
+    " BufExplorer {{{
+        let g:bufExplorerDisableDefaultKeyMapping=1
+        let g:bufExplorerSortBy='fullpath'
+        let g:bufExplorerSplitBelow=0
+        let g:bufExplorerSplitHorzSize=15
 
-    " Buffergator {{{
-        let g:buffergator_autoexpand_on_split = 0
-        let g:buffergator_mru_cycle_local_to_window = 1
-        let g:buffergator_mru_cycle_loop = 0
-        let g:buffergator_sort_regime = "filepath"
-        let g:buffergator_split_size = 15
-        let g:buffergator_viewport_split_policy = "T"            
+        " To sync up my .ideavim and Vim muscle memory
+        autocmd FileType bufexplorer
+            \  map <buffer> <c-j> j
+            \| map <buffer> <c-k> k
+            \| map <buffer> <Esc> q
+
+        " For some reason, trying to map <Esc> in a NERDTree
+        " buffer creats all kinds of havoc.
+        autocmd FileType nerdtree
+            \  map <buffer> <c-j> j
+            \| map <buffer> <c-k> k
+
+        " BufExplorer kinda sucks... if you try and open it with
+        " no buffers open (excluding "No Name" buffers, whose name 
+        " is actually returned as "") it throws errors.
+        nnoremap <silent> <leader>b :call OpenBufExplorer()<cr>
+
+        function! OpenBufExplorer()
+            let l:bufNums = range(1, bufnr('$'))
+            let l:bufList = filter(l:bufNums, 'buflisted(v:val) && bufname(v:val) != ""')
+
+            if len(l:bufList) > 0
+                execute 'BufExplorerHorizontalSplit'
+            else
+                echo 'No buffers'
+            endif
+        endfunction
+
     " }}}
+
     
     " Fzf {{{
         function s:FzfProjectFiles(path, bang)
