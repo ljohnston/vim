@@ -76,6 +76,8 @@
         Plug 'tpope/vim-fugitive'
         Plug 'tpope/vim-surround'
 
+        Plug 'easymotion/vim-easymotion'
+
         Plug 'jlanzarotta/bufexplorer'
 
         Plug 'luochen1990/rainbow'
@@ -90,6 +92,7 @@
         Plug 'jiangmiao/auto-pairs'
 
         Plug 'vim-scripts/groovyindent-unix'
+        Plug 'udalov/kotlin-vim'
         Plug 'rodjek/vim-puppet'
         Plug 'markcornick/vim-terraform'
         Plug 'lmeijvogel/vim-yaml-helper'
@@ -902,6 +905,10 @@
 
     " }}}
 
+
+    " EasyMotion {{{
+        map s <Plug>(easymotion-prefix)
+    " }}}
     
     " Fzf {{{
         function s:FzfProjectFiles(path, bang)
