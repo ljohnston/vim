@@ -387,6 +387,44 @@
     endfunction
 " }}}
 
+" {{{ ConfirmQuit 
+
+    if has("gui_running")
+
+        " When completely quiting, present a confirm prompt.
+        " In VIM completely quiting means quiting the last
+        " open window.
+        
+        function! ConfirmQuit(writeFile)
+            if (a:writeFile)
+                if (expand("%")=="")
+                    echo "Can't save file with no name."
+                    return
+                endif
+                write
+            endif
+
+            if (winnr('$') > 1 || tabpagenr('$') > 1)
+                quit
+            elseif (confirm("Do you really want to quit?", "&Yes\n&No", 2)==1)
+                quit
+            endif
+        endfu
+
+        " We could map these keys via cnoremap, but then we end up
+        " creating the dreaded keyboard delay whenver they're typed.
+        " We would also have an issue where doing a search for any of
+        " the keys assigned (followed by a carriage return), would 
+        " try to search for 'silent call ConfirmQuit(?)' which is 
+        " totally " unnaccepatable. This little trick solves both 
+        " of those issues quite nicely.
+
+        cabbrev q  <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'silent call ConfirmQuit(0)' : 'q')<cr>
+        cabbrev wq <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'silent call ConfirmQuit(1)' : 'wq')<cr>
+        cabbrev x  <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'silent call ConfirmQuit(1)' : 'x')<cr>
+    endif
+" }}}
+
 " General {{{
     filetype plugin indent on
     syntax enable
