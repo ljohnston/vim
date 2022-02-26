@@ -86,7 +86,7 @@
         Plug 'ajh17/VimCompletesMe'
         Plug 'scrooloose/syntastic'
         Plug 'godlygeek/tabular'
-        Plug 'tomtom/tcomment_vim'
+        Plug 'tpope/vim-commentary'
         Plug 'tyru/open-browser.vim'
 
         Plug 'jiangmiao/auto-pairs'
