@@ -40,23 +40,23 @@
 " Debugging {{{
     " augroup vimrc_debug
     "     autocmd!
-    "     autocmd BufCreate   * unsilent echom('========== BufCreate:'   . expand('%') . ';winid:' . win_getid())
-    "     autocmd BufEnter    * unsilent echom('========== BufEnter:'    . expand('%') . ';winid:' . win_getid())
-    "     autocmd BufFilePre  * unsilent echom('========== BufFilePre:'  . expand('%') . ';winid:' . win_getid())
-    "     autocmd BufFilePost * unsilent echom('========== BufFilePost:' . expand('%') . ';winid:' . win_getid())
-    "     autocmd BufHidden   * unsilent echom('========== BufHidden:'   . expand('%') . ';winid:' . win_getid())
-    "     autocmd BufLeave    * unsilent echom('========== BufLeave:'    . expand('%') . ';winid:' . win_getid())
-    "     autocmd BufNew      * unsilent echom('========== BufNew:'      . expand('%') . ';winid:' . win_getid())
-    "     autocmd BufRead     * unsilent echom('========== BufRead:'     . expand('%') . ';winid:' . win_getid())
-    "     autocmd BufWinEnter * unsilent echom('========== BufWinEnter:' . expand('%') . ';winid:' . win_getid())
-    "     autocmd BufWinLeave * unsilent echom('========== BufWinLeave:' . expand('%') . ';winid:' . win_getid())
-    "     autocmd BufUnload   * unsilent echom('========== BufUnload:'   . expand('%') . ';winid:' . win_getid()) 
-    "     autocmd BufWipeout  * unsilent echom('========== BufWipeout:'  . expand('<abuf>') . ';winid:' . win_getid()) 
+    "     autocmd BufCreate   * unsilent echom('========== BufCreate:'   . expand('%')      . ';winid:' . win_getid() . ';filetype:' . &filetype . ':bufname(%)=' . bufname('%'))
+    "     autocmd BufEnter    * unsilent echom('========== BufEnter:'    . expand('%')      . ';winid:' . win_getid() . ';filetype:' . &filetype . ':bufname(%)=' . bufname('%'))
+    "     autocmd BufFilePre  * unsilent echom('========== BufFilePre:'  . expand('%')      . ';winid:' . win_getid() . ';filetype:' . &filetype . ':bufname(%)=' . bufname('%'))
+    "     autocmd BufFilePost * unsilent echom('========== BufFilePost:' . expand('%')      . ';winid:' . win_getid() . ';filetype:' . &filetype . ':bufname(%)=' . bufname('%'))
+    "     autocmd BufHidden   * unsilent echom('========== BufHidden:'   . expand('%')      . ';winid:' . win_getid() . ';filetype:' . &filetype . ':bufname(%)=' . bufname('%'))
+    "     autocmd BufLeave    * unsilent echom('========== BufLeave:'    . expand('%')      . ';winid:' . win_getid() . ';filetype:' . &filetype . ':bufname(%)=' . bufname('%'))
+    "     autocmd BufNew      * unsilent echom('========== BufNew:'      . expand('%')      . ';winid:' . win_getid() . ';filetype:' . &filetype . ':bufname(%)=' . bufname('%'))
+    "     autocmd BufRead     * unsilent echom('========== BufRead:'     . expand('%')      . ';winid:' . win_getid() . ';filetype:' . &filetype . ':bufname(%)=' . bufname('%'))
+    "     autocmd BufWinEnter * unsilent echom('========== BufWinEnter:' . expand('%')      . ';winid:' . win_getid() . ';filetype:' . &filetype . ':bufname(%)=' . bufname('%'))
+    "     autocmd BufWinLeave * unsilent echom('========== BufWinLeave:' . expand('%')      . ';winid:' . win_getid() . ';filetype:' . &filetype . ':bufname(%)=' . bufname('%'))
+    "     autocmd BufUnload   * unsilent echom('========== BufUnload:'   . expand('%')      . ';winid:' . win_getid() . ';filetype:' . &filetype . ':bufname(%)=' . bufname('%')) 
+    "     autocmd BufWipeout  * unsilent echom('========== BufWipeout:'  . expand('<abuf>') . ';winid:' . win_getid() . ';filetype:' . &filetype . ':bufname(%)=' . bufname('%')) 
     "     autocmd FileType    * unsilent echom('========== FileType:'    . expand('%')) 
     "     autocmd VimEnter    * unsilent echom('========== VimEnter:'    . expand('%'))
-    "     autocmd WinNew      * unsilent echom('========== WinNew:'      . expand('%') . ';winid:' . win_getid())
-    "     autocmd WinEnter    * unsilent echom('========== WinEnter:'    . expand('%') . ';winid:' . win_getid())
-    "     autocmd WinLeave    * unsilent echom('========== WinLeave:'    . expand('%') . ';winid:' . win_getid())
+    "     autocmd WinNew      * unsilent echom('========== WinNew:'      . expand('%')      . ';winid:' . win_getid() . ';filetype:' . &filetype . ':bufname(%)=' . bufname('%'))
+    "     autocmd WinEnter    * unsilent echom('========== WinEnter:'    . expand('%')      . ';winid:' . win_getid() . ';filetype:' . &filetype . ':bufname(%)=' . bufname('%'))
+    "     autocmd WinLeave    * unsilent echom('========== WinLeave:'    . expand('%')      . ';winid:' . win_getid() . ';filetype:' . &filetype . ':bufname(%)=' . bufname('%'))
     "     autocmd OptionSet   * unsilent echom('========== OptionSet:'   . expand('<amatch>'))
     " augroup END
 " }}}
@@ -64,8 +64,6 @@
 " Install Plugins {{{
     call plug#begin('~/.vim/plugged')
 
-        " Plug 'vim-airline/vim-airline'
-        " Plug 'vim-airline/vim-airline-themes'
         Plug 'flazz/vim-colorschemes'
         Plug 'itchyny/lightline.vim'
         
@@ -104,7 +102,7 @@
     endif
 " }}}
 
-" Altbuf Plugin {{{
+" Altbuf {{{
 
     " TODO (for a real plugin):
     " - check compatible
@@ -113,13 +111,15 @@
     
     " TODO (issues):
 
+    "
     " autocmd event notes
     " - We get a bdelete on a bwipeout
     " - Some plugins seem to do weird things with the events. For example,
     "   netrw fires a BufEnter event before the buffer has a name and then
-    "   files two (yes, two) BufDelete events. It isn't until the second
-    "   BufDelete that the buffer's filetype is correctly set to netrw. On the
-    "   BufEnter, buflisted=1.
+    "   fires two (yes, two) BufDelete events. It isn't until the second
+    "   BufDelete that the buffer's filetype is correctly set to netrw. 
+    "   On the BufEnter, buflisted=1.
+    "   
     
     command! -nargs=0 AltbufPrevious :call AltbufPrevious()
 
@@ -498,7 +498,7 @@
 
            if OSX()
                if !has('gui_vimr')
-                   set guifont=SourceCodeProForPowerline-Regular:h18
+                   set guifont=SourceCodeProForPowerline-Regular:h16
                    set columns=160
                    set lines=40
                endif
@@ -604,18 +604,44 @@
     " }}}
 " }}}
 
-" Keys {{{
-    " Some useful keymappig links:
+    "
+    " Some useful key mapping links:
     " - https://raddevon.com/articles/what-to-do-when-a-vim-keymap-doesnt-work/
-
+    "
+    " Some useful key mapping commands:
+    " - :help index - Shows keys mapped by vim
+    " - :map <key> - Show current mapping for <key>
+    " - :verbose map <key> - Show current mapping for <key> and where it was
+    "   set
+    "
+    " Several ctrl key combinations aren't recognized by vim. To test if a ctrl
+    " key is recognized:
+    " - Go to insert mode
+    " - Press ^v followed by desired ctrl key combination
+    " - If the corresponding ctrl character is entered the key is recognized
+    " - If only the key paired with the ctrl key is entered, the key is not
+    "   recognized
+    "
+    " Note also that several ctrl key combinations are overloaded as other
+    " keys (e.g. ctrl-h is backspace, ctrl-i is tab, etc.). This is fine if
+    " mapped in normal or visual modes. In insert mode, however, these keys
+    " either can't be mapped or can't be mapped without affecting the
+    " corresponding key. For example:
+    "
+    "   - ctrl-h can not be remapped in insert mode (it simply remains a
+    "     backspace)
+    "   - ctrl-i can be remapped in insert mode and behave as expected, but it
+    "     will remap the tab key to the same action.
+    "
+    
     let mapleader = "\<Space>"
     let g:mapleader = "\<Space>"
 
     :nnoremap <leader>ve :vsplit ~/.vimrc<cr>
 
-    noremap <leader>gs :Gstatus<cr>
-    noremap <leader>gb :Gblame<cr>
-    noremap <leader>gl :Glog<cr>
+    noremap <leader>gs :Git<cr>
+    noremap <leader>gb :Git blame<cr>
+    noremap <leader>gl :Git log<cr>
 
     noremap gyy :YamlGetFullPath<cr>
     noremap gyp :YamlGoToParent<cr>
@@ -635,12 +661,20 @@
 
     nnoremap < <l
     nnoremap > >l
+                     
+    " This is primarily to get the insert mode mappings, but
+    " might as well configure the same for insert and visual.
+    vnoremap <c-s>, <gv
+    vnoremap <c-s>. >gv
+    nnoremap <c-s>, <l
+    nnoremap <c-s>. >l
+    inoremap <c-s>, <c-o><l
+    inoremap <c-s>. <c-o>>l
 
     " Allow using the repeat operator with a visual selection (!)
     vnoremap . :normal .<CR>
 
     nnoremap Y y$
-    " }}
 
     " Use the black hole register to paste without overwriting the unnamed
     " register.
@@ -648,22 +682,26 @@
 
     " Overwrite current character with one from line above. NOTE that this ONLY
     " works with "virtualedit" equals "all". To do this right, we'd probably need a
-    " functiont that could save, set, restore vitualedit. And would (hopefully?) be
+    " function that could save, set, restore vitualedit. And would (hopefully?) be
     " more efficient (as this is VERY slow).
     " nnoremap <c-k> kyljv"0pl
     " inoremap <c-k> <esc>lkyljv"0pli
+    
+    " Insert a semi-colon at EOL.
+    nnoremap <expr> <c-s>; getline('.')[-1:] == ';' ? '' : 'mxA;<esc>`x'
+    inoremap <expr> <c-s>; getline('.')[-1:] == ';' ? '' : '<Esc>lmxA;<Esc>`xi'
 
     " Tab navigation.
     nnoremap <S-H> gT
     nnoremap <S-L> gt
 
     " Beginning / end of line.
-    nnoremap <c-h> ^
-    nnoremap <c-l> $
+    " nnoremap <c-h> ^
+    " nnoremap <c-l> $
 
     " These become useful when using an auto-close plugin.
-    inoremap <c-h> <c-o>h
-    inoremap <c-l> <c-o>l
+    " inoremap <c-h> <c-o>h
+    " inoremap <c-l> <c-o>l
 
     "
     " Command mode mappings.
@@ -695,7 +733,6 @@
     nnoremap <leader>W :wall<cr>
 
     " Delete buffer.
-    " nnoremap <c-q> :bdelete<cr>
     nnoremap <c-o> :bdelete<cr>
     
     " Goto previous buffer.
@@ -719,6 +756,13 @@
     nnoremap <C-\> :set cursorcolumn!<cr>
     imap <C-\> <C-o><C-\>
 
+    " open line below while in insert mode
+    imap <C-o> <C-o>o
+
+    " Delete to beginning of line and insert
+    nnoremap <C-c> cc
+    inoremap <C-c> <C-o>cc
+
     " <tab> to move to matching paren, bracket, etc.
     nnoremap <tab> %
     vnoremap <tab> %
@@ -741,36 +785,11 @@
     nnoremap <leader>e :execute 'edit' . getcwd()<cr>
 
     " fzf
+    nnoremap <leader>pf :FzfProjectFiles<cr> 
+    nnoremap <expr> <leader>ps IsInProject() ? ':FzfProjectRg<space>' : '' 
 
-    nnoremap <leader>r :Files<cr>
-    nnoremap <leader>R :Rg<space>
-
-    nnoremap <leader>p :FzfProjectFiles<cr>
-    nnoremap <expr> <leader>P IsInProject() ? ':FzfProjectRg<space>' : ''
-    
-    " vim-surround's default keys include 'ds'. I have lots of plugins with
-    " buffer-local key mappings that use 'd' (e.g. buffergator's delete
-    " buffer), and I don't want the associated key delay, so changing all
-    " surround keys to begin with 's'. <nowait> on the plugin's mapping (e.g.
-    " buffergator) would solve the problem, but key mapping for plugins aren't
-    " always customizable (again, buffergator).  Possible solution here: 
-    "
-    " https://github.com/tpope/vim-surround/issues/98#issuecomment-21426681 
-    "
-
-    let g:surround_no_mappings = 1
-    let g:surround_no_insert_mappings = 1
-
-    nmap sd  <Plug>Dsurround
-    nmap sc  <Plug>Csurround
-    nmap sC  <Plug>CSurround
-    nmap ss  <Plug>Ysurround
-    nmap sS  <Plug>YSurround
-    nmap sss <Plug>Yssurround
-    nmap ssS <Plug>YSsurround
-    xmap S   <Plug>VSurround
-    xmap sg  <Plug>VgSurround
-    
+    nnoremap <leader>rf :Files<cr>
+    nnoremap <leader>rs :Rg<space>
 " }}}
 
 " Autocommands {{{
@@ -820,13 +839,7 @@
     " }}}
 
     " .vimrc {{{
-        " reread .vimrc on save
-        " For some reason I don't understand, sourceing .vimrc causes lightline
-        " to lose it's colors (it's just white on black), We'll hack our way
-        " around this for now with this...
-        autocmd! BufWritePost .vimrc source % | :call lightline#enable()
-
-        " prevent our .vimrc modeline from closing all our folds on save
+        " prevent .vimrc modeline from closing all our folds on save
         autocmd! BufWritePre .vimrc setlocal nomodeline
     " }}}
 
@@ -970,12 +983,12 @@
 
         autocmd VimEnter * call NERDTreeAddKeyMap({
                \ 'key': 'q',
-               \ 'callback': 'NERDTreeClose',
+               \ 'callback': 'NERDTreeWipeout',
                \ 'quickhelpText': 'Close NERDTree buffer',
                \ 'scope': 'all',
                \ 'override' : 1})
 
-        function! NERDTreeClose()
+        function! NERDTreeWipeout()
             execute 'bwipeout' 
         endfunction
 
@@ -988,7 +1001,7 @@
 
         augroup explore
             autocmd!
-            autocmd BufEnter,BufWinEnter * call s:explore(expand('<amatch>'))
+            " autocmd BufEnter,BufWinEnter * call s:explore(expand('<amatch>'))
         augroup END
 
         function s:explore(path)
@@ -1029,11 +1042,13 @@
     
     " VimWiki {{{
         
-        " TODO: 'VimwikiIndex' should work here, but recently it's started
-        " randomly creating new 'index.wiki' files in the current working
-        " directory.
-        " nmap <leader>vw <Plug>VimwikiIndex
-        nmap <leader>vw :execute 'edit ~/vimwiki/index.wiki'<CR>
+        " TODO: I'd like to switch this over to markdown syntax with '.md'
+        " files, but that breaks things at the moment.
+        
+        nmap <leader>vw <Plug>VimwikiIndex
+        let g:vimwiki_list = [{'path': '~/vimwiki/'}]
+        " let g:vimwiki_list = [{'path': '~/vimwiki/',
+        "                       \ 'syntax': 'markdown', 'ext': '.md'}]
     
         " By default, vimwiki uses <leader>w... for a number of key mappings.
         " I user <leader>w for write and want to avoid the key delay. So...
