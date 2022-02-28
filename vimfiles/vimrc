@@ -645,6 +645,7 @@
     " }}}
 " }}}
 
+" {{{ Key Mappings
     "
     " Some useful key mapping links:
     " - https://raddevon.com/articles/what-to-do-when-a-vim-keymap-doesnt-work/
