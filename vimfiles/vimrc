@@ -97,7 +97,7 @@
         Plug 'udalov/kotlin-vim'
         Plug 'rodjek/vim-puppet'
         Plug 'markcornick/vim-terraform'
-        Plug 'lmeijvogel/vim-yaml-helper'
+        Plug 'Einenlum/yaml-revealer'
         
         Plug 'vimwiki/vimwiki', { 'tag': 'v2.5' }
     call plug#end()
@@ -243,10 +243,10 @@
 
     "
     " There is no such thing as a WinDelete event, so the active window still
-    " exists when we get the leave event, so the window that triggered this
-    " event won't be removed from the Altbuf state. Any other windows that are
-    " no longer active, however, will. This is just taking advantage of an
-    " opportunity to keep our state as accurate as possible.
+    " exists when we get the leave event. As a result, the window that
+    " triggered this event won't be removed from the Altbuf state. Any other
+    " windows that are no longer active, however, will. This is just taking
+    " advantage of an opportunity to keep our state as accurate as possible.
     "
     function! s:AltbufWinLeave()
         call s:AltbufDebugMsg('altbufWinLeave:@%=' . @%)
@@ -649,8 +649,8 @@
     noremap <leader>gb :Git blame<cr>
     noremap <leader>gl :Git log<cr>
 
-    noremap gyy :YamlGetFullPath<cr>
-    noremap gyp :YamlGoToParent<cr>
+    " noremap gyy :YamlGetFullPath<cr>
+    " noremap gyp :YamlGoToParent<cr>
 
     " Wrapped lines goes down/up to next row, rather than next line in file.
     noremap j gj
