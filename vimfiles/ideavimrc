@@ -53,6 +53,8 @@ nmap <Leader>s <Action>(OpenProjectWindows)
 " mnemonic here is "open projects"
 nmap <Leader>o <Action>(ManageRecentProjects)
 
+nmap <Leader>vv :action Tool_External Tools_mvim<CR>
+
 " It's not AltBuf, but in IntelliJ, I think it'll do.
 nmap <Leader><Leader> :b#<CR>
 
@@ -104,6 +106,7 @@ nmap ,qo <Action>(CloseAllEditorsButActive)
 nmap ,qp <Action>(CloseProject)
 nmap ,qr <Action>(CloseAllToTheRight)
 nmap ,qu <Action>(CloseAllUnpinnedEditors)
+nmap ,ql <Action>(HideActiveWindow)
 
 " This will close a git diff tab (and ???)
 nmap ,qc <Action>(CloseContent)
