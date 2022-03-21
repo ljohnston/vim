@@ -83,7 +83,8 @@
         Plug 'jlanzarotta/bufexplorer'
 
         Plug 'luochen1990/rainbow'
-        Plug 'mtth/scratch.vim'
+        " Plug 'mtth/scratch.vim'
+        Plug 'ljohnston/scratch.vim'
         " Plug 'ervandew/supertab'
         Plug 'ajh17/VimCompletesMe'
         Plug 'scrooloose/syntastic'
@@ -878,17 +879,12 @@
         let g:bufExplorerSplitBelow=0
         let g:bufExplorerSplitHorzSize=15
 
-        " To sync up my .ideavim and Vim muscle memory
+        " My IntelliJ buffer switcher uses <c-j>, <c-k>, etc. so I don't
+        " have to use arrow keys. This creates same behavior here.
         autocmd FileType bufexplorer
             \  map <buffer> <c-j> j
             \| map <buffer> <c-k> k
             \| map <buffer> <Esc> q
-
-        " For some reason, trying to map <Esc> in a NERDTree
-        " buffer creats all kinds of havoc.
-        autocmd FileType nerdtree
-            \  map <buffer> <c-j> j
-            \| map <buffer> <c-k> k
 
         " BufExplorer kinda sucks... if you try and open it with
         " no buffers open (excluding "No Name" buffers, whose name 
@@ -1000,6 +996,13 @@
         let g:NERDTreeMapToggleFilters=v:null
         let g:NERDTreeMapToggleZoom=v:null
 
+        " My ideavim "nerdtree" uses <c-j>, <c-k>, etc. so I don't
+        " have to use arrow keys. This creates same behavior here.
+        autocmd FileType nerdtree
+            \  map <buffer> <c-j> j
+            \| map <buffer> <c-k> k
+            \| map <buffer> <Esc> q
+
         "
         " Need to hook into both open and close to make sure the NERDTree
         " buffers are getting wiped out. The OpenNode mapping also ensures that
@@ -1062,9 +1065,13 @@
     " }}}
 
     " Scratch {{{
-        " let g:scratch_height = 0.4
-        " let g:scratch_autohide = 0
-        " let g:scratch_insert_autohide = 0
+        let g:scratch_no_mappings = 1
+        nmap gs :<c-u>call scratch#open(0)<cr>
+        xmap gs <plug>(scratch-selection-reuse)<cr>
+
+        let g:scratch_height = 0.3
+        let g:scratch_autohide = 0
+        let g:scratch_insert_autohide = 0
         let g:scratch_persistence_file=$HOME . '/.scratch.vim'
     " }}}
 
