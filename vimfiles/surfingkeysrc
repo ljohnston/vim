@@ -129,6 +129,9 @@ settings.tabsMRUOrder = false;
 // Doesn't seem to work (at least in Vivaldi, which has prefrences for where to open new tabs).
 settings.newTabPosition = 'right';
 
+// Focus candidates in omnibar
+settings.focusFirstCandidate = true
+
 // Surfingkeys internally maintains a tab order and maps the following keys to
 // navigate based on that order (search default mappings for 'historyTab').
 api.unmap('F');
