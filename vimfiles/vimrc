@@ -479,7 +479,7 @@
     " Strip trailing whitespace from these files.
     augroup whitespace
         autocmd!
-        autocmd FileType groovy,java,python,puppet,ruby,terraform 
+        autocmd FileType groovy,java,kotlin,python,puppet,ruby,scala,sh,terraform,yaml
             \ autocmd BufWritePre <buffer> %s/\s\+$//e
     augroup END
 " }}}
