@@ -29,7 +29,7 @@ Surfingkeys is a (awesome!) Vim extension for Chrome and Firefox. In Chrome, it
 can support an external file for specifying configuration, much like a .vimrc
 file. Getting this to work, however, is not entirely straighforward.
 
-#### Chrome
+#### Chrome/Vivaldi
 
     - Install Surfingkeys.
     - Permissions:
@@ -72,7 +72,7 @@ won't work. That makes the mapping of browser-level key shortcuts rather
 important. Ideally, we'd like to set the browser-level shortcuts to match the
 Surfingkeys mappings, so that even if we're on a page where Surfingkeys can't
 operate, we still have at least some of the same mappings available (e.g. close
-the current tab, or navigate history).
+the current tab, or fwd/bkwd history).
 
 Unfortunately, on OS X, neither Chrome or Firefox offer extensive key mapping
 capabilities. As a result, I tend to prefer alternative browsers that _do_
@@ -80,16 +80,11 @@ support custom key mappings (and Surfingkeys). Vivaldi to the rescue... it
 supports all kinds of custom key mappings. Refer to comments in
 vimfiles/surfingkeysrc in this repo for key mapping details.
 
-### eclim
-
-If this vim needs eclim (and what doesn't?), that has to be installed
-separately. See TODOs below for more info.
-
 ### Vimballs
 
 There don't seem to be a lot of plugins that are distributed as vimballs, but
-some, including netrw which always seems to be introducing and fixing bugs. We
-can install a vimball as follows:
+there are a few, including netrw which always seems to be introducing and
+fixing bugs. We can install a vimball as follows:
 
 $ vim somevimball.vba[.gz]
 :so %
@@ -106,32 +101,3 @@ following:
 $ vim -c 'so %' -c 'q' vimballs/netrw.vba.gz
 
 ## TODO
-
-- Automate eclim install. This is non-trivial but via some command-line
-calls to wget to get the right eclim jar, java to execute it, etc. we
-can do it. By default, eclim, runs a gui installer, that, in addition
-to installing the eclim vim plugin, will make sure eclipse dependencies
-are satisfied. The eclim installer can be run in an automated fashion,
-but then it doesn't install the eclipse stuff. Which I think we can
-simply do separately.
-
-Seems possbile we can even automate the eclipse install, however, via 
-something like the following:
-
-  ```
-  $ java -Xmx256m -XX:MaxPermSize=128m \
-        -Dhttp.nonProxyHosts=local|*.local|169.254/16|*.169.254/16 \
-        -jar /Applications/eclipse/plugins/org.eclipse.equinox.launcher_1.3.0.v20140415-2008.jar \
-        -clean -application org.eclipse.equinox.p2.director \
-        -repository file:///var/folders/61/nffj87kj3tl3k6f6j58wt6dckc09k1/T/formic_73396882/update \
-        -uninstallIU org.eclim.installer.feature.group
-  ```
-
-I got the above from the console after running the gui installer.
-Seems it would take some serious doin', however, to figure out what to
-install and what the actual arguments in something like the above
-would need to be.
-
-This definitely looks doable. See here:  http://eclim.org/install.html#installer-automated
-
-- Automate vimball installs? Not sure about that one...
