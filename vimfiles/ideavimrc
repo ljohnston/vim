@@ -108,6 +108,11 @@ nmap ,qr <Action>(CloseAllToTheRight)
 nmap ,qu <Action>(CloseAllUnpinnedEditors)
 nmap ,ql <Action>(HideActiveWindow)
 
+" mnemonic here is "close non-project" editors
+" While I suppose you could have readonly project files, 
+" this is as close as I could get to what I was after.
+nmap ,qn <Action>(CloseAllReadonly)
+
 " This will close a git diff tab (and ???)
 nmap ,qc <Action>(CloseContent)
 
@@ -136,11 +141,11 @@ nmap ,rf <Action>(RerunFailedTests)
 
 nmap ,db <Action>(ToggleLineBreakpoint)
 nmap ,dc <Action>(DebugClass)
-nmap ,dd <Action>(Debug)
 nmap ,de <Action>(ToggleBreakpointEnabled)
 nmap ,dm <Action>(DebugMainMenu)
 nmap ,dr <Action>(Resume)
 nmap ,ds <Action>(Stop)<Action>(Stop)
+nmap ,dv <Action>(ViewBreakpoints)
 nmap ,dx <Action>(EvaluateExpression)
 
 nmap ,si <Action>(StepInto)
