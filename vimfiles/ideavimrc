@@ -90,11 +90,12 @@ nmap <c-s><ctrl-.> >l
 imap <c-s><ctrl-,> <c-o><l
 imap <c-s><ctrl-.> <c-o>>l
 
-" This actually toggles hiding all tool windows (i.e. maximizing the editor)
+" This toggles hiding all tool windows (i.e. maximizing the editor)
 nmap ,e <Action>(HideAllWindows)
 
 nmap ,b <Action>(BuildMenu)
 nmap ,f <Action>(ShowIntentionActions)
+nmap ,l <Action>(RestoreDefaultLayout)
 nmap ,o <Action>(OpenFile)
 
 " This actually toggles the pin

@@ -117,6 +117,9 @@ api.mapkey('sU', '#4Edit current URL with vim editor, and open in new tab', func
 });
 // }}
 
+// Don't focus any input text boxes on page load.
+settings.stealFocusOnLoad = true
+
 // Default is 'center'.
 settings.hintAlign = 'left';
 
