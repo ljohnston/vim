@@ -30,18 +30,18 @@ install_vimplug() {
 
 
 install_dotfiles() {
-    
+
     #
     # Link up ~/.vimrc to vimfiles/vimrc in the project.
     # If it already exists as a link, we'll delete it and recreate it.
-    # If it already exists and is not a link, we'll leave it, causing the 
+    # If it already exists and is not a link, we'll leave it, causing the
     # subsequent link creation to fail (with an error message we'll want
     # to see).
     #
-    
+
     [ -L ~/.vimrc ] && rm ~/.vimrc
     ln -s $VIM_DIR/vimfiles/vimrc ~/.vimrc
-    
+
     [ -L ~/.ideavimrc ] && rm ~/.ideavimrc
     ln -s $VIM_DIR/vimfiles/ideavimrc ~/.ideavimrc
 
@@ -49,17 +49,13 @@ install_dotfiles() {
     [ -d ~/.config/nvim ] || mkdir -p ~/.config/nvim
     [ -L ~/.config/nvim/init.vim ] && rm ~/.config/nvim/init.vim
     ln -s $VIM_DIR/vimfiles/init.vim ~/.config/nvim/init.vim
-    
-    # Vrapper is the eclipse vim plugin
-    [ -L ~/.vrapperrc ] && rm ~/.vrapperrc
-    ln -s $VIM_DIR/vimfiles/vrapperrc ~/.vrapperrc
 }
 
 
 install_surfingkeysrc() {
     # If we want to support local Surfingkeys config, we need to resort to some
     # fairly ugly hackery.
-    
+
     [ -L ~/.surfingkeysrc ] && rm ~/.surfingkeysrc
 
     if [ -e ~/.surfingkeysrc.local ]; then
@@ -77,9 +73,9 @@ install_surfingkeysrc() {
 
 
 install_plugins() {
-    # g:plugin_install=1 will cause .vimrc to stop processing 
+    # g:plugin_install=1 will cause .vimrc to stop processing
     # after the plugins are installed.
-    vim --not-a-term --cmd "let g:plugin_install=1" +PlugInstall +qall 
+    vim --not-a-term --cmd "let g:plugin_install=1" +PlugInstall +qall
 }
 
 
@@ -104,7 +100,7 @@ VIM_DIR="$( cd $SCRIPT_DIR/.. && pwd )"
 # This must match what's in .vimrc's plug#begin().
 PLUGIN_DIR="${VIM_DIR}/plugged"
 
-case "$1" in 
+case "$1" in
     install)
         install
         ;;
