@@ -51,10 +51,10 @@
 //
 //     - ... Page (page focus)
 //
-//       Shift-Cmd-K: Focus Address Bar/Field
+//       Shift-Cmd-K: Focus Address Field
 //       Shift-Cmd-J: Focus Page
-//       H (Shift-h): Backward history
-//       L (Shift-l): Forward history
+//       H (Shift-h): History Back
+//       L (Shift-l): History Forward
 //
 //     - ... Tab (to match Surfingkeys)
 //
