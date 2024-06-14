@@ -69,7 +69,7 @@
         Plug 'flazz/vim-colorschemes'
         Plug 'itchyny/lightline.vim'
         
-        Plug 'preservim/nerdtree', { 'tag': '6.9.9' }
+        Plug 'preservim/nerdtree', { 'tag': '6.10.16' }
 
         Plug '/usr/local/opt/fzf'
         Plug 'junegunn/fzf.vim'
@@ -86,7 +86,7 @@
         " Plug 'mtth/scratch.vim'
         Plug 'ljohnston/scratch.vim'
         " Plug 'ervandew/supertab'
-        Plug 'ajh17/VimCompletesMe'
+        Plug 'vim-scripts/VimCompletesMe'
         Plug 'scrooloose/syntastic'
         Plug 'godlygeek/tabular'
         Plug 'tpope/vim-commentary'
@@ -97,10 +97,10 @@
         Plug 'vim-scripts/groovyindent-unix'
         Plug 'udalov/kotlin-vim'
         Plug 'rodjek/vim-puppet'
-        Plug 'markcornick/vim-terraform'
+        Plug 'hashivim/vim-terraform'
         Plug 'Einenlum/yaml-revealer'
         
-        Plug 'vimwiki/vimwiki', { 'tag': 'v2.5' }
+        Plug 'vimwiki/vimwiki', { 'tag': 'v2023.04.04_1' }
     call plug#end()
 
     if exists("g:plugin_install") && g:plugin_install == 1 
@@ -781,6 +781,8 @@
     " Turn current highlight off.
     nnoremap <silent> <leader>/ :noh<cr>
 
+    " nnoremap <leader>h i/* ----------------  ---------------- */<esc><b><b>i
+
     " Search for my section headers.
     nnoremap <leader>s /^.*-\{40,80}\n^.*\[.*\]\s*\_.\{-}-\{40,80}\s*$<cr>
 
@@ -960,10 +962,10 @@
         \   'colorscheme': 'PaperColor',
         \   'active': {
         \     'left': [ [ 'mode', 'paste' ],
-        \               [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+        \               [ 'fugitivestatus', 'readonly', 'filename', 'modified' ] ]
         \   },
         \   'component_function': {
-        \     'gitbranch': 'fugitive#head'
+        \     'fugitivestatus': 'FugitiveStatusline'
         \   },
 		\   'component': {
 		\     'lineinfo': '%3l:%-2v',

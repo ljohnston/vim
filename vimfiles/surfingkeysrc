@@ -60,9 +60,17 @@
 //
 //       Ctrl-o: Close Tab
 //
+//     - ... Window
+//
+//       Remove ^. from "break mode" (we assign this key to 'g0')
+//
 
 // Close current tab (configure in browser).
 api.map('<Ctrl-o>', 'x');
+
+// Go to first tab.
+// In 
+api.map('<Ctrl-.>', 'g0');
 
 // Forward/backward history (configure in browser).
 api.map('H', 'S');
@@ -92,12 +100,20 @@ api.map('o', 'go');
 // No prefix will cause it to show up in the 'Misc' section.
 //
 
-api.mapkey('gh', "Open google in the current tab", function() {
-    window.location.href = 'https://google.com';
+// api.mapkey('gh', "Open google in the current tab", function() {
+//     window.location.href = 'https://google.com';
+// });
+// 
+// api.mapkey('gH', 'Open google in a new tab', function() {
+//     api.tabOpenLink('https://google.com');
+// });
+
+api.mapkey('gh', "Open brave in the current tab", function() {
+    window.location.href = 'https://search.brave.com';
 });
 
-api.mapkey('gH', 'Open google in a new tab', function() {
-    api.tabOpenLink('https://google.com');
+api.mapkey('gH', 'Open brave in a new tab', function() {
+    api.tabOpenLink('https://search.brave.com');
 });
 
 // Flip flop the 'su' and 'sU' mappings. {{

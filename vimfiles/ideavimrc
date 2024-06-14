@@ -29,34 +29,44 @@ unmap <Leader>rs
 " Action descriptions can be found here:  https://bit.ly/3mzJpDA
 "
 
+" Can't map <c-cr> in vim, but we can in IdeaVim.
+map <c-cr> <Action>(Console.Jdbc.Execute)
+
 " SelectInProjectView is a much better experience than
 " NERDTreeFocus or some other fake "NERDTree" behavior
 " as it focuses the tree on the file currently open in
 " the editor.
 nmap <Leader>e <Action>(SelectInProjectView)
 
+" Switcher shows open buffers.
+nmap <Leader>b <Action>(Switcher)
+nmap <Leader>r <Action>(RecentFiles)
+nmap <Leader>f <Action>(FileStructurePopup)
+
+nmap <Leader>c <Action>(ChooseRunConfiguration)
+
 nmap <Leader>gb <Action>(Annotate)
 nmap <Leader>gm <Action>(Git.Menu)
 nmap <Leader>gs <Action>(ActivateCommitToolWindow)
 
-nmap <Leader>pc <Action>(GotoClass) 
+" Search in project maps.
+nmap <Leader>pc <Action>(GotoClass)         
 nmap <Leader>pf <Action>(GotoFile) 
 nmap <Leader>ps <Action>(FindInPath) 
 
-" Switcher shows open buffers.
-nmap <Leader>b <Action>(Switcher)
-nmap <Leader>r <Action>(RecentFiles)
+" Open project.
+nmap <Leader>po <Action>(ManageRecentProjects)
 
-" mnemonic here is "switch projects"
-nmap <Leader>s <Action>(OpenProjectWindows)
-
-" mnemonic here is "open projects"
-nmap <Leader>o <Action>(ManageRecentProjects)
+" Switch projects.
+nmap <Leader>pp <Action>(OpenProjectWindows)
 
 nmap <Leader>vv :action Tool_External Tools_mvim<CR>
 
 " It's not AltBuf, but in IntelliJ, I think it'll do.
 nmap <Leader><Leader> :b#<CR>
+
+nmap <Leader>dn <Action>(NextDiff)
+nmap <Leader>dp <Action>(PreviousDiff)
 
 " For some reason, using <Action>(...) ends up moving the 
 " cursor one character forward after the action is complete. 
@@ -66,8 +76,6 @@ nmap <Leader><Leader> :b#<CR>
 " :action ... works around this.
 nmap zc :action CollapseRegion<CR>
 nmap zo :action ExpandRegion<CR>
-
-nmap <Leader>c <Action>(ChooseRunConfiguration)
 
 nmap <s-h> <Action>(Back)
 nmap <s-l> <Action>(Forward)
@@ -90,18 +98,24 @@ nmap <c-s><ctrl-.> >l
 imap <c-s><ctrl-,> <c-o><l
 imap <c-s><ctrl-.> <c-o>>l
 
-" This toggles hiding all tool windows (i.e. maximizing the editor)
-nmap ,e <Action>(HideAllWindows)
-
 nmap ,b <Action>(BuildMenu)
 nmap ,f <Action>(ShowIntentionActions)
 nmap ,l <Action>(RestoreDefaultLayout)
-nmap ,o <Action>(OpenFile)
 
-" This actually toggles the pin
+" I also have the following configuration in IntelliJ:
+" - Advanced Settings > Editor Tabs > Keep pinned tabs on the left
+" - Keymap > Other > Tabs > Select Tab #1 mapped to ^.
+"   There is an "action" for this in IdeaVim so ideally
+"   I wouldn't have to set it in IntelliJ config, but it 
+"   doesn't work.
 nmap ,p <Action>(PinActiveEditorTab)
 
-" ,qX here because I want ,cX for code actions
+nmap ,ee <Action>(HideAllWindows)
+nmap ,ev <Action>(SplitVertically)
+nmap ,eh <Action>(SplitHorizontally)
+nmap ,eu <Action>(Unsplit)
+
+" ,q? (quit?) here as I want ,c? (close?) for code actions
 nmap ,qa <Action>(CloseAllEditors)
 nmap ,qo <Action>(CloseAllEditorsButActive)
 nmap ,qp <Action>(CloseProject)
@@ -109,7 +123,7 @@ nmap ,qr <Action>(CloseAllToTheRight)
 nmap ,qu <Action>(CloseAllUnpinnedEditors)
 nmap ,ql <Action>(HideActiveWindow)
 
-" mnemonic here is "close non-project" editors
+" mnemonic here is "quit non-project" editors
 " While I suppose you could have readonly project files, 
 " this is as close as I could get to what I was after.
 nmap ,qn <Action>(CloseAllReadonly)
@@ -126,10 +140,10 @@ nmap ,cr <Action>(RefactoringMenu)
 nmap ,cg <Action>(Generate)
 
 nmap ,gd <Action>(GotoDeclarationOnly)
-nmap ,gf <Action>(FileStructurePopup)
 nmap ,gi <Action>(GotoImplementation)
 nmap ,gs <Action>(GotoSuperMethod)
-nmap ,gu <Action>(FindUsages)
+nmap ,gu <Action>(ShowUsages)
+nmap ,gU <Action>(FindUsages)
 
 nmap ,rc <Action>(RunClass)
 nmap ,rm <Action>(RunMenu)
@@ -148,6 +162,7 @@ nmap ,dr <Action>(Resume)
 nmap ,ds <Action>(Stop)<Action>(Stop)
 nmap ,dv <Action>(ViewBreakpoints)
 nmap ,dx <Action>(EvaluateExpression)
+nmap ,d. <Action>(ShowExecutionPoint)
 
 nmap ,si <Action>(StepInto)
 nmap ,so <Action>(StepOver)
@@ -159,8 +174,13 @@ nmap ,tc <Action>(ActivateCommitToolWindow)
 nmap ,td <Action>(ActivateDebugToolWindow)
 nmap ,tf <Action>(ActivateFindToolWindow)
 nmap ,tg <Action>(ActivateGradleToolWindow)
-nmap ,tl <Action>(JumpToLastWindow)
 nmap ,tp <Action>(ActivateProblemsViewToolWindow)
 nmap ,tr <Action>(ActivateRunToolWindow)
+nmap ,ts <Action>(ActivateServicesToolWindow)
 nmap ,tt <Action>(ActivateTerminalToolWindow)
 nmap ,tv <Action>(ActivateVersionControlToolWindow)
+
+" with ,td already mapped, mnemonic here: j = jdbc
+nmap ,tj <Action>(ActivateDatabaseToolWindow)
+
+nmap ,tl <Action>(JumpToLastWindow)
