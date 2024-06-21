@@ -108,12 +108,12 @@ api.map('o', 'go');
 //     api.tabOpenLink('https://google.com');
 // });
 
-api.mapkey('gh', "Open brave in the current tab", function() {
-    window.location.href = 'https://search.brave.com';
+api.mapkey('gh', "Open google in the current tab", function() {
+    window.location.href = 'https://google.com';
 });
 
-api.mapkey('gH', 'Open brave in a new tab', function() {
-    api.tabOpenLink('https://search.brave.com');
+api.mapkey('gH', 'Open google in a new tab', function() {
+    api.tabOpenLink('https://google.com');
 });
 
 // Flip flop the 'su' and 'sU' mappings. {{
