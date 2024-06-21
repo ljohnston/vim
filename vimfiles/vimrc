@@ -71,8 +71,14 @@
         
         Plug 'preservim/nerdtree', { 'tag': '6.10.16' }
 
-        Plug '/usr/local/opt/fzf'
         Plug 'junegunn/fzf.vim'
+        if !empty(glob('/usr/local/opt/fzf'))
+            echom("intel")
+            Plug '/usr/local/opt/fzf'
+        elseif !empty(glob('/opt/homebrew/opt/fzf'))
+            echom("silicon")
+            Plug '/opt/homebrew/opt/fzf'
+        endif
 
         Plug 'tpope/vim-abolish'
         Plug 'tpope/vim-fugitive'
