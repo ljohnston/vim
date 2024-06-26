@@ -72,11 +72,12 @@
         Plug 'preservim/nerdtree', { 'tag': '6.10.16' }
 
         Plug 'junegunn/fzf.vim'
+
+        " Brew-managed installations go to different locations
+        " depending on intel vs apple silicon architecture.
         if !empty(glob('/usr/local/opt/fzf'))
-            echom("intel")
             Plug '/usr/local/opt/fzf'
         elseif !empty(glob('/opt/homebrew/opt/fzf'))
-            echom("silicon")
             Plug '/opt/homebrew/opt/fzf'
         endif
 
@@ -751,14 +752,16 @@
     " Goto previous buffer.
     nnoremap <silent> <leader><leader> :AltbufPrevious<cr>
 
+    " Location window.
+    nnoremap <leader>lo :lopen<cr>
+    nnoremap <leader>ln :lnext<cr>
+    nnoremap <leader>lp :lprev<cr>
+
+
     " Ideally, used in split window with desired diff buffers open.
     nnoremap <leader>dt :windo diffthis<CR>
     nnoremap <leader>do :windo diffoff<CR>
     nnoremap <leader>du :diffupdate<CR>
-
-    " Build with gradle.
-    " nnoremap <leader>gb :compiler gradlew<CR> :make compile<CR>
-    " nnoremap <leader>gt :compiler gradlew<CR> :make test<CR>
 
     "
     " <C-o> instead of <esc> to reduce side-effects. More here:
@@ -1094,14 +1097,19 @@
     " }}}
     
     " VimWiki {{{
-        
-        " TODO: I'd like to switch this over to markdown syntax with '.md'
-        " files, but that breaks things at the moment.
-        
-        nmap <leader>vw <Plug>VimwikiIndex
-        let g:vimwiki_list = [{'path': '~/vimwiki/'}]
-        " let g:vimwiki_list = [{'path': '~/vimwiki/',
-        "                       \ 'syntax': 'markdown', 'ext': '.md'}]
+        if !empty(glob('~/vimwiki/work'))
+            let g:vimwiki_list = [
+                \ {'path': '~/vimwiki/personal', 'syntax': 'markdown', 'ext': '.md'},
+                \ {'path': '~/vimwiki/work', 'syntax': 'markdown', 'ext': '.md'}]
+            nmap <leader>vwp 1<Plug>VimwikiIndex
+            nmap <leader>vww 2<Plug>VimwikiIndex
+        else
+            let g:vimwiki_list = [
+                \ {'path': '~/vimwiki/personal', 'syntax': 'markdown', 'ext': '.md'}]
+            nmap <leader>vw <Plug>VimwikiIndex
+        endif
+
+        nmap <leader>vws :VimwikiSearch<space>
     
         " By default, vimwiki uses <leader>w... for a number of key mappings.
         " I user <leader>w for write and want to avoid the key delay. So...
